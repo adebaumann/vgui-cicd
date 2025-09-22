@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Vorgaben Informatiksicherheit BIT</h1>
-<h2>Standards</h2>
+<h2>Aktuell erfasste Standards</h2>
 <ul>
     {% for standard in standards %}
-    <li>{{ standard }}</li>
+    <li><a href="{% url 'standard_detail' nummer=standard.nummer %}">{{ standard }}</a></li>
     {% endfor %}
 </ul>
 {% endblock %}
