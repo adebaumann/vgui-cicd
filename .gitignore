@@ -1,6 +1,6 @@
 r0126.txt
 __pycache__/
-*.pyc
+**/*.pyc
 lib/
 lib64
 bin/
