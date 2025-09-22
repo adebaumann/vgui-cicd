@@ -1,0 +1,14 @@
+.nested-inline h3 {
+    background-color: #f3f3f3;
+    border-bottom: 1px solid #ccc;
+    padding: 0.4em;
+    margin: 0;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .nested-inline fieldset.module {
+    margin-bottom: 1em;
+    border: 1px solid #ccc;
+    padding: 0;
+  }

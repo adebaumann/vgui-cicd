@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Stichworte{% endblock %}
+{% block content %}
+<h1>Stichworte</h1>
+
+  {% for Anfang, Worte in stichworte.items %}
+    <h2>{{ Anfang }}</h2>
+    <ul>
+      {% for Wort in Worte %}
+      <li><a href="{% url 'stichwort_detail' stichwort=Wort %}">{{ Wort }}</a></li>
+      {% endfor %}
+      </ul>
+    {% endfor %}
+ {% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Referenzen</h1>
+
+<div>
+{% load mptt_tags %}
+<ul class="tree">
+    {% recursetree referenzen %}
+        <li>
+            <a href="{{node.id}}">{{ node.name_nummer }}{% if node.name_text %} ({{node.name_text}}){% endif %}</a>
+            {% if not node.is_leaf_node %}
+                <ul class="children">
+                    {{ children }}
+                </ul>
+            {% endif %}
+        </li>
+    {% endrecursetree %}
+</ul>
+</div>
+{% endblock %}

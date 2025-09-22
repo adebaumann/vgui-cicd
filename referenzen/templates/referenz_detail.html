@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load mptt_tags %}
+{% block content %}
+<h1><a href="../{{ referenz.ParentID }}">⭡</a>{{ referenz.Path }}</h1>
+{% if referenz.erklaerung %}
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center bg-secondary text-light">
+      <h3 class="h5 m-0">Beschreibung</h3>
+      {% if referenz.url %}
+      <span class="badge bg-light text-black">
+        <a href="{{ referenz.url }}">Link</a>
+      </span>{% endif %}
+    </div>
+
+    <div class="card-body p-2">
+        {% for typ, html in referenz.erklaerung %}
+        {% if html %}<div>{{ html|safe }}</div>{% endif %}{% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+ <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center bg-secondary text-light">
+      <h3 class="h5 m-0">Referenzierte Vorgaben</h3>
+    </div>
+
+    <div class="card-body p-2">
+      {% recursetree referenz.children %}
+            {% if not node == referenz %}
+                {#<a href="../{{node.id}}">#}
+                    {{ node.Path }}
+                {#</a>#}
+            {% else %}
+                {{ node.Path }}
+            {% endif %}
+        <br>
+            {% if node.referenziertvon %}
+                <ul>
+                {% for ref in node.referenziertvon %}
+                    <li><a href="{% url 'standard_detail' nummer=ref.dokument.nummer %}#{{ref.Vorgabennummer}}">{{ref}}</a></li>
+                {% endfor %}
+                </ul>
+                <br>
+            {% endif %}
+            {% if not node.is_leaf_node %}
+                {{ children }}
+            {% endif %}
+    {% endrecursetree %}
+    </div>
+  </div>
+{% endblock %}

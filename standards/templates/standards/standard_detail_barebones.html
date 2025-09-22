@@ -1,0 +1,35 @@
+<h1>{{ standard.nummer }} – {{ standard.name }}</h1>
+
+<p><strong>Autoren:</strong> {{ standard.autoren.all|join:", " }}</p>
+<p><strong>Prüfende:</strong> {{ standard.pruefende.all|join:", " }}</p>
+<p><strong>Gültigkeit:</strong> {{ standard.gueltigkeit_von }} bis {{ standard.gueltigkeit_bis }}</p>
+
+{% if standard.geltungsbereich_html %}
+<h2>Geltungsbereich</h2>
+{% for typ, html in standard.geltungsbereich_html %}
+<div>{{ html|safe }}</div>
+{% endfor %}
+{% endif %}
+
+
+<h2>Vorgaben</h2>
+{% for vorgabe in vorgaben %}
+  <h3>{{ vorgabe.Vorgabennummer }} – {{ vorgabe.titel }}</h3>
+  {% if vorgabe.referenzpfade %}
+  <h4>Referenzen:</h4>
+  {% endif %}
+  {% for ref in vorgabe.referenzpfade %}
+  {{ref | safe}}<br>
+  {% empty %}
+  Keine Referenzen angegeben
+  {% endfor %}
+  {# <h4>Kurztext</h4> #}
+  {% for typ, html in vorgabe.kurztext_html %}
+  {% if html %}<div>{{ html|safe }}</div>{% endif %}
+  {% endfor %}
+
+  <h4>Langtext</h4>
+  {% for typ, html in vorgabe.langtext_html %}
+  {% if html %}<div>{{ html|safe }}</div>{% endif %}
+  {% endfor %}
+{% endfor %}

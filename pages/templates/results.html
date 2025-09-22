@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load page_extras %}
+{% block content %}
+<h1 class="mb-4">Suchresultate für {{ suchbegriff }}</h1>
+{% if resultat.geltungsbereich %}
+<h2>Standards mit "{{suchbegriff}}" im Geltungsbereich</h2>
+{% for standard,geltungsbereich in resultat.geltungsbereich.items %}
+<h4>{{ standard }}</h4>
+{% for typ, html in geltungsbereich %}
+<div>{{ html|highlighttext:suchbegriff|safe }}</div>
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+{% if resultat.kurztext %}
+    <h2>Vorgaben mit "{{ suchbegriff }}" im Kurztext</h2>
+    {% for standard, vorgaben in resultat.kurztext.items %}
+        <h4>{{ standard }}</h4>
+        <ul>
+            {% for vorgabe in vorgaben %}
+            <li><a href="{% url 'standard_detail' nummer=vorgabe.dokument.nummer %}#{{vorgabe.Vorgabennummer}}">{{vorgabe}}</a></li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+{% endif %}
+
+{% if resultat.langtext %}
+    <h2>Vorgaben mit "{{ suchbegriff }}" im Langtext</h2>
+    {% for standard, vorgaben in resultat.langtext.items %}
+        <h4>{{ standard }}</h4>
+        <ul>
+            {% for vorgabe in vorgaben %}
+            <li><a href="{% url 'standard_detail' nummer=vorgabe.dokument.nummer %}#{{vorgabe.Vorgabennummer}}">{{vorgabe}}</a></li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+{% endif %}
+{% if not resultat.langtext and not resultat.kurztext and not resultat.geltungsbereich %}
+    <h2>Keine Resultate für "{{suchbegriff}}"</h2>
+{% endif %}
+{% endblock %}

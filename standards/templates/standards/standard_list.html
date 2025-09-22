@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Standards Informatiksicherheit</h1>
+<ul>
+  {% for standard in standards %}
+    <li>
+      <a href="{% url 'standard_detail' nummer=standard.nummer %}">
+        {{ standard.nummer }} – {{ standard.name }}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

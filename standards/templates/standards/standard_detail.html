@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}{{ standard }}{% endblock %}
+{% block content %}
+<h1>{{ standard.nummer }} – {{ standard.name }}</h1>
+{% if standard.history == True %}
+<h2>Version vom {{ standard.check_date }}</h2>
+{% endif %}
+
+<p><strong>Autoren:</strong> {{ standard.autoren.all|join:", " }}</p>
+<p><strong>Prüfende:</strong> {{ standard.pruefende.all|join:", " }}</p>
+<p><strong>Gültigkeit:</strong> {{ standard.gueltigkeit_von }} bis {{ standard.gueltigkeit_bis }}</p>
+
+{% if standard.einleitung_html %}
+<h2>Einleitung</h2>
+{% for typ, html in standard.einleitung_html %}
+<div>{{ html|safe }}</div>
+{% endfor %}
+{% endif %}
+
+{% if standard.geltungsbereich_html %}
+<h2>Geltungsbereich</h2>
+{% for typ, html in standard.geltungsbereich_html %}
+<div>{{ html|safe }}</div>
+{% endfor %}
+{% endif %}
+
+<h2>Vorgaben</h2>
+{% for vorgabe in vorgaben %}
+{% if standard.history == True or vorgabe.long_status == "active" %}
+  <a id="{{ vorgabe.Vorgabennummer }}"></a><div class="card mb-4">
+    {% if vorgabe.long_status == "active"%}
+    <div class="card-header d-flex justify-content-between align-items-center bg-secondary text-light">
+    {% elif standard.history == True %}
+    <div class="card-header d-flex justify-content-between align-items-center bg-danger-subtle">
+    {% endif %}
+     <h3 class="h5 m-0">{{ vorgabe.Vorgabennummer }} – {{ vorgabe.titel }}
+        {% if vorgabe.long_status != "active"  and standard.history == True %}<span class="text-danger"> ({{ vorgabe.long_status}})</span>{% endif %}
+      </h3>
+      {% if vorgabe.relevanzset %}
+      <span class="badge bg-light text-black"> Relevanz:
+      {% for V in vorgabe.relevanzset %}
+      {{ V|make_list|first }}
+      {% endfor %}
+      </span>
+      {% endif %}
+
+      <span class="badge bg-light text-black">{{ vorgabe.thema }}</span>
+    </div>
+
+    <div class="card-body p-0">
+
+      {% comment %} KURZTEXT BLOCK {% endcomment %}
+      {% if vorgabe.kurztext_html.0.1 %}
+      <div class="p-3 mb-3 bg-light border-3" style="width: 100%;">
+        {% for typ, html in vorgabe.kurztext_html %}
+          {% if html %}
+            <div class="mb-2">{{ html|safe }}</div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      <div class="p-3 mb-3">
+      {% comment %} LANGTEXT BLOCK {% endcomment %}
+      {# <h5>Langtext</h5> #}
+      {% for typ, html in vorgabe.langtext_html %}
+        {% if html %}<div class="mb-3">{{ html|safe }}</div>{% endif %}
+      {% endfor %}
+
+      {% comment %} CHECKLISTENFRAGEN BLOCK {% endcomment %}
+      <h5>Checklistenfragen</h5>
+      {% if vorgabe.checklistenfragen.all %}
+        <ul class="list-group">
+          {% for frage in vorgabe.checklistenfragen.all %}
+            <li class="list-group-item">{{ frage.frage }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p><em>Keine Checklistenfragen</em></p>
+      {% endif %}
+      {% comment %} STICHWORTE + REFERENZEN AT BOTTOM {% endcomment %}
+      <div class="mt-4 small text-muted">
+        <strong>Stichworte:</strong>
+        {% if vorgabe.stichworte.all %}
+          {% for s in vorgabe.stichworte.all %}
+            <a href="{% url 'stichwort_detail' stichwort=s %}">{{ s }}</a>{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        {% else %}
+          <em>Keine</em>
+        {% endif %}
+        <br>
+        <strong>Referenzen:</strong>
+        {% if vorgabe.referenzpfade %}
+          {% for ref in vorgabe.referenzpfade %}
+            {{ ref|safe }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        {% else %}
+          <em>Keine</em>
+        {% endif %}
+      </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endfor %}
+{% endblock %}

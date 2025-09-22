@@ -1,0 +1,15 @@
+/* Style each Vorgabe inline block */
+.djn-dynamic-form-Standards-vorgabe {
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+
+/* Optional: Slight padding for inner fieldsets (e.g., Langtext/Kurztext inlines) */
+.djn-dynamic-form-Standards-vorgabe .inline-related {
+    margin-top: 10px;
+    padding-left: 10px;
+    border-left: 2px dashed #ccc;
+}

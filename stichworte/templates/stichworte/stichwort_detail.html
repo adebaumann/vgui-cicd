@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Stichwort: {{stichwort.stichwort}}{% endblock %}
+{% block content %}
+<h1>{{stichwort}}</h1>
+{% if stichwort.erklaerung %}
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center bg-secondary text-light">
+      <h3 class="h5 m-0">Beschreibung</h3>
+    </div>
+    <div class="card-body p-2">
+        {% for typ, html in stichwort.erklaerung %}
+        {% if html %}<div>{{ html|safe }}</div>{% endif %}{% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center bg-secondary text-light">
+      <h3 class="h5 m-0">Relevante Vorgaben</h3>
+    </div>
+    <div class="card-body p-2">
+<ul>
+    {% for vorgabe in stichwort.vorgaben %}
+    {% if vorgabe.get_status == "active" %}
+    <li><a href="{% url 'standard_detail' nummer=vorgabe.dokument.nummer %}#{{vorgabe.Vorgabennummer}}">{{vorgabe.Vorgabennummer}}</a>: {{vorgabe.titel}}</li>
+    {% endif %}
+    {% endfor %}
+</ul>
+    </div>
+{% endblock %}
