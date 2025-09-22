@@ -1,3 +1,8 @@
 r0126.txt
-__pycache__
+__pycache__/
 *.pyc
+lib/
+lib64
+bin/
+pyvenv.cfg
+include/
