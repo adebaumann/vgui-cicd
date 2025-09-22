@@ -6,3 +6,4 @@ lib64
 bin/
 pyvenv.cfg
 include/
+keys/
