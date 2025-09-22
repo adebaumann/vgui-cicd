@@ -18,7 +18,7 @@ spec:
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
         - name: web
-          image: docker.io/adebaumann/vorgabenui:0.91
+          image: docker.io/adebaumann/vui:0.914
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

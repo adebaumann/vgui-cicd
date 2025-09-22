@@ -7,11 +7,12 @@ spec:
   restartPolicy: Never
   containers:
     - name: loader
-      image: alpine:3.20
-      command: ["sh","-c","sleep 3600"]
+      image: adebaumann/vgui-preloader:0.4
+      command: ["sh","-c","cp -v /preload/preload.sqlite3 /data/db.sqlite3; chown -R 999:999 /data; ls -la /data"]
       volumeMounts:
         - name: data
           mountPath: /data
+
   volumes:
     - name: data
       persistentVolumeClaim:
