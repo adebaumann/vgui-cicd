@@ -38,9 +38,7 @@
       </h3>
       {% if vorgabe.relevanzset %}
       <span class="badge bg-light text-black"> Relevanz:
-      {% for V in vorgabe.relevanzset %}
-      {{ V|make_list|first }}
-      {% endfor %}
+	 {{ vorgabe.relevanzset|join:", " }}
       </span>
       {% endif %}
 

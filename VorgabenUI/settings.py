@@ -87,6 +87,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'VorgabenUI.wsgi.application'
 
+CSRF_TRUSTED_ORIGINS=["https://vorgabenportal.knowyoursecurity.com"]
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

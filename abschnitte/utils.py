@@ -4,7 +4,7 @@ import zlib
 import re
 from textwrap import dedent
 
-DIAGRAMMSERVER="http://10.128.128.144:8000/diagramm"
+DIAGRAMMSERVER="/diagramm"
 
 def render_textabschnitte(queryset):
     """
