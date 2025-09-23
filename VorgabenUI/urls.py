@@ -30,7 +30,7 @@ urlpatterns = [
     path('',pages.views.startseite),
     path('search/',pages.views.search),
     path('standards/', include("standards.urls")),
-    path('admin/', admin.site.urls),
+    path('autorenumgebung/', admin.site.urls),
     path('stichworte/', include("stichworte.urls")),
     path('referenzen/', referenzen.views.tree, name="referenz_tree"),
     path('referenzen/<str:refid>/', referenzen.views.detail, name="referenz_detail"),
