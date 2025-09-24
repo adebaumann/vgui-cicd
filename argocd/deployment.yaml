@@ -4,7 +4,7 @@ metadata:
   name: django
   namespace: vorgabenui
 spec:
-  replicas: 1
+  replicas: 10
   selector:
     matchLabels:
       app: django
@@ -18,7 +18,7 @@ spec:
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
         - name: web
-          image: docker.io/adebaumann/vui:0.914
+          image: docker.io/adebaumann/vui:0.917
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
