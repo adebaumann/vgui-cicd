@@ -7,7 +7,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: django
+      app: kroki
   template:
     metadata:
       labels:
