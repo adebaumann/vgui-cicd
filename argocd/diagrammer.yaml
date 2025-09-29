@@ -14,7 +14,7 @@ spec:
         app: kroki
     spec:
       containers:
-        - name: web
+        - name: kroki
           image: docker.io/yuzutech/kroki:latest
           ports:
             - containerPort: 8000
@@ -30,6 +30,66 @@ spec:
             httpGet:
               path: /
               port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+        - name: mermaid
+          image: docker.io/yuzutech/kroki-mermaid:latest
+          ports:
+            - containerPort: 8002
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8002
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+        - name: bpmn
+          image: docker.io/yuzutech/kroki-bpmn:latest
+          ports:
+            - containerPort: 8003
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8003
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8003
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+        - name: excalidraw
+          image: docker.io/yuzutech/kroki-excalidraw:latest
+          ports:
+            - containerPort: 8004
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8004
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8004
             initialDelaySeconds: 20
             periodSeconds: 20
             timeoutSeconds: 2
