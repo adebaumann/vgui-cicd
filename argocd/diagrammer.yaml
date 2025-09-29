@@ -5,9 +5,6 @@ metadata:
   namespace: vorgabenui
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: kroki
   template:
     metadata:
       labels:
