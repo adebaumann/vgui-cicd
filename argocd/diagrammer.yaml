@@ -17,11 +17,11 @@ spec:
         - name: web
           image: docker.io/yuzutech/kroki:latest
           ports:
-            - containerPort: 80
+            - containerPort: 8000
           readinessProbe:
             httpGet:
               path: /
-              port: 80
+              port: 8000
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 2
@@ -29,7 +29,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /
-              port: 80
+              port: 8000
             initialDelaySeconds: 20
             periodSeconds: 20
             timeoutSeconds: 2
@@ -44,6 +44,6 @@ spec:
   selector:
     app: django
   ports:
-    - port: 80
-      targetPort: 80
+    - port: 8000
+      targetPort: 8000
 
