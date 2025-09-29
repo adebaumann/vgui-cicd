@@ -1,4 +1,4 @@
 from revproxy.views import ProxyView
 
 class DiagrammProxyView(ProxyView):
-    upstream = "http://kroki:8000/"
+    upstream = "http://svckroki:8000/"

@@ -4,7 +4,7 @@ metadata:
   name: kroki
   namespace: vorgabenui
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: kroki
@@ -46,4 +46,3 @@ spec:
   ports:
     - port: 8000
       targetPort: 8000
-
