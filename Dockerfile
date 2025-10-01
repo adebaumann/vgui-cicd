@@ -22,5 +22,12 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 USER appuser
 EXPOSE 8000
+RUN rm -rf /app/Dockerfile* \
+           /app/README.md \
+           /app/argocd \
+           /app/k8s \
+           /app/data-loader \
+           /app/keys \
+           /app/requirements.txt
 CMD ["gunicorn","--bind","0.0.0.0:8000","--workers","3","VorgabenUI.wsgi:application"]
 
