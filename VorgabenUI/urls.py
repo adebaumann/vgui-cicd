@@ -34,5 +34,5 @@ urlpatterns = [
     path('referenzen/', referenzen.views.tree, name="referenz_tree"),
     path('referenzen/<str:refid>/', referenzen.views.detail, name="referenz_detail"),
     re_path(r'^diagramm/(?P<path>.*)$', DiagrammProxyView.as_view()),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) +debug_toolbar_urls()
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
