@@ -18,7 +18,6 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
-from debug_toolbar.toolbar import debug_toolbar_urls
 from diagramm_proxy.views import DiagrammProxyView
 import standards.views
 import pages.views
@@ -35,5 +34,5 @@ urlpatterns = [
     path('referenzen/', referenzen.views.tree, name="referenz_tree"),
     path('referenzen/<str:refid>/', referenzen.views.detail, name="referenz_detail"),
     re_path(r'^diagramm/(?P<path>.*)$', DiagrammProxyView.as_view()),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) +debug_toolbar_urls()
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
