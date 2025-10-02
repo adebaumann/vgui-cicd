@@ -99,8 +99,8 @@ class PersonAdmin(admin.ModelAdmin):
     
 
 
-@admin.register(Standard)
-class StandardAdmin(NestedModelAdmin):
+@admin.register(Dokument)
+class DokumentAdmin(NestedModelAdmin):
     actions_on_top=True
     inlines = [EinleitungInline,GeltungsbereichInline,VorgabeInline]
     #filter_horizontal=['autoren','pruefende']
@@ -118,7 +118,7 @@ class StandardAdmin(NestedModelAdmin):
 #admin.site.register(Stichwort)
 
 admin.site.register(Checklistenfrage)
-#admin.site.register(Dokumententyp)
+admin.site.register(Dokumententyp)
 #admin.site.register(Person)
 admin.site.register(Thema)
 #admin.site.register(Referenz, DraggableM§PTTAdmin)
