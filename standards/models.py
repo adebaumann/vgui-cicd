@@ -13,6 +13,10 @@ class Dokumententyp(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name="Dokumententyp"
+        verbose_name_plural="Dokumententypen"
+
 
 class Person(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
@@ -33,7 +37,7 @@ class Thema(models.Model):
         verbose_name_plural="Themen"
 
 
-class Standard(models.Model):
+class Dokument(models.Model):
     nummer = models.CharField(max_length=50, primary_key=True)
     dokumententyp = models.ForeignKey(Dokumententyp, on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
@@ -48,12 +52,12 @@ class Standard(models.Model):
         return f"{self.nummer} – {self.name}"
 
     class Meta:
-        verbose_name_plural="Standards"
-        verbose_name="Standard"
+        verbose_name_plural="Dokumente"
+        verbose_name="Dokument"
 
 class Vorgabe(models.Model):
     nummer = models.IntegerField()
-    dokument = models.ForeignKey(Standard, on_delete=models.CASCADE, related_name='vorgaben')
+    dokument = models.ForeignKey(Dokument, on_delete=models.CASCADE, related_name='vorgaben')
     thema = models.ForeignKey(Thema, on_delete=models.PROTECT)
     titel = models.CharField(max_length=255)
     referenzen = models.ManyToManyField(Referenz, blank=True)
@@ -97,13 +101,13 @@ class VorgabeKurztext(Textabschnitt):
         verbose_name="Kurztext-Abschnitt"
 
 class Geltungsbereich(Textabschnitt):
-    geltungsbereich=models.ForeignKey(Standard,on_delete=models.CASCADE)
+    geltungsbereich=models.ForeignKey(Dokument,on_delete=models.CASCADE)
     class Meta:
         verbose_name_plural="Geltungsbereich"
         verbose_name="Geltungsbereichs-Abschnitt"
 
 class Einleitung(Textabschnitt):
-    einleitung=models.ForeignKey(Standard,on_delete=models.CASCADE)
+    einleitung=models.ForeignKey(Dokument,on_delete=models.CASCADE)
     class Meta:
         verbose_name_plural="Einleitung"
         verbose_name="Einleitungs-Abschnitt"
@@ -119,7 +123,7 @@ class Checklistenfrage(models.Model):
         verbose_name_plural="Fragen für Checkliste"
 
 class Changelog(models.Model):
-    dokument = models.ForeignKey(Standard, on_delete=models.CASCADE, related_name='changelog')
+    dokument = models.ForeignKey(Dokument, on_delete=models.CASCADE, related_name='changelog')
     autoren = models.ManyToManyField(Person)
     datum = models.DateField()
     aenderung = models.TextField()

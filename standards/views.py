@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Standard
+from .models import Dokument
 from abschnitte.utils import render_textabschnitte
 
 from datetime import date
@@ -9,14 +9,14 @@ calendar=parsedatetime.Calendar()
 
 
 def standard_list(request):
-    standards = Standard.objects.all()
+    standards = Dokument.objects.all()
     return render(request, 'standards/standard_list.html',
                   {'standards': standards}
                   )
 
 
 def standard_detail(request, nummer,check_date=""):
-    standard = get_object_or_404(Standard, nummer=nummer)
+    standard = get_object_or_404(Dokument, nummer=nummer)
 
     if check_date:
         check_date = calendar.parseDT(check_date)[0].date()
@@ -48,7 +48,7 @@ def standard_detail(request, nummer,check_date=""):
 
 
 def standard_checkliste(request, nummer):
-    standard = get_object_or_404(Standard, nummer=nummer)
+    standard = get_object_or_404(Dokument, nummer=nummer)
     vorgaben = list(standard.vorgaben.all())
     return render(request, 'standards/standard_checkliste.html', {
         'standard': standard,
