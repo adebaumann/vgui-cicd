@@ -1,11 +1,11 @@
-# Standards/management/commands/import_standard.py
+# Document/management/commands/import_standard.py
 import re
 from pathlib import Path
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
 from standards.models import (
-    Standard,
+    Dokument,
     Dokumententyp,
     Thema,
     Vorgabe,
@@ -21,15 +21,15 @@ from stichworte.models import Stichwort
 
 class Command(BaseCommand):
     help = (
-        "Import a security standard from a structured text file.\n"
+        "Import a policy document from a structured text file.\n"
         "Supports Einleitung, Geltungsbereich, Vorgaben (Kurztext/Langtext with AbschnittTyp), "
         "Stichworte (comma-separated), Checklistenfragen, dry-run, verbose, and purge."
     )
 
     def add_arguments(self, parser):
         parser.add_argument("file_path", type=str, help="Path to the plaintext file")
-        parser.add_argument("--nummer", required=True, help="Standard number (e.g., STD-001)")
-        parser.add_argument("--name", required=True, help='Standard name (e.g., "IT-Sicherheit Container")')
+        parser.add_argument("--nummer", required=True, help="Document number (e.g., STD-001)")
+        parser.add_argument("--name", required=True, help='Document name (e.g., "IT-Sicherheit Container")')
         parser.add_argument("--dokumententyp", required=True, help='Dokumententyp name (e.g., "IT-Sicherheit")')
         parser.add_argument("--gueltigkeit_von", default=None, help="Start date (YYYY-MM-DD)")
         parser.add_argument("--gueltigkeit_bis", default=None, help="End date (YYYY-MM-DD)")
@@ -63,8 +63,8 @@ class Command(BaseCommand):
         if dry_run:
             self.stdout.write(self.style.WARNING("Dry run: no database changes will be made."))
 
-        # get or create Standard (we want a real instance even in purge to count existing rows)
-        standard, created = Standard.objects.get_or_create(
+        # get or create Document (we want a real instance even in purge to count existing rows)
+        standard, created = Dokument.objects.get_or_create(
             nummer=nummer,
             defaults={
                 "dokumententyp": dokumententyp,
@@ -74,9 +74,9 @@ class Command(BaseCommand):
             },
         )
         if created:
-            self.stdout.write(self.style.SUCCESS(f"Created Standard {nummer} – {name}"))
+            self.stdout.write(self.style.SUCCESS(f"Created Document {nummer} – {name}"))
         else:
-            self.stdout.write(self.style.WARNING(f"Standard {nummer} already exists; content may be updated."))
+            self.stdout.write(self.style.WARNING(f"Document {nummer} already exists; content may be updated."))
 
         # purge (Einleitung + Geltungsbereich + Vorgaben cascade)
         if purge:
@@ -347,6 +347,6 @@ class Command(BaseCommand):
                     )
 
         self.stdout.write(self.style.SUCCESS(
-            "Dry run complete" if dry_run else f"Imported standard {nummer} – {name} with {len(vorgaben_data)} Vorgaben"
+            "Dry run complete" if dry_run else f"Imported document {nummer} – {name} with {len(vorgaben_data)} Vorgaben"
         ))
 
