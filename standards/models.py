@@ -81,17 +81,17 @@ class Vorgabe(models.Model):
 
         return "expired" if not verbose else "Ist seit dem "+self.gueltigkeit_bis.strftime('%d.%m.%Y')+" nicht mehr in Kraft."
 
+    def __str__(self):
+        return f"{self.Vorgabennummer()}: {self.titel}"
 
     class Meta:
         verbose_name_plural="Vorgaben"
 
-    def __str__(self):
-        return f"{self.Vorgabennummer()}: {self.titel}"
 
 class VorgabeLangtext(Textabschnitt):
     abschnitt=models.ForeignKey(Vorgabe,on_delete=models.CASCADE)
     class Meta:
-        verbose_name_plural="Langtext-Abschnitte"
+        verbose_name_plural="Langtext"
         verbose_name="Langtext-Abschnitt"
 
 class VorgabeKurztext(Textabschnitt):
@@ -121,6 +121,7 @@ class Checklistenfrage(models.Model):
 
     class Meta:
         verbose_name_plural="Fragen für Checkliste"
+        verbose_name="Frage für Checkliste"
 
 class Changelog(models.Model):
     dokument = models.ForeignKey(Dokument, on_delete=models.CASCADE, related_name='changelog')
@@ -130,3 +131,7 @@ class Changelog(models.Model):
 
     def __str__(self):
         return f"{self.datum} – {self.dokument.nummer}"
+
+    class Meta:
+        verbose_name_plural="Changelog"
+        verbose_name="Changelog-Eintrag"
