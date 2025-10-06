@@ -18,7 +18,7 @@ spec:
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
         - name: web
-          image: git.baumann.gr/adebaumann/vui:0.924 
+          image: git.baumann.gr/adebaumann/vui:0.925
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
