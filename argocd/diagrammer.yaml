@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: kroki
-          image: yuzutech/kroki:latest
+          image: git.baumann.gr/adebaumann/kroki:0.026
           ports:
             - containerPort: 8000
           readinessProbe:
