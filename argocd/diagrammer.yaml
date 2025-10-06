@@ -35,15 +35,15 @@ spec:
             timeoutSeconds: 2
             failureThreshold: 3
         - name: mermaid
-          image: yuzutech/kroki-mermaid:latest
+          image: git.baumann.gr/adebaumann/kroki-mermaid:0.026
           ports:
             - containerPort: 8002
         - name: bpmn
-          image: yuzutech/kroki-bpmn:latest
+          image: git.baumann.gr/adebaumann/kroki-bpnm:0.026
           ports:
             - containerPort: 8003
         - name: excalidraw
-          image: yuzutech/kroki-excalidraw:latest
+          image: git.baumann.gr/adebaumann/kroki-excalidraw:0.026
           ports:
             - containerPort: 8004
 ---
