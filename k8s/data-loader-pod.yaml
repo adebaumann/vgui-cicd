@@ -7,8 +7,8 @@ spec:
   restartPolicy: Never
   containers:
     - name: loader
-      image: adebaumann/vgui-preloader:0.4
-      command: ["sh","-c","cp -v /preload/preload.sqlite3 /data/db.sqlite3; chown -R 999:999 /data; ls -la /data"]
+      image: adebaumann/vgui-preloader:0.5
+      command: ["sh","-c","cp -v --debug --update=none /preload/preload.sqlite3 /data/db.sqlite3; chown -R 999:999 /data; ls -la /data; exit 0"]
       volumeMounts:
         - name: data
           mountPath: /data

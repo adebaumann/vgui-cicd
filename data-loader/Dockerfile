@@ -8,5 +8,4 @@ RUN chown appuser:appuser /preload/preload.sqlite3
 RUN mkdir /data
 RUN chown appuser:appuser /data
 USER root
-CMD ["sh"]
 

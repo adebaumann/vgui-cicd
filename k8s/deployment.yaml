@@ -16,6 +16,13 @@ spec:
       securityContext:
         fsGroup: 999
         fsGroupChangePolicy: "OnRootMismatch"
+      initContainers:
+        - name: loader
+          image: adebaumann/vgui-preloader:0.5
+          command: [ "sh","-c","cp -v --debug --update=none /preload/preload.sqlite3 /data/db.sqlite3; chown -R 999:999 /data; ls -la /data; exit 0" ]
+          volumeMounts:
+            - name: data
+              mountPath: /data
       containers:
         - name: web
           image: docker.io/adebaumann/vui:0.917
