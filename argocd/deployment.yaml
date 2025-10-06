@@ -19,7 +19,7 @@ spec:
       initContainers:
         - name: loader
           image: git.baumann.gr/adebaumann/vgui-data-loader:0.5
-          command: [ "sh","-c","cp -n /preload /preload.sqlite3 /data/db.sqlite3; chown -R 999:999 /data; ls -la /data; sleep 60; exit 0" ]
+          command: [ "sh","-c","cp -n /preload.sqlite3 /data/db.sqlite3; chown -R 999:999 /data; ls -la /data; sleep 60; exit 0" ]
           volumeMounts:
             - name: data
               mountPath: /data
