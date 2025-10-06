@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: kroki
-          image: docker.io/yuzutech/kroki:latest
+          image: yuzutech/kroki:latest
           ports:
             - containerPort: 8000
           readinessProbe:
