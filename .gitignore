@@ -8,5 +8,6 @@ pyvenv.cfg
 include/
 keys/
 .venv/
+.idea/
 
 *.kate-swp
