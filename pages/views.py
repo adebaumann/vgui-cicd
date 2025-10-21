@@ -13,16 +13,11 @@ def search(request):
         return render(request, 'search.html')
     elif request.method == "POST":
         suchbegriff=request.POST.get("q")
-        areas=request.POST.getlist("suchbereich[]")
         result= {"all": {}}
         qs = VorgabeKurztext.objects.filter(inhalt__contains=suchbegriff).exclude(abschnitt__gueltigkeit_bis__lt=datetime.date.today())
         result["kurztext"] = {k: [o.abschnitt for o in g] for k, g in groupby(qs, key=lambda o: o.abschnitt.dokument)}
         qs = VorgabeLangtext.objects.filter(inhalt__contains=suchbegriff).exclude(abschnitt__gueltigkeit_bis__lt=datetime.date.today())
         result['langtext']=  {k: [o.abschnitt for o in g] for k, g in groupby(qs, key=lambda o: o.abschnitt.dokument)}
-        result["geltungsbereich"]={}
-        geltungsbereich=set(list([x.geltungsbereich for x in Geltungsbereich.objects.filter(inhalt__contains=suchbegriff)]))
-        for s in geltungsbereich:
-            result["geltungsbereich"][s]=render_textabschnitte(s.geltungsbereich_set.order_by("order"))
         for r in result.keys():
             for s in result[r].keys():
                 result["all"][s] = set(result[r][s])
