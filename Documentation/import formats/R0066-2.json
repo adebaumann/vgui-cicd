@@ -1,0 +1,1997 @@
+{
+  "Vorgabendokument": {
+    "Typ": "Standard IT-Sicherheit",
+    "Nummer": "R0066",
+    "Name": "Logging",
+    "Autoren": [
+      "Adrian A. Baumann",
+      "Emily Hentgen"
+    ],
+    "Pruefende": [
+      "Jan Hohenauer",
+      "Fritz Weyermann"
+    ],
+    "Geltungsbereich": {
+      "Abschnitt": [
+        {
+          "typ": "text",
+          "inhalt": "Der vorliegende Standard IT-Sicherheit beinhaltet Definitionen und Anforderungen, die für das Logging im BIT benötigt werden. Das Dokument beschreibt das Thema Logging aus Sicherheitssicht."
+        },
+        {
+          "typ": "text",
+          "inhalt": "Es werden keine konkreten Umsetzungen vorgegeben, sondern lediglich die Anforderungen aufgezeigt. Alle Betreiber von Infrastrukturen beim BIT müssen das Vorgehen für die bei Ihnen anfallenden Log-Daten selbst konkretisieren und umsetzen. Das gewählte Vorgehen muss dokumentiert und begründet werden."
+        },
+        {
+          "typ": "text",
+          "inhalt": "Nicht Bestandteil des vorliegenden Standards sind die Sammlung und Auswertung von Log-Daten zum Zweck der Überwachung von Services und Systemen um Betriebsaufgaben wahrzunehmen. Bei der Umsetzung macht es jedoch Sinn, die betrieblichen Aspekte mit einzubeziehen und zu spezifizieren; viele der Log-Daten sind sowohl für die Sicherheit wie auch für den Betrieb von Interesse."
+        },
+        {
+          "typ": "text",
+          "inhalt": "Betriebswirtschaftliche Aspekte werden ebenfalls nicht berücksichtigt. Diese müssen in der Umsetzungsplanung berücksichtigt werden. Auch hier können Log-Daten potentiell z.B. für Key Performance Indicators (KPI) verwendet werden."
+        }
+      ]
+    },
+    "Ziel": "",
+    "Grundlagen": "",
+    "Changelog": [],
+    "Anhänge": [],
+    "Verantwortlich": "Information Security Management BIT",
+    "Klassifizierung": null,
+    "Glossar": {
+      "ASCII": "American Standard Code for Information Interchange",
+      "CSV": "Comma-Separated Values",
+      "IP": "Internet Protocol",
+      "NTP": "Network Time Protocol",
+      "OSSEC": "Open Source HIDS SECurity",
+      "PIN": "Personal Identification Number",
+      "SCP": "Secure Copy",
+      "SLA": "Service Level Agreement",
+      "TCP": "Transmission Control Protocol",
+      "TLS": "Transport Layer Security"
+    },
+    "Vorgaben": [
+      {
+        "Nummer": "1",
+        "Titel": "Inventarisierung der Log-Daten Quellen",
+        "Thema": "Organisation",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Übersicht über die Log-Daten-Quellen muss gewährleistet sein. Dafür müssen Log-Daten-Quellen eindeutig identifiziert und systematisch inventarisiert werden."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Übersicht über die Log-Daten-Quellen muss gewährleistet sein. Dafür müssen Log-Daten-Quellen eindeutig identifiziert und systematisch inventarisiert werden. Der Verantwortliche der Log-Datensammlung muss sicherstellen, dass die Dokumentation gepflegt wird und aktuell ist."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Folgende Informationen müssen für jede Log-Daten Quelle schriftlich dokumentiert werden:"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "Welche Logs aktiviert sind",
+                "Welche Logs nicht aktiviert sind, inkl. Begründung warum das Logging deaktiviert ist"
+              ]
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz, O2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Die Übersicht über die Log-Daten-Quellen muss gewährleistet sein. Dafür Wird sichergestellt, dass Log-Daten-Quellen eindeutig identifiziert und systematisch inventarisiert werden. Der Verantwortliche der Log-Datensammlung muss sicherstellen, dass die Dokumentation gepflegt wird und aktuell ist?",
+          "Folgende Informationen Wird sichergestellt, dass für jede Log-Daten Quelle schriftlich dokumentiert werden:?",
+          "Ist sichergestellt, dass welche Logs aktiviert sind?",
+          "Ist sichergestellt, dass welche Logs nicht aktiviert sind, inkl. Begründung warum das Logging deaktiviert ist?"
+        ],
+        "Stichworte": [
+          "Logdatenquelle",
+          "Logdatensammlung",
+          "Dokumentation"
+        ]
+      },
+      {
+        "Nummer": "2",
+        "Thema": "Organisation",
+        "Titel": "Dokumentation der Log-Daten Quellen Attribute",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Logdaten müssen in einem maschinenlesbaren Format vorliegen."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Für jede Log-Daten-Quelle soll eine vollständige Dokumentation der Attribute zur Verfügung stehen. Zudem soll schriftlich dokumentiert werden, welche Attribute effektiv geloggt werden. Sollten Attribute nicht geloggt werden, soll dies nachvollziehbar dokumentiert und begründet werden."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz, O2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Für jede Log-Daten-Quelle Wird sichergestellt, dass eine vollständige Dokumentation der Attribute zur Verfügung stehen. Zudem Wird sichergestellt, dass schriftlich dokumentiert werden, welche Attribute effektiv geloggt werden. Sollten Attribute nicht geloggt werden, Wird sichergestellt, dass dies nachvollziehbar dokumentiert und begründet werden?"
+        ],
+        "Stichworte": [
+          "Logdatenquelle",
+          "Dokumentation",
+          "Attribute"
+        ]
+      },
+      {
+        "Nummer": "3",
+        "Thema": "Organisation",
+        "Titel": "Dateninhaber",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Für jede Log-Daten Sammlung muss ein Dateninhaber definiert werden, der für die Qualität, Integrität und Sicherheit der Daten zuständig ist."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Für jede Log-Daten Sammlung muss ein Dateninhaber definiert werden."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Beim Dateninhaber handelt es sich um eine Person oder ein Bundesorgan, die oder das allein oder zusammen entscheidet, wer auf die Log-Daten zugreifen darf, wer die Log-Daten bearbeiten darf, und wie die Log-Daten bearbeitet werden dürfen. Der Dateninhaber ist zuständig für die Qualität, Integrität und Sicherheit ihrer Daten."
+            }
+          ]
+        },
+        "Referenz": [
+          "ISO27001, A8.1.1",
+          "ISO27001, A8.1.2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Der Dateninhaber der Logdatensammlung ist definiert."
+        ],
+        "Stichworte": [
+          "Logdatensammlung",
+          "Dateninhaber"
+        ]
+      },
+      {
+        "Nummer": "4",
+        "Thema": "Organisation",
+        "Titel": "Log-Daten Sammlungen mit Personendaten",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Für Log-Daten mit Personendaten gelten die Anforderungen des DSG. Rollen müssen definiert werden, um die Log-Daten konform und sicher zu bearbeiten."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Für Log-Daten, die Personendaten beinhalten, oder die die Zusammenstellung von Persönlichkeitsprofilen ermöglichen, gelten die Anforderungen des DSG."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Als Personendaten gelten alle Angaben, die sich auf eine bestimmte oder bestimmbare Person beziehen. Als Persönlichkeitsprofil gelten Zusammenstellungen von Daten, die eine Beurteilung wesentlicher Aspekte der Persönlichkeit einer natürlichen Person erlaubt (Art. 3, Bst. a, DSG)."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten fallen in dieser Kategorie, insofern die geloggten Aktivitäten auf eine bestimmte natürliche Person zurückzuführen sind (z.B. mit einer Benutzer ID). Die Anforderungen zum Auskunftsrecht müssen sichergestellt werden können."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Rollen müssen definiert werden, damit die Log-Daten Sammlungen konform und sicher bearbeitet werden."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Im Kontext von Log-Daten Sammlungen, die Personendaten beinhalten, werden folgende Rollen definiert:"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "*Verantwortlicher*: Beim Verantwortlichen handelt es sich grundsätzlich um den Dateninhaber der Log-Daten Sammlung. Er entscheidet allein oder zusammen mit anderen über den Zweck und die Mittel der Bearbeitung der Log-Daten. Siehe auch: Inhaber der Datensammlung nach DSG",
+                "*Auftragsbearbeiter*: Beim Auftragsbearbeiter handelt es um eine Person oder ein Bundesorgan, die oder das im Auftrag des Verantwortlichen die Log-Daten bearbeitet. Bemerkung: Der Auftragsbearbeiter ist kein Dritter. Als Dritte gilt einen eigenständigen Verantwortlichen. Er unterscheidet sich vom Auftragsbearbeiter oder von einem gemeinsamen Verantwortlichen im Rahmen der Datenbearbeitung.",
+                "*Datensubjekt*: Beim Datensubjekt handelt es sich um eine natürliche oder juristische Person, deren persönlichen Daten von einer Organisation gesammelt, gespeichert oder bearbeitet werden."
+              ]
+            },
+            {
+              "typ": "text",
+              "inhalt": "Der Verantwortliche und der Auftragsbearbeiter müssen folgende Informationen schriftlich dokumentieren:"
+            },
+            {
+              "typ": "tabelle",
+              "inhalt": "| Was | Verantwortliche | Auftragsbearbeiter |\n|----------------|----------------|------------------|\n| Identität des Verantwortlichen | x | x |\n| Identität des Auftragsbearbeiters | | x |\n| Bearbeitungszweck | x | |\n| Beschreibung der Kategorien betroffener Personen | x | |\n| Beschreibung der Kategorien bearbeiteter Personendaten | x | |\n| Kategorie der Empfängerinnen und Empfänger (Personen, denen Daten bekanntgegeben werden) | x | |\n| Kategorien von Bearbeitungen, die im Auftrag des Verantwortlichen durchgeführt werden | | x |\n| Aufbewahrungsdauer der Log-Daten | x | |\n| Beschreibung der Massnahmen zur Gewährleistung der Datensicherheit | x | x |\n| Falls die Daten ins Ausland bekanntgegeben werden, die Angabe des Staats sowie die Garantien eines geeigneten Datenschutzes | x | x |"
+            },
+            {
+              "typ": "text",
+              "inhalt": "Mit dem Begriff \"Bearbeitung\" wird jeder Umgang mit Daten, unabhängig von den angewandten Mitteln und Verfahren, insbesondere das Beschaffen, Speichern, Aufbewahren, Verwenden, Verändern, Bekanntgeben, Archivieren, Löschen oder Vernichten von Daten verstanden (Art. 3 Abs. e, DSG). Unter der Bearbeitung von Log-Daten wird somit verstanden, dass die Log-Daten gelesen (d.h. analysiert), verschoben (rotiert, gelöscht) und die Logging-Mechanismen verändert (Konfiguration des Logging-Dienstes, Ein- resp. Ausschalten des Loggings, etc.) werden können."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz O1",
+          "DSG"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Log-Daten fallen in dieser Kategorie, insofern die geloggten Aktivitäten auf eine bestimmte natürliche Person zurückzuführen sind (z.B. mit einer Benutzer ID). Die Anforderungen zum Auskunftsrecht Wird sichergestellt, dass sichergestellt werden können?",
+          "Rollen Wird sichergestellt, dass definiert werden, damit die Log-Daten Sammlungen konform und sicher bearbeitet werden?",
+          "Ist sichergestellt, dass *Verantwortlicher*: Beim Verantwortlichen handelt es sich grundsätzlich um den Dateninhaber der Log-Daten Sammlung. Er entscheidet allein oder zusammen mit anderen über den Zweck und die Mittel der Bearbeitung der Log-Daten. Siehe auch: Inhaber der Datensammlung nach DSG?",
+          "Ist sichergestellt, dass *Auftragsbearbeiter*: Beim Auftragsbearbeiter handelt es um eine Person oder ein Bundesorgan, die oder das im Auftrag des Verantwortlichen die Log-Daten bearbeitet. Bemerkung: Der Auftragsbearbeiter ist kein Dritter. Als Dritte gilt einen eigenständigen Verantwortlichen. Er unterscheidet sich vom Auftragsbearbeiter oder von einem gemeinsamen Verantwortlichen im Rahmen der Datenbearbeitung?",
+          "Ist sichergestellt, dass *Datensubjekt*: Beim Datensubjekt handelt es sich um eine natürliche oder juristische Person, deren persönlichen Daten von einer Organisation gesammelt, gespeichert oder bearbeitet werden?",
+          "Der Verantwortliche und der Auftragsbearbeiter Wird sichergestellt, dass folgende Informationen schriftlich dokumentieren:?"
+        ],
+        "Stichworte": [
+          "Verantwortung",
+          "Dokumentation",
+          "Datensammlung"
+        ]
+      },
+      {
+        "Nummer": "5",
+        "Thema": "Organisation",
+        "Titel": "Dokumentation der Log-Daten Sammlungen",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Dokumentation zu den Log-Daten Sammlungen muss gepflegt und aktuell sein, einschließlich Informationen über Systeme, Aufbewahrungsdauer und Zugriffsrechte."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Dokumentation zu den jeweiligen Log-Daten Sammlungen muss gepflegt und aktuell sein."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Folgende Informationen müssen für jede Log-Daten Sammlung schriftlich dokumentiert werden:"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "Auf welchen Systemen die Logs gesammelt werden",
+                "Wie lange die Logs pro System aufbewahrt werden",
+                "Wer Zugriff pro System auf die Logs hat, inkl. mit welchen Privilegien",
+                "Wer Zugriff auf den Logging-Mechanismus hat, inkl. mit welchen Privilegien"
+              ]
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz, O2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Folgende Informationen Wird sichergestellt, dass für jede Log-Daten Sammlung schriftlich dokumentiert werden:?",
+          "Ist sichergestellt, dass auf welchen Systemen die Logs gesammelt werden?",
+          "Ist sichergestellt, dass wie lange die Logs pro System aufbewahrt werden?",
+          "Ist sichergestellt, dass wer Zugriff pro System auf die Logs hat, inkl. mit welchen Privilegien?",
+          "Ist sichergestellt, dass wer Zugriff auf den Logging-Mechanismus hat, inkl. mit welchen Privilegien?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "6",
+        "Thema": "Organisation",
+        "Titel": "Dokumentation der Log-Management Prozesse",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Management Prozesse müssen definiert und schriftlich dokumentiert werden, einschließlich aller Phasen von der Policy Definition bis zur Vernichtung."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Management Prozesse müssen definiert und schriftlich dokumentiert werden. Es muss ein gemeinsames Verständnis des Lebenszyklus der Log-Daten bestehen, von ihrer Erzeugung bis zu ihrer Vernichtung."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Folgende Phasen des Log-Management Prozesses müssen beschrieben werden:"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "Policy Definition",
+                "Konfiguration",
+                "Sammlung",
+                "Normalisierung",
+                "Indexierung",
+                "Auswertung",
+                "Korrelierung",
+                "Baselining",
+                "Alerting",
+                "Reporting",
+                "Aufbewahrung",
+                "Vernichtung"
+              ]
+            },
+            {
+              "typ": "text",
+              "inhalt": "Alle Phasen sind mit entsprechenden Sicherheitsmechanismen zu unterstützen. Es müssen Kontrollen implementiert werden, die während jeder Phase und bei jedem Übergang zur nächsten Phase sicherstellen, dass die Bearbeitung der Log-Daten sicher und konform ist."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz, O2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Log-Management Prozesse Wird sichergestellt, dass definiert und schriftlich dokumentiert werden. Es muss ein gemeinsames Verständnis des Lebenszyklus der Log-Daten bestehen, von ihrer Erzeugung bis zu ihrer Vernichtung?",
+          "Folgende Phasen des Log-Management Prozesses Wird sichergestellt, dass beschrieben werden:?",
+          "Ist sichergestellt, dass policy Definition?",
+          "Ist sichergestellt, dass konfiguration?",
+          "Ist sichergestellt, dass sammlung?",
+          "Ist sichergestellt, dass normalisierung?",
+          "Ist sichergestellt, dass indexierung?",
+          "Ist sichergestellt, dass auswertung?",
+          "Ist sichergestellt, dass korrelierung?",
+          "Ist sichergestellt, dass baselining?",
+          "Ist sichergestellt, dass alerting?",
+          "Ist sichergestellt, dass reporting?",
+          "Ist sichergestellt, dass aufbewahrung?",
+          "Ist sichergestellt, dass vernichtung?",
+          "Alle Phasen sind mit entsprechenden Sicherheitsmechanismen zu unterstützen. Es Wird sichergestellt, dass Kontrollen implementiert werden, die während jeder Phase und bei jedem Übergang zur nächsten Phase sicherstellen, dass die Bearbeitung der Log-Daten sicher und konform ist?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": 7,
+        "Thema": "Technik",
+        "Titel": "Vollständigkeit der Log-Daten Sammlungen",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten-Sammlungen müssen vollständig sein, um unberechtigte Aktivitäten zu erkennen und Ereignisse zu rekonstruieren."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten-Sammlungen müssen vollständig sein. Dadurch sollen sich unberechtigte Aktivitäten erkennen lassen, Ereignisse rekonstruiert werden können und Personen rechenschaftspflichtig gemacht werden können. Zur Sicherstellung der IT-Sicherheit braucht es eine Nachvollziehbarkeit von Handlungen, welche zur Sammlung relativ vieler Daten führen kann. Dazu soll das periodische Abholen oder Abliefern der gesammelten Logs von den Logsammel-Geräten sichergestellt werden. Die Infrastruktur muss zudem fähig sein, Log-Daten bei Wartungsarbeiten oder Ausfällen (bspw. einer Netzwerkkomponente) ohne Datenverluste weiter zu sammeln. Eine Log-Daten-Quelle darf nicht ausfallen, ohne dass dies sofort auffällt."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1",
+          "RVOG Art. 57l"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Log-Daten-Sammlungen Wird sichergestellt, dass vollständig sein. Dadurch sollen sich unberechtigte Aktivitäten erkennen lassen, Ereignisse rekonstruiert werden können und Personen rechenschaftspflichtig gemacht werden können. Zur Sicherstellung der IT-Sicherheit braucht es eine Nachvollziehbarkeit von Handlungen, welche zur Sammlung relativ vieler Daten führen kann. Dazu soll das periodische Abholen oder Abliefern der gesammelten Logs von den Logsammel-Geräten sichergestellt werden. Die Infrastruktur muss zudem fähig sein, Log-Daten bei Wartungsarbeiten oder Ausfällen (bspw. einer Netzwerkkomponente) ohne Datenverluste weiter zu sammeln. Eine Log-Daten-Quelle darf nicht ausfallen, ohne dass dies sofort auffällt?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": 8,
+        "Thema": "Technik",
+        "Titel": "Datensparsamkeit",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Bei der Protokollierung dürfen nur so viele Daten bearbeitet werden, wie zur Erfüllung des Zwecks notwendig sind."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Bei der Protokollierung dürfen nur so viele Daten bearbeitet werden, wie zur Erfüllung des Zwecks oder des Auftrags notwendig sind. Dabei müssen die jeweils geltenden gesetzlichen und betrieblichen Bestimmungen beachtet werden. Diese besagen unter anderem, dass die Protokollierung von Ereignissen nur zweckgebunden erfolgen darf. Die Protokollierung von Ereignissen zum Zweck der Arbeitskontrolle/Überwachung von Mitarbeitern ist nicht zulässig. Es dürfen nur dort Log-Daten gesammelt und ausgewertet, wo ein Zweck belegbar ist und eine gesetzliche Grundlage vorliegt."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1",
+          "RVOG Art. 57l"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Bei der Protokollierung dürfen nur so viele Daten bearbeitet werden, wie zur Erfüllung des Zwecks oder des Auftrags notwendig sind. Dabei Wird sichergestellt, dass die jeweils geltenden gesetzlichen und betrieblichen Bestimmungen beachtet werden. Diese besagen unter anderem, dass die Protokollierung von Ereignissen nur zweckgebunden erfolgen darf. Die Protokollierung von Ereignissen zum Zweck der Arbeitskontrolle/Überwachung von Mitarbeitern ist nicht zulässig. Es dürfen nur dort Log-Daten gesammelt und ausgewertet, wo ein Zweck belegbar ist und eine gesetzliche Grundlage vorliegt?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": 9,
+        "Thema": "Technik",
+        "Titel": "Relevante Informationen",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die protokollierten Informationen müssen die Sicherstellung der IT-Sicherheit ermöglichen und aussagekräftige sowie zuverlässige Informationen enthalten."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die protokollierten Informationen müssen die Sicherstellung der IT-Sicherheit ermöglichen. Log-Daten müssen aussagekräftige und zuverlässige Informationen enthalten. Der Grad und der Umfang der geloggten Informationen soll sich an dem Schutzbedarf des Schutzobjekts und der Anforderung an die Nachvollziehbarkeit orientieren. Insbesondere bei Systemen und Schutzobjekten mit erhöhtem Schutzbedarf ist sicherzustellen, dass genügend Informationen geloggt werden, um die IT-Sicherheit aufrechtzuerhalten."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1",
+          "RVOG Art. 57l"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Die protokollierten Informationen Wird sichergestellt, dass die Sicherstellung der IT-Sicherheit ermöglichen. Log-Daten Wird sichergestellt, dass aussagekräftige und zuverlässige Informationen enthalten. Der Grad und der Umfang der geloggten Informationen soll sich an dem Schutzbedarf des Schutzobjekts und der Anforderung an die Nachvollziehbarkeit orientieren. Insbesondere bei Systemen und Schutzobjekten mit erhöhtem Schutzbedarf ist sicherzustellen, dass genügend Informationen geloggt werden, um die IT-Sicherheit aufrechtzuerhalten?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": 10,
+        "Thema": "Technik",
+        "Titel": "Sicherheitsrelevante Ereignisse und Aktivitäten",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Sicherheitsrelevante Aktivitäten und Ereignisse müssen protokolliert, laufend überwacht und nachvollziehbar sein."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Sicherheitsrelevante Aktivitäten und Ereignisse müssen protokolliert werden, laufend überwacht werden und nachvollziehbar sein."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Der Begriff «sicherheitsrelevant» wird verwendet, um die Funktionen oder Mechanismen zu beschreiben, auf die man sich stützt, um die Schutzziele Vertraulichkeit, Integrität, Verfügbarkeit und Nachvollziehbarkeit zu erreichen. Als «sicherheitsrelevant» gelten somit alle Aktivitäten und Ereignisse, die den Betrieb von Sicherheitsfunktionen oder die Bereitstellung von Sicherheitsmechanismen in einer Weise beeinträchtigen können, oder dazu führen könnten, dass Sicherheitsrichtlinien nicht durchgesetzt oder aufrechterhalten werden können."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Sicherheitsrelevante Aktivitäten und Ereignisse Wird sichergestellt, dass protokolliert werden, laufend überwacht werden und nachvollziehbar sein?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "11",
+        "Thema": "Technik",
+        "Titel": "Aktivitäten, die mit erhöhten Privilegien durchgeführt werden",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Alle Aktivitäten, die mit erhöhten Privilegien durchgeführt werden, müssen protokolliert werden, laufend überwacht werden, und nachvollziehbar sein."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Als «erhöhte Privilegien» gelten alle Rechte zur Durchführung von Tätigkeiten, welche ein «normaler» Benutzer nicht durchführen darf. Auf einem Server kann dies Aktionen umfassen, welche Administratoren-Privilegien oder Root-Rechte benötigen. Darunter fallen auch Aktivitäten mithilfe von Administrations-Tools. In Applikationen sind dies typischerweise Privilegien, welche die Administration der Applikation selbst ermöglichen. Der Begriff ist auch für technische Benutzer zutreffend."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Die Vorgabe 'Aktivitäten, die mit erhöhten Privilegien durchgeführt werden' ist dokumentiert und implementiert."
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "12",
+        "Thema": "Technik",
+        "Titel": "Log-Daten-Format",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten müssen in einem geeigneten und konsistenten Format für die Bearbeitung bereitgestellt werden, wobei proprietäre Formate vermieden werden sollen."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten müssen in einem geeigneten und konsistenten Format für die Bearbeitung bereitgestellt werden. Soweit möglich muss sichergestellt werden, dass Log-Daten in den bestehenden Lösungen zur Sicherstellung der IT-Sicherheit integriert werden können."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten aus heterogenen Quellen sollen, wo technisch möglich und sinnvoll, vereinheitlicht werden, um die Komplexität der Log-Infrastruktur in Grenze zu halten. Dabei soll sichergestellt werden, dass die Log-Daten portierbar bleiben."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Soweit möglich sollen proprietäre Formate vermieden werden. Log-Daten in einem proprietären Format müssen zumindest lokal auf den Systemen gespeichert werden."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Wenn als Logformat ein freies ASCII-Textformat (z.B. CSV-Format) mit vordefiniertem Header verlangt ist, muss:"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "Das Headerfile dokumentiert und dem Logauswerter bekannt gegeben werden.",
+                "Die vordefinierten Header dürfen nur in Absprache mit dem Logempfänger abgeändert werden."
+              ]
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Log-Daten Wird sichergestellt, dass in einem geeigneten und konsistenten Format für die Bearbeitung bereitgestellt werden. Soweit möglich muss sichergestellt werden, dass Log-Daten in den bestehenden Lösungen zur Sicherstellung der IT-Sicherheit integriert werden können?",
+          "Log-Daten aus heterogenen Quellen Wird darauf geachtet, dass, wo technisch möglich und sinnvoll, vereinheitlicht werden, um die Komplexität der Log-Infrastruktur in Grenze zu halten. Dabei soll sichergestellt werden, dass die Log-Daten portierbar bleiben?",
+          "Soweit möglich sollen proprietäre Formate vermieden werden. Log-Daten in einem proprietären Format Wird sichergestellt, dass zumindest lokal auf den Systemen gespeichert werden?",
+          "Ist sichergestellt, dass das Headerfile dokumentiert und dem Logauswerter bekannt gegeben werden?",
+          "Ist sichergestellt, dass die vordefinierten Header dürfen nur in Absprache mit dem Logempfänger abgeändert werden?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "12",
+        "Thema": "Technik",
+        "Titel": "Zeitliche Identifikation",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Bei der Protokollierung muss immer eine eindeutige zeitliche Identifikation geloggt werden, um die Rekonstruktion von Sicherheitsvorfällen zu ermöglichen."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Bei der Protokollierung muss immer eine eindeutige zeitliche Identifikation geloggt werden, um die Rekonstruktion von Sicherheitsvorfällen zu ermöglichen. Als Identifikation müssen Datum und Zeit gewählt werden, sodass eine eindeutige zeitliche Korrelation der Log-Daten möglich wird. Da das Format HH:MM:SS für die notwendige Eindeutigkeit nicht ausreicht, muss zusätzlich die Millisekunde geloggt werden. In diesem Sinne muss auch sichergestellt werden, dass das Datums- und Zeitformat der verschiedenen Log-Daten einheitlich ist."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Sollten Zeit-Synchronisationsprobleme zwischen Diensten auftauchen, erschwert dies die zeitliche Rekonstruktion von Sicherheitsvorfällen. Hierzu muss die korrekte Synchronisation der Systemzeit mit der NTP-Infrastruktur des Bundes oder einem AD-Service sichergestellt werden."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Bei der Protokollierung muss immer eine eindeutige zeitliche Identifikation geloggt werden, um die Rekonstruktion von Sicherheitsvorfällen zu ermöglichen. Als Identifikation Wird sichergestellt, dass Datum und Zeit gewählt werden, sodass eine eindeutige zeitliche Korrelation der Log-Daten möglich wird. Da das Format HH:MM:SS für die notwendige Eindeutigkeit nicht ausreicht, muss zusätzlich die Millisekunde geloggt werden. In diesem Sinne muss auch sichergestellt werden, dass das Datums- und Zeitformat der verschiedenen Log-Daten einheitlich ist?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "13",
+        "Thema": "Technik",
+        "Titel": "Benutzer-Identifikation",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Bei der Protokollierung muss eine eindeutige Benutzer-Identifikation geloggt werden, um Aktivitäten einem eindeutigen Benutzer zuordnen zu können."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Bei der Protokollierung muss eine eindeutige Benutzer-Identifikation geloggt werden, die auf eine natürliche Person zurückführt, damit Aktivitäten einem eindeutigen Benutzer zugeordnet werden können. Der Benutzer, dessen Aktivitäten die Erzeugung der Log-Daten ausgelöst hat, muss eindeutig identifiziert werden können. Rollenwechsel zwischen Accounts, welche natürlichen Personen zugeordnet sind, und generischen Accounts, müssen so geloggt werden, dass eine weitere Zuordnung zum Ursprungs-Account (der Person) bestehen bleibt."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Bei der Protokollierung muss eine eindeutige Benutzer-Identifikation geloggt werden, die auf eine natürliche Person zurückführt, damit Aktivitäten einem eindeutigen Benutzer zugeordnet werden können. Der Benutzer, dessen Aktivitäten die Erzeugung der Log-Daten ausgelöst hat, muss eindeutig identifiziert werden können. Rollenwechsel zwischen Accounts, welche natürlichen Personen zugeordnet sind, und generischen Accounts, Wird sichergestellt, dass so geloggt werden, dass eine weitere Zuordnung zum Ursprungs-Account (der Person) bestehen bleibt?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "14",
+        "Thema": "Technik",
+        "Titel": "System-Identifikation",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Bei der Protokollierung muss eine eindeutige System-Identifikation geloggt werden, um Aktivitäten einem eindeutigen System zuordnen zu können."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Bei der Protokollierung muss eine eindeutige System-Identifikation geloggt werden, die auf ein eindeutiges System zurückführt, wovon die Aktivitäten durchgeführt wurden (Hostname, IP-Adresse, etc.), damit Aktivitäten einem eindeutigen System zugeordnet werden können."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Die Vorgabe 'System-Identifikation' ist dokumentiert und implementiert."
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "15",
+        "Thema": "Technik",
+        "Titel": "Realtime-Analyse",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Eine Realtime-Analyse muss für sicherheitsrelevante Log-Daten möglich sein, um Sicherheitsvorfälle schnellstmöglich zu erkennen."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Eine Realtime-Analyse muss für Log-Daten möglich sein, welche eine direkte Sicherheitsrelevanz haben, d.h. Komponenten, welche aus Sicherheitsgründen etabliert worden sind (Firewall, Gateway, Virenscanner, etc.). Sicherheitsrelevante Log-Daten sind laufend auszuwerten. Bei vermuteten oder bestätigten Sicherheitsvorfällen sind angemessenen Prozesse zeitnah auszulösen. Durch die laufende Auswertung von Log-Daten (Real-time-Analyse) sollen somit Sicherheitsvorfälle schnellstmöglich erkannt werden."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Beim Bezug von internen oder externen Dienstleistungen ist sicherzustellen, dass die Auswertung der Log-Daten in die ordentlichen Betriebsprozesse integriert wird."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Die Möglichkeit einer Offline-Analyse der Daten muss auch dort vorgesehen werden, wo eine erhöhte Nachvollziehbarkeit gefordert ist (z.B. um ein bestimmtes Ereignis im Nachhinein genauer oder überhaupt nachvollziehen zu können). Grundsätzlich werden die Daten nicht in Realtime übertragen, d.h. die Daten werden lokal gesammelt und zu einem bestimmten Zeitpunkt übertragen und für die Offline-Analyse bereitgestellt. Offline bedeutet in diesem Zusammenhang, dass ein begrenztes und abgeschlossenes Paket mit Log-Daten auf einem zweiten System analysiert wird, z.B. nach einem Logrotate. Die Offline-Analyse kann auch Daten umfassen, welche zuvor bereits der Realtime-Analyse dienten. Offline-Analysen sollten jedoch nur im Ausnahmefall erfolgen. In der Regel ist eine Realtime-Analyse der Log-Daten zu bevorzugen."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Eine Realtime-Analyse muss für Log-Daten möglich sein, welche eine direkte Sicherheitsrelevanz haben, d.h. Komponenten, welche aus Sicherheitsgründen etabliert worden sind (Firewall, Gateway, Virenscanner, etc.). Sicherheitsrelevante Log-Daten sind laufend auszuwerten. Bei vermuteten oder bestätigten Sicherheitsvorfällen sind angemessenen Prozesse zeitnah auszulösen. Durch die laufende Auswertung von Log-Daten (Real-time-Analyse) Wird darauf geachtet, dass somit Sicherheitsvorfälle schnellstmöglich erkannt werden?",
+          "Die Möglichkeit einer Offline-Analyse der Daten muss auch dort vorgesehen werden, wo eine erhöhte Nachvollziehbarkeit gefordert ist (z.B. um ein bestimmtes Ereignis im Nachhinein genauer oder überhaupt nachvollziehen zu können). Grundsätzlich werden die Daten nicht in Realtime übertragen, d.h. die Daten werden lokal gesammelt und zu einem bestimmten Zeitpunkt übertragen und für die Offline-Analyse bereitgestellt. Offline bedeutet in diesem Zusammenhang, dass ein begrenztes und abgeschlossenes Paket mit Log-Daten auf einem zweiten System analysiert wird, z.B. nach einem Logrotate. Die Offline-Analyse kann auch Daten umfassen, welche zuvor bereits der Realtime-Analyse dienten. Offline-Analysen Wird sichergestellt, dassten jedoch nur im Ausnahmefall erfolgen. In der Regel ist eine Realtime-Analyse der Log-Daten zu bevorzugen?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "16",
+        "Thema": "Technik",
+        "Titel": "Priorisierung der Auswertungen",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Auswertung der Log-Daten muss priorisiert und systematisch erfolgen, um eine zeitnahe Reaktion auf Sicherheitsvorfälle sicherzustellen."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Auswertung der Log-Daten muss bezüglich der IT-Sicherheit priorisiert werden und systematisch erfolgen, um eine möglichst zeitnahe Reaktion auf Sicherheitsvorfälle sicherzustellen. Es müssen zuerst diejenigen Log-Daten von Systemen analysiert werden, welche entweder an einer neuralgischen Stelle (z.B. Netzwerkübergang) stehen oder welche Daten mit hohen Sicherheitsanforderungen enthalten."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Die Auswertung der Log-Daten muss bezüglich der IT-Sicherheit priorisiert werden und systematisch erfolgen, um eine möglichst zeitnahe Reaktion auf Sicherheitsvorfälle sicherzustellen. Es Wird sichergestellt, dass zuerst diejenigen Log-Daten von Systemen analysiert werden, welche entweder an einer neuralgischen Stelle (z.B. Netzwerkübergang) stehen oder welche Daten mit hohen Sicherheitsanforderungen enthalten?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "17",
+        "Thema": "Technik",
+        "Titel": "Auswertung von korrelierten Log-Daten",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Korrelierte Log-Daten müssen sicher und konform bearbeitet werden, wobei der Zugriff beschränkt und der Datenschutz berücksichtigt werden muss."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Korrelierte Log-Daten müssen sicher und konform bearbeitet werden. Es wird zwischen normalen und korrelierten Log-Daten unterschieden. Die normalen Log-Daten sind Daten, welche im Betrieb anfallen. Korrelierte Log-Daten sind Daten, welche zur Analyse mit weiteren Datensätzen aufbereitet wurden und es unter Umständen ermöglichen, ein Profil (z.B. eines Benutzers) zu erstellen. Der Zugriff auf korrelierten Log-Daten muss beschränkt werden, da die Auswertung von korrelierten Log-Daten heikel werden kann. Persönlichkeitsprofile nach DSG sind besonders schützenswerten Personendaten gleichgestellt."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Die Auswertung und Korrelation der Daten dürfen nur unter Berücksichtigung des Datenschutzes und der gesetzlichen Grundlagen erfolgen. Durch die Korrelation können unter Umständen von der Schutzwürdigkeit her unbedenkliche Daten zu besonders schützenswerten Daten oder Persönlichkeitsprofilen gewandelt werden. Dieser Eventualität muss bereits bei der Planung der Auswertung von Log-Daten Rechnung getragen werden. Im Zweifelsfall muss der Rechtsdienst des BIT kontaktiert werden."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Falls die korrelierten Daten besonders schützenswerte Personendaten beinhalten oder die Zusammenstellung von besonders schützenswerte Persönlichkeitsprofilen ermöglichen, muss für die Auswertung der korrelierten Daten ein bewilligtes Datenschutzbearbeitungsreglement vorliegen."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Für die Vergabe der entsprechenden Rechte bei besonders schützenswerten Personendaten oder Persönlichkeitsprofilen ist der Rechtsdienst BIT zuständig. Für die in einem entsprechenden Datenbearbeitungsreglement vorgesehenen Rollen wird die Zustimmung implizit angenommen."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1",
+          "Least-Privilege-Prinzip",
+          "Need-to-Know Prinzip"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Korrelierte Log-Daten Wird sichergestellt, dass sicher und konform bearbeitet werden. Es wird zwischen normalen und korrelierten Log-Daten unterschieden. Die normalen Log-Daten sind Daten, welche im Betrieb anfallen. Korrelierte Log-Daten sind Daten, welche zur Analyse mit weiteren Datensätzen aufbereitet wurden und es unter Umständen ermöglichen, ein Profil (z.B. eines Benutzers) zu erstellen. Der Zugriff auf korrelierten Log-Daten muss beschränkt werden, da die Auswertung von korrelierten Log-Daten heikel werden kann. Persönlichkeitsprofile nach DSG sind besonders schützenswerten Personendaten gleichgestellt?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "18",
+        "Thema": "Technik",
+        "Titel": "Zugriffsberechtigungen auf Log-Daten",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Zugriffsberechtigungen auf Log-Daten müssen nach dem Least-Privilege-Prinzip und dem Need-to-Know-Prinzip vergeben werden."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Zugriffsberechtigungen auf Log-Daten müssen nach dem Least-Privilege-Prinzip und dem Need-to-Know-Prinzip vergeben werden."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Zum Schutz der Log-Daten muss jeder Zugriff auf den Log-Daten und jede Auswertung dieser mit persönlichen Accounts erfolgen und nachvollziehbar sein. Der Zugriff auf Log-Daten ist einer eindeutigen natürlichen Person zurückzuführen. Ausnahmen dazu sind rein maschinelle Auswertungen, die keine natürliche Person zugeordnet werden können."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Der Zugriff auf Log- und korrelierten Betriebsdaten ist auf die folgenden Rollen beschränkt:"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "CSIRT Mitarbeitende",
+                "Betreiber",
+                "Dateninhaber",
+                "Datenschutzverantwortlicher (nach DSG), nach Prüfung durch den Rechtsdienst des Dateninhabers",
+                "Supportfunktionen, nach Prüfung durch den Rechtsdienst des Dateninhabers",
+                "Alle vom Dateninhaber sonstigen berechtigten Rollen (z.B. Entwickler, Anwendungsbetreuer, Auditor, etc.)"
+              ]
+            },
+            {
+              "typ": "text",
+              "inhalt": "Für die Vergabe der entsprechenden Rechte ist immer der Dateninhaber zuständig. Bei den Betreibern wird die Zustimmung implizit angenommen. Betreiber von Systemen dürfen nur die Log-Daten von den Systemen sehen, korrelieren, oder auswerten, die sie auch betreiben."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Folgende Rollen dürfen Leserecht auf ihren Log-Daten und den zugehörigen Logging-Mechanismen haben. Dabei beinhaltet das Leserecht kein Recht zum vollständigen Kopieren der Log-Daten. Die Log-Daten dürfen die Plattform nur auszugsweise verlassen:"
+            },
+            {
+              "typ": "tabelle",
+              "inhalt": "| Rolle | Gründe | Art der Daten |\n|--------------------------------------------|-------------------|---------------------------------------------|\n|Betreiber des Services (z.B. DB-Admin) |Serviceerbringung |Log-Daten (auch korreliert) des Service |\n|Betreiber der Anwendung |Serviceerbringung |Log-Daten (auch korreliert) der Anwendung |\n|Betreiber des Systems (z.B. System-Admin) |Serviceerbringung |Log-Daten (auch korreliert) der Systeme |\n|Betreiber der Plattform |Serviceerbringung |Log-Daten (auch korreliert) der Plattform |"
+            },
+            {
+              "typ": "text",
+              "inhalt": "Folgende Rollen dürfen Leserecht auf die Log-Daten haben:"
+            },
+            {
+              "typ": "tabelle",
+              "inhalt": "|Rolle | Gründe | Art der Daten |\n|-------------------------------------------------------------------------------------------|---------------------------------------------------|---------------------------------------------------------------------------------|\n|CSIRT-Mitarbeitende | Security-Incidentmanagement | Alle Log-Daten inkl. korrelierter Daten |\n|SI-SUR Mitarbeitende | Security-Incidentmanagement, Kontrolle, Prüfungen | Alle Log-Daten inkl. korrelierter Daten |\n|Externer (nicht-BIT) Leistungserbringer (z.B. externer Entwickler, externer Support, etc.) | Serviceerbringung | Log-Daten nach Absprache mit dem ISBO des für die Daten verantwortlichen Amtes |\n|Interner (BIT) Leistungserbringer (z.B. Entwickler, Support, etc.) | Serviceerbringung | Log-Daten welche für die Leistungserbringung notwendig sind |\n|Leistungsbezüger | Kontrolle | Log-Daten wie nach SLA vereinbart |\n|Informationsschutzverantwortlicher | Kontrolle | Alle Log-Daten inkl. korrelierter Daten |\n|Datenschutzverantwortlicher | Kontrolle | Alle Log-Daten inkl. korrelierter Daten |"
+            },
+            {
+              "typ": "text",
+              "inhalt": "Rollen, die in keine der oben aufgeführten Kategorien gehören, dürfen ohne Einwilligung des Dateninhabers keinen Zugriff auf die Log-Daten haben."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1",
+          "Least-Privilege-Prinzip",
+          "Need-to-Know Prinzip"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Zugriffsberechtigungen auf Log-Daten Wird sichergestellt, dass nach dem Least-Privilege-Prinzip und dem Need-to-Know-Prinzip vergeben werden?",
+          "Ist sichergestellt, dass cSIRT Mitarbeitende?",
+          "Ist sichergestellt, dass betreiber?",
+          "Ist sichergestellt, dass dateninhaber?",
+          "Ist sichergestellt, dass datenschutzverantwortlicher (nach DSG), nach Prüfung durch den Rechtsdienst des Dateninhabers?",
+          "Ist sichergestellt, dass supportfunktionen, nach Prüfung durch den Rechtsdienst des Dateninhabers?",
+          "Ist sichergestellt, dass alle vom Dateninhaber sonstigen berechtigten Rollen (z.B. Entwickler, Anwendungsbetreuer, Auditor, etc.)?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "19",
+        "Thema": "Technik",
+        "Titel": "Aufbewahrung",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten müssen revisionssicher und konform aufbewahrt werden, wobei Vertraulichkeit und Integrität gewährleistet sein müssen."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Log-Daten müssen revisionssicher und konform aufbewahrt werden. Die Vertraulichkeit und Integrität der Log-Daten müssen bei deren Aufbewahrung jederzeit gewährleistet werden."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Bei der Aufbewahrung der Log-Daten muss sichergestellt werden, dass"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "alle benötigten Log-Daten aufbewahrt werden",
+                "die Log-Daten vor unberechtigter Einsichtnahme geschützt werden",
+                "die Log-Daten vor unautorisierten Manipulationen geschützt werden",
+                "die Log-Daten vor Verlust geschützt werden",
+                "die Log-Daten nicht länger aufbewahrt werden, als deren Bearbeitungszweck es vorsieht",
+                "archivierte Log-Daten bei Bedarf mit vertretbarem Aufwand abgerufen werden können",
+                "die Service Level Agreements (SLA) der Kundinnen und Kunden in Hinsicht auf Aufbewahrung eingehalten werden"
+              ]
+            },
+            {
+              "typ": "text",
+              "inhalt": "Dafür müssen Kontrollen implementiert werden, welche die revisionssichere und konforme Aufbewahrung von Log-Daten sicherstellen."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Logs sind verschlüsselt zu speichern (Harddisk: verschlüsselte Partition; Backup: verschlüsseltes File)."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1",
+          "IT-Grundschutz I2",
+          "IT-Grundschutz I3"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Die Log-Daten Wird sichergestellt, dass revisionssicher und konform aufbewahrt werden. Die Vertraulichkeit und Integrität der Log-Daten Wird sichergestellt, dass bei deren Aufbewahrung jederzeit gewährleistet werden?",
+          "Ist sichergestellt, dass alle benötigten Log-Daten aufbewahrt werden?",
+          "Ist sichergestellt, dass die Log-Daten vor unberechtigter Einsichtnahme geschützt werden?",
+          "Ist sichergestellt, dass die Log-Daten vor unautorisierten Manipulationen geschützt werden?",
+          "Ist sichergestellt, dass die Log-Daten vor Verlust geschützt werden?",
+          "Ist sichergestellt, dass die Log-Daten nicht länger aufbewahrt werden, als deren Bearbeitungszweck es vorsieht?",
+          "Ist sichergestellt, dass archivierte Log-Daten bei Bedarf mit vertretbarem Aufwand abgerufen werden können?",
+          "Ist sichergestellt, dass die Service Level Agreements (SLA) der Kundinnen und Kunden in Hinsicht auf Aufbewahrung eingehalten werden?",
+          "Dafür Wird sichergestellt, dass Kontrollen implementiert werden, welche die revisionssichere und konforme Aufbewahrung von Log-Daten sicherstellen?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "20",
+        "Thema": "Technik",
+        "Titel": "Aufbewahrungsfristen",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Aufbewahrungsfristen der Log-Daten müssen die IT-Sicherheit ermöglichen und mit bundesweiten Vorgaben und Gesetzen konform sein."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Aufbewahrungsfristen der Log-Daten müssen die Sicherstellung der IT-Sicherheit ermöglichen und müssen mit den bundesweiten Vorgaben und Gesetzen konform sein."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Bei der Aufbewahrung von Log-Daten wird zwischen Schnellzugriffs-Speicher und Langzeitaufbewahrung differenziert. Bei Schnellzugriffs-Speicher können Log-Daten mit geringem Aufwand und innerhalb kurzer Zeit abgerufen werden. Bei der Langzeitaufbewahrung werden die Log-Daten langfristig archiviert. Obwohl archivierte Log-Daten weiterhin verfügbar sind, ist deren Abruf jedoch wesentlich aufwändiger im Vergleich zu einer Aufbewahrung in einem Schnellzugriffs-Speicher."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten müssen mindestens 3 Monate (90 Tage) im Schnellzugriffs-Speicher aufbewahrt werden und durchsuchbar sein."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten, die Personendaten enthalten oder aus denen Rückschlüsse auf Personen möglich sind,"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "müssen mindestens 1 Jahr langfristig getrennt vom System, in welchem die Personendaten bearbeitet werden, aufbewahrt werden (Art. 4, Abs. 5, DSV)",
+                "dürfen maximal 2 Jahre aufbewahrt werden (Art. 4, VPNIB). Für eine längere Aufbewahrungsfrist ist eine separate rechtliche Grundlage notwendig."
+              ]
+            },
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten, die keine Personendaten enthalten und aus denen keine Rückschlüsse auf Personen möglich sind,"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "dürfen langfristig aufbewahrt werden, insofern diese archivwürdig sind (Art. 7, BGA)",
+                "archivwürdig sind Unterlagen, die von juristischer oder administrativer Bedeutung sind oder einen grossen Informationswert haben (Art. 3, Abs. 3, BGA)",
+                "die Archivwürdigkeit der Log-Daten muss zwischen dem Dateninhaber und dem Schweizerischen Bundesarchiv (BAR) bewertet werden (Art. 7, BGA, Art.6, VBGA)",
+                "archivwürdige Log-Daten müssen archiviert werden, wenn die Log-Daten nicht mehr häufig oder regelmässig gebraucht werden, jedoch spätestens 5 Jahre nach dem letzten Aktenzuwachs (Art. 4, Abs. 1, VBGA)"
+              ]
+            },
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten von Netzwerkgeräten müssen mindestens 2 Jahre lang aufbewahrt werden (BRB 1c)). Die langfristige Aufbewahrung darf offline erfolgen (Archivierung)."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Bei staatsrechnungsrelevanten Applikationen müssen die relevanten Log-Daten mindestens 6 Monate lang in Speichern mit schneller Zugriffsmöglichkeit aufbewahrt werden. Die 6 Monate entsprechen einem halben Prüfungsjahr. Zusätzlich zu den 6 Monaten sollte eine zeitliche Abgrenzungsreserve von 1 Monat vorgesehen werden. Nach Abschluss der Frist müssen die Log-Daten von staatsrechnungsrelevanten Applikationen nachträglich langfristig aufbewahrt werden (Archivierung) und unter Berücksichtigung der VPNIB und DSG Vorschriften. Für kürzere Zeiträume der maximalen Aufbewahrungsdauer im Schnellzugriffs-Speicher ist die Eidgenössische Finanzkontrolle (EFK) beizuziehen."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1",
+          "IT-Grundschutz I2",
+          "IT-Grundschutz I3"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Die Aufbewahrungsfristen der Log-Daten Wird sichergestellt, dass die Sicherstellung der IT-Sicherheit ermöglichen und Wird sichergestellt, dass mit den bundesweiten Vorgaben und Gesetzen konform sein?",
+          "Log-Daten Wird sichergestellt, dass mindestens 3 Monate (90 Tage) im Schnellzugriffs-Speicher aufbewahrt werden und durchsuchbar sein?",
+          "Ist sichergestellt, dass müssen mindestens 1 Jahr langfristig getrennt vom System, in welchem die Personendaten bearbeitet werden, aufbewahrt werden (Art. 4, Abs. 5, DSV)?",
+          "Ist sichergestellt, dass dürfen maximal 2 Jahre aufbewahrt werden (Art. 4, VPNIB). Für eine längere Aufbewahrungsfrist ist eine separate rechtliche Grundlage notwendig?",
+          "Ist sichergestellt, dass dürfen langfristig aufbewahrt werden, insofern diese archivwürdig sind (Art. 7, BGA)?",
+          "Ist sichergestellt, dass archivwürdig sind Unterlagen, die von juristischer oder administrativer Bedeutung sind oder einen grossen Informationswert haben (Art. 3, Abs. 3, BGA)?",
+          "Ist sichergestellt, dass die Archivwürdigkeit der Log-Daten muss zwischen dem Dateninhaber und dem Schweizerischen Bundesarchiv (BAR) bewertet werden (Art. 7, BGA, Art.6, VBGA)?",
+          "Ist sichergestellt, dass archivwürdige Log-Daten müssen archiviert werden, wenn die Log-Daten nicht mehr häufig oder regelmässig gebraucht werden, jedoch spätestens 5 Jahre nach dem letzten Aktenzuwachs (Art. 4, Abs. 1, VBGA)?",
+          "Log-Daten von Netzwerkgeräten Wird sichergestellt, dass mindestens 2 Jahre lang aufbewahrt werden (BRB 1c)). Die langfristige Aufbewahrung darf offline erfolgen (Archivierung)?",
+          "Bei staatsrechnungsrelevanten Applikationen Wird sichergestellt, dass die relevanten Log-Daten mindestens 6 Monate lang in Speichern mit schneller Zugriffsmöglichkeit aufbewahrt werden. Die 6 Monate entsprechen einem halben Prüfungsjahr. Zusätzlich zu den 6 Monaten sollte eine zeitliche Abgrenzungsreserve von 1 Monat vorgesehen werden. Nach Abschluss der Frist Wird sichergestellt, dass die Log-Daten von staatsrechnungsrelevanten Applikationen nachträglich langfristig aufbewahrt werden (Archivierung) und unter Berücksichtigung der VPNIB und DSG Vorschriften. Für kürzere Zeiträume der maximalen Aufbewahrungsdauer im Schnellzugriffs-Speicher ist die Eidgenössische Finanzkontrolle (EFK) beizuziehen?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "21",
+        "Thema": "Technik",
+        "Titel": "Löschung und Vernichtung",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten müssen revisionssicher und konform gelöscht und vernichtet werden, wobei die Rekonstruktion der Daten praktisch undurchführbar sein soll."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten müssen revisionssicher und konform gelöscht und vernichtet werden."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Die Löschung von Daten bezeichnet generell die Unkenntlichmachung von Daten. Die Vernichtung von Daten bezieht sich meist auf die physische Zerstörung des Speichermediums. In beiden Fällen soll die Rekonstruktion der ursprünglichen Daten praktisch undurchführbar sein."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Bei der Löschung bzw. Vernichtung von Log-Daten sind folgende Anforderungen zu beachten:"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "Log-Daten dürfen nur nach Ablauf ihrer Aufbewahrungsfrist gelöscht oder vernichtet werden.",
+                "Log-Daten müssen nach Ablauf ihrer Aufbewahrungsfrist, entsprechend den betrieblichen Umständen, möglichst zeitnah gelöscht bzw. vernichtet werden. Spätestens 3 Monate nach Ablauf der Aufbewahrungsfrist sind die Log-Daten zu löschen oder zu vernichten (Art. 4, Abs. 2, VPNIB).",
+                "Nur die vom Verantwortlichen bestimmten Personen dürfen, in ihrer Rolle als Auftragsbearbeiter, Log-Daten löschen oder vernichten, bzw. die entsprechenden Prozesse zum Löschen oder Vernichten der Log-Daten einleiten.",
+                "Zu Verifizierungszwecken ist die Löschung und Vernichtung von Log-Daten zu protokollieren.",
+                "Die Log-Daten sind nach einem festgelegten Verfahren und auf konsistente Weise zu löschen bzw. zu vernichten."
+              ]
+            },
+            {
+              "typ": "text",
+              "inhalt": "Datenträger, auf welchen die Log-Daten gespeichert sind, sind durch das Bundesamt für Bauten und Logistik (BBL) zu entsorgen. Für die Entsorgung sind die Vorgaben zur Entsorgung elektronischer Datenträger zu beachten. Je nach Schutzobjekt sind auch die Anforderungen des entsprechenden ISDS-Konzeptes zu beachten."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1",
+          "IT-Grundschutz I2",
+          "IT-Grundschutz I3",
+          "VPNIB"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Log-Daten Wird sichergestellt, dass revisionssicher und konform gelöscht und vernichtet werden?",
+          "Die Löschung von Daten bezeichnet generell die Unkenntlichmachung von Daten. Die Vernichtung von Daten bezieht sich meist auf die physische Zerstörung des Speichermediums. In beiden Fällen Wird sichergestellt, dass die Rekonstruktion der ursprünglichen Daten praktisch undurchführbar sein?",
+          "Ist sichergestellt, dass log-Daten dürfen nur nach Ablauf ihrer Aufbewahrungsfrist gelöscht oder vernichtet werden?",
+          "Ist sichergestellt, dass log-Daten müssen nach Ablauf ihrer Aufbewahrungsfrist, entsprechend den betrieblichen Umständen, möglichst zeitnah gelöscht bzw. vernichtet werden. Spätestens 3 Monate nach Ablauf der Aufbewahrungsfrist sind die Log-Daten zu löschen oder zu vernichten (Art. 4, Abs. 2, VPNIB)?",
+          "Ist sichergestellt, dass nur die vom Verantwortlichen bestimmten Personen dürfen, in ihrer Rolle als Auftragsbearbeiter, Log-Daten löschen oder vernichten, bzw. die entsprechenden Prozesse zum Löschen oder Vernichten der Log-Daten einleiten?",
+          "Ist sichergestellt, dass zu Verifizierungszwecken ist die Löschung und Vernichtung von Log-Daten zu protokollieren?",
+          "Ist sichergestellt, dass die Log-Daten sind nach einem festgelegten Verfahren und auf konsistente Weise zu löschen bzw. zu vernichten?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "22",
+        "Thema": "Technik",
+        "Titel": "Änderungen an Logging-Mechanismen",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Änderungen an Logging-Mechanismen müssen kontinuierlich überwacht werden, wobei das Starten, Stoppen und Pausieren der Protokollierung überwacht werden muss."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Änderungen an Logging-Mechanismen und Protokollierungseinstellungen sind kontinuierlich zu überwachen. Das Starten, Stoppen und Pausieren der Protokollierung müssen überwacht werden. Die Protokollierung darf nicht pausiert oder gestoppt werden, ohne dass dies sofort auffällt. Sämtliche Zugriffe auf Protokollierungseinstellungen müssen überwacht werden. Zugriffe auf Protokollierungseinstellungen müssen mit persönlichen Accounts erfolgen, schriftlich begründet sein und nachvollziehbar sein."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Änderungen an Logging-Mechanismen und Protokollierungseinstellungen sind kontinuierlich zu überwachen. Das Starten, Stoppen und Pausieren der Protokollierung Wird sichergestellt, dass überwacht werden. Die Protokollierung darf nicht pausiert oder gestoppt werden, ohne dass dies sofort auffällt. Sämtliche Zugriffe auf Protokollierungseinstellungen Wird sichergestellt, dass überwacht werden. Zugriffe auf Protokollierungseinstellungen Wird sichergestellt, dass mit persönlichen Accounts erfolgen, schriftlich begründet sein und nachvollziehbar sein?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "23",
+        "Thema": "Technik",
+        "Titel": "Überwachung des Logging-Prozesses",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Fehlkonfigurationen und Fehlverhalten im Logging-Prozess sind rechtzeitig zu erkennen, wobei Alerts eingerichtet werden müssen."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Fehlkonfigurationen und Fehlverhalten im Logging-Prozess sind rechtzeitig zu erkennen. Alerts müssen eingerichtet werden, um Fehlkonfigurationen und Fehlverhalten im Logging-Prozess schnellstmöglich zu erkennen und zu beheben."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Fehlkonfigurationen und Fehlverhalten im Logging-Prozess sind rechtzeitig zu erkennen. Alerts Wird sichergestellt, dass eingerichtet werden, um Fehlkonfigurationen und Fehlverhalten im Logging-Prozess schnellstmöglich zu erkennen und zu beheben?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "24",
+        "Thema": "Technik",
+        "Titel": "Testen der Logging-Mechanismen",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Logging-Mechanismen müssen ordnungsgemäß getestet werden, bevor sie produktiv eingerichtet und verwendet werden."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Logging-Mechanismen müssen ordnungsgemäss getestet werden, bevor sie produktiv eingerichtet und verwendet werden. Somit soll sichergestellt werden, dass Log-Daten korrekt bearbeitet werden. Gleichzeitig soll vermieden werden, dass Log-Daten aufgrund fehlerhaft eingerichteter Logging-Mechanismen verloren gehen."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Bei der Einrichtung der Logging-Mechanismen muss auch sichergestellt werden, dass keine sensiblen Daten geloggt werden. Werden sensible Daten geloggt, müssen sie vorab angemessen obfuskiert werden, z.B. durch Hashing. Zudem muss sichergestellt werden, dass die Protokollierung von personenbezogenen Daten innerhalb des rechtlichen Rahmens bleibt. Die Logging-Mechanismen müssen zusammen mit dem Gesamtsystem vor ihrem produktiven Einsatz formell abgenommen werden."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Logging-Mechanismen Wird sichergestellt, dass ordnungsgemäss getestet werden, bevor sie produktiv eingerichtet und verwendet werden. Somit soll sichergestellt werden, dass Log-Daten korrekt bearbeitet werden. Gleichzeitig soll vermieden werden, dass Log-Daten aufgrund fehlerhaft eingerichteter Logging-Mechanismen verloren gehen?",
+          "Bei der Einrichtung der Logging-Mechanismen muss auch sichergestellt werden, dass keine sensiblen Daten geloggt werden. Werden sensible Daten geloggt, Wird sichergestellt, dass sie vorab angemessen obfuskiert werden, z.B. durch Hashing. Zudem muss sichergestellt werden, dass die Protokollierung von personenbezogenen Daten innerhalb des rechtlichen Rahmens bleibt. Die Logging-Mechanismen Wird sichergestellt, dass zusammen mit dem Gesamtsystem vor ihrem produktiven Einsatz formell abgenommen werden?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "25",
+        "Thema": "Technik",
+        "Titel": "Trennung der logdatensammelnden und der logdatenproduzierenden Systeme",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten müssen vor Manipulation geschützt werden, indem die logdatensammelnden und logdatenproduzierenden Systeme getrennt werden."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten müssen vor einer gewollten (z.B. durch einen Angreifenden) oder versehentlichen Manipulation (z.B. durch einen Benutzenden oder eine Applikation) von Nicht-Administratoren geschützt werden. Dies soll durch die Trennung der logdatenproduzierenden und der logdatensammelnden Systeme erreicht werden."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten müssen mittels geeigneter Technologie an einen Speicherort verschoben werden, welcher physisch vom logdatenproduzierenden System getrennt ist. Die Weiterleitung muss ohne Verzögerung erfolgen."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Der Zugriff auf das logdatensammelnde System und insbesondere auf die Log-Daten selbst muss stark eingeschränkt und lediglich einem kleinen und wohldefinierten Personenkreis vorbehalten werden (Need-to-Know Prinzip). Die Liste der erlaubten Personen muss schriftlich dokumentiert werden und jederzeit aktuell gehalten werden."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Die Trennung zwischen dem logdatensammelnden System und dem logdatenproduzierenden System folgt dem Sicherheitsprinzip gemäss Funktionstrennung (Separation-of-Duty)."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1",
+          "IT-Grundschutz I2.2",
+          "Need-to-Know Prinzip"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Log-Daten Wird sichergestellt, dass vor einer gewollten (z.B. durch einen Angreifenden) oder versehentlichen Manipulation (z.B. durch einen Benutzenden oder eine Applikation) von Nicht-Administratoren geschützt werden. Dies soll durch die Trennung der logdatenproduzierenden und der logdatensammelnden Systeme erreicht werden?",
+          "Log-Daten Wird sichergestellt, dass mittels geeigneter Technologie an einen Speicherort verschoben werden, welcher physisch vom logdatenproduzierenden System getrennt ist. Die Weiterleitung muss ohne Verzögerung erfolgen?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "26",
+        "Thema": "Technik",
+        "Titel": "Logdatensammler-Infrastruktur",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten müssen an einer dedizierten zentralen Logdatensammelstelle gesammelt werden, die skalierbar und hochverfügbar sein muss."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten müssen an einer dedizierten zentralen Logdatensammelstelle gesammelt werden. Werden Log-Daten nicht systematisch an einer dedizierten zentralen Logdatensammelstelle gesammelt und nur lokal gespeichert, besteht das Risiko, dass Log-Daten verloren gehen (z.B bei Wartungsarbeiten oder Ausfällen) oder nicht brauchbar sind."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Die Logdatensammler-Infrastruktur muss dazu fähig sein, die erzeugte Menge an Log-Daten zu verarbeiten und somit entsprechend skalierbar sein. Gegebenenfalls sollte die Logdatensammler-Infrastruktur hochverfügbar sein."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Die Infrastruktur zum zentralen Sammeln der Log-Daten muss zudem folgende Bedingungen erfüllen:"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "Die Anforderungen aus der Sicherheit an die Logdatensammler-Infrastruktur ergeben sich aus dem höchsten geforderten Schutzziel aller auf der Infrastruktur bearbeiteten Daten (Maximumprinzip).",
+                "Für die jeweiligen Infrastrukturen müssen ISDS-Konzepte erstellt werden.",
+                "Um die Netzwerkverkehr zu minimieren, sollen die Logsammel-Geräte möglichst nahe (Netzwerktechnisch) an den logproduzierenden Geräten stehen."
+              ]
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1",
+          "IT-Grundschutz I2.2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Log-Daten Wird sichergestellt, dass an einer dedizierten zentralen Logdatensammelstelle gesammelt werden. Werden Log-Daten nicht systematisch an einer dedizierten zentralen Logdatensammelstelle gesammelt und nur lokal gespeichert, besteht das Risiko, dass Log-Daten verloren gehen (z.B bei Wartungsarbeiten oder Ausfällen) oder nicht brauchbar sind?",
+          "Die Logdatensammler-Infrastruktur muss dazu fähig sein, die erzeugte Menge an Log-Daten zu verarbeiten und somit entsprechend skalierbar sein. Gegebenenfalls Wird sichergestellt, dasste die Logdatensammler-Infrastruktur hochverfügbar sein?",
+          "Ist sichergestellt, dass die Anforderungen aus der Sicherheit an die Logdatensammler-Infrastruktur ergeben sich aus dem höchsten geforderten Schutzziel aller auf der Infrastruktur bearbeiteten Daten (Maximumprinzip)?",
+          "Ist sichergestellt, dass für die jeweiligen Infrastrukturen müssen ISDS-Konzepte erstellt werden?",
+          "Ist sichergestellt, dass um die Netzwerkverkehr zu minimieren, sollen die Logsammel-Geräte möglichst nahe (Netzwerktechnisch) an den logproduzierenden Geräten stehen?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "27",
+        "Thema": "Technik",
+        "Titel": "Gemanagte Konfiguration der Protokollierung",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Konfiguration der Protokollierung soll systemübergreifend konsistent sein und zentral verwaltet werden."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Konfiguration der Protokollierung soll systemübergreifend konsistent sein. Dabei soll die Konfiguration der Protokollierung pro Teilgebiet (Netzwerk, Datenbanken, Applikationen, etc.) an einer zentralen Stelle hinterlegt und verwaltet werden. Dadurch werden inkonsistente lokale Konfigurationen vermieden. Zudem reduzieren sich Arbeitsaufwände, wenn Konfigurationen weitmöglichst zentral verwaltet werden, anstatt lokal auf jedem einzelnen System."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Die Konfiguration der Protokollierung Wird sichergestellt, dass systemübergreifend konsistent sein. Dabei Wird sichergestellt, dass die Konfiguration der Protokollierung pro Teilgebiet (Netzwerk, Datenbanken, Applikationen, etc.) an einer zentralen Stelle hinterlegt und verwaltet werden. Dadurch werden inkonsistente lokale Konfigurationen vermieden. Zudem reduzieren sich Arbeitsaufwände, wenn Konfigurationen weitmöglichst zentral verwaltet werden, anstatt lokal auf jedem einzelnen System?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "28",
+        "Thema": "Technik",
+        "Titel": "Härtung der Logsammler-Geräte",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Geräte zum Sammeln der Log-Daten müssen gehärtet sein und bestimmte Sicherheitsbedingungen erfüllen."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Geräte zum Sammeln der Log-Daten müssen gehärtet sein."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Folgende Bedingungen müssen erfüllt werden:"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "Die Geräte müssen nach den Vorgaben der IT-Sicherheit konfiguriert sein (Einhaltung der Standards und Richtlinien).",
+                "Die Geräte müssen zusätzlich gehärtet werden (z.B. mit lokal installierter Firewall). Sind spezifische Vorgaben zur Härtung vorhanden, müssen diese eingehalten werden.",
+                "Die Geräte müssen über einen Integritätscheck verfügen (z.B. OSSEC).",
+                "Die Geräte müssen das Abholen der offline Log-Daten mittels SCP ermöglichen.",
+                "Die Geräte müssen das Abholen der online Log-Daten mittels TLS over TCP ermöglichen.",
+                "Die Geräte müssen so konfiguriert werden, dass die Speicher für die Log-Daten ausreichend gross bemessen sind. D.h. der Speicher darf zwischen zwei Backup-Zyklen weder überlaufen, noch soll ein Überschreiben der Log-Daten notwendig werden.",
+                "Die Geräte sollen über Mandantenfähigkeit verfügen.",
+                "Die Geräte stehen in einem Administrations-Netzwerk oder in einer dedizierten Logging-Zone.",
+                "Die Geräte sollen hierarchisch gegliedert werden."
+              ]
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1",
+          "IT-Grundschutz I1",
+          "IT-Grundschutz I2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Die Geräte zum Sammeln der Log-Daten Wird sichergestellt, dass gehärtet sein?",
+          "Folgende Bedingungen Wird sichergestellt, dass erfüllt werden:?",
+          "Ist sichergestellt, dass die Geräte müssen nach den Vorgaben der IT-Sicherheit konfiguriert sein (Einhaltung der Standards und Richtlinien)?",
+          "Ist sichergestellt, dass die Geräte müssen zusätzlich gehärtet werden (z.B. mit lokal installierter Firewall). Sind spezifische Vorgaben zur Härtung vorhanden, müssen diese eingehalten werden?",
+          "Ist sichergestellt, dass die Geräte müssen über einen Integritätscheck verfügen (z.B. OSSEC)?",
+          "Ist sichergestellt, dass die Geräte müssen das Abholen der offline Log-Daten mittels SCP ermöglichen?",
+          "Ist sichergestellt, dass die Geräte müssen das Abholen der online Log-Daten mittels TLS over TCP ermöglichen?",
+          "Ist sichergestellt, dass die Geräte müssen so konfiguriert werden, dass die Speicher für die Log-Daten ausreichend gross bemessen sind. D.h. der Speicher darf zwischen zwei Backup-Zyklen weder überlaufen, noch soll ein Überschreiben der Log-Daten notwendig werden?",
+          "Ist sichergestellt, dass die Geräte sollen über Mandantenfähigkeit verfügen?",
+          "Ist sichergestellt, dass die Geräte stehen in einem Administrations-Netzwerk oder in einer dedizierten Logging-Zone?",
+          "Ist sichergestellt, dass die Geräte sollen hierarchisch gegliedert werden?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "29",
+        "Thema": "Technik",
+        "Titel": "Log-Daten-Beatbeitung in einer Cloud-Lösung",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Bearbeitung von Log-Daten in einer Cloud-Lösung muss konform mit den IT-Sicherheitsvorgaben und bundesweiten Gesetzen sein."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Bearbeitung von Log-Daten in einer Cloud-Lösung muss konform mit den IT-Sicherheitsvorgaben des BIT und den bundesweiten Vorgaben und Gesetze sein."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Die Bearbeitung der Log-Daten in einer Cloud-Lösung durch den Auftragsbearbeiter ist zwischen dem Verantwortlichen und dem Auftragsbearbeiter vertraglich zu regeln. Der Verantwortliche muss sich vor dem Vertragsabschluss vergewissern, dass der Auftragsbearbeiter in der Lage ist, die Sicherheit der Log-Daten zu gewährleisten. Der Schutz der Log-Daten muss nachweislich gleich so hoch sein wie bei einer On-Premises Lösung. Bei der Beurteilung der Sicherheit sind die Schutzziele Vertraulichkeit, Integrität, Verfügbarkeit und Nachvollziehbarkeit zu berücksichtigen."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Zudem muss nachgewiesen werden, dass allfällige zusätzliche Risiken, die durch eine Bearbeitung der Log-Daten in einer Cloud-Lösung entstehen, tragbar sind. Das Nutzen einer Bearbeitung von Log-Daten in einer Cloud-Lösung sollte die daraus entstehenden Risiken überwiegen. Sollte das nicht möglich sind, sind kompensierende Massnahmen zur Risikominimierung zu definieren und umzusetzen."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Der Verantwortliche muss sich auch vergewissern, dass die Log-Daten vom Auftragsbearbeiter gleich bearbeitet werden, wie der Verantwortliche es selbst tun dürfte."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Zudem muss nachgewiesen werden, dass allfällige zusätzliche Risiken, die durch eine Bearbeitung der Log-Daten in einer Cloud-Lösung entstehen, tragbar sind. Das Nutzen einer Bearbeitung von Log-Daten in einer Cloud-Lösung Wird sichergestellt, dasste die daraus entstehenden Risiken überwiegen. Sollte das nicht möglich sind, sind kompensierende Massnahmen zur Risikominimierung zu definieren und umzusetzen?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "30",
+        "Thema": "Technik",
+        "Titel": "Cloud-Dienste",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Visibilität über sicherheitsrelevante Ereignisse und Aktivitäten betreffend Schutzobjekte, die Cloud-Dienste beziehen, muss gewährleistet werden."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Visibilität über sicherheitsrelevante Ereignisse und Aktivitäten betreffend Schutzobjekte, die Cloud-Dienste beziehen, muss gewährleistet werden."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Beim Bezug von Cloud-Diensten sind folgende Punkte abzuklären und schriftlich zu dokumentieren:"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "Welche Log-Daten werden generiert",
+                "Wo werden die Log-Daten aufbewahrt",
+                "Wie werden die Log-Daten gesichert",
+                "Werden die Log-Daten verschlüsselt und falls ja, wie die Verschlüsselung gehandhabt wird (Verschlüsselungsalgorithmus, Schlüssel-Management, etc.)"
+              ]
+            },
+            {
+              "typ": "text",
+              "inhalt": "Der Serviceverantwortliche oder der Applikationsverantwortliche muss sich vergewissern, dass er genügend Einsicht in die Log-Daten hat, um die IT-Sicherheit zu gewährleisten. In diesem Sinne muss er sich auch vergewissern, dass angemessenen Schnittstellen zur Verfügung stehen, damit Log-Daten abgerufen und ausgewertet werden können."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Ist sichergestellt, dass welche Log-Daten werden generiert?",
+          "Ist sichergestellt, dass wo werden die Log-Daten aufbewahrt?",
+          "Ist sichergestellt, dass wie werden die Log-Daten gesichert?",
+          "Ist sichergestellt, dass werden die Log-Daten verschlüsselt und falls ja, wie die Verschlüsselung gehandhabt wird (Verschlüsselungsalgorithmus, Schlüssel-Management, etc.)?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "31",
+        "Thema": "Technik",
+        "Titel": "Integration in bestehende Lösungen",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Cloud-Logs müssen in die bestehenden Lösungen zur Log-Daten Bearbeitung integriert werden und mit On-Premise Log-Daten korreliert werden können."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Cloud-Logs müssen in die bestehenden Lösungen zur Log-Daten Bearbeitung integriert werden. Das Prinzip der zentralen Sammlung der Log-Daten darf durch einen Cloud-Service nicht gebrochen werden. Die Cloud-Logs müssen mit den On-Premise Log-Daten korreliert werden können."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Cloud-Logs müssen zudem in einem geeigneten und konsistenten Format für die Bearbeitung bereitgestellt werden. In diesem Sinne muss sichergestellt werden, dass Cloud-Logs in den bestehenden Lösungen zur Sicherstellung der IT-Sicherheit integriert werden können und die Auswertung der Cloud-Logs in die ordentlichen Betriebsprozesse integriert wird."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Cloud-Logs Wird sichergestellt, dass in die bestehenden Lösungen zur Log-Daten Bearbeitung integriert werden. Das Prinzip der zentralen Sammlung der Log-Daten darf durch einen Cloud-Service nicht gebrochen werden. Die Cloud-Logs Wird sichergestellt, dass mit den On-Premise Log-Daten korreliert werden können?",
+          "Cloud-Logs Wird sichergestellt, dass zudem in einem geeigneten und konsistenten Format für die Bearbeitung bereitgestellt werden. In diesem Sinne muss sichergestellt werden, dass Cloud-Logs in den bestehenden Lösungen zur Sicherstellung der IT-Sicherheit integriert werden können und die Auswertung der Cloud-Logs in die ordentlichen Betriebsprozesse integriert wird?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "32",
+        "Thema": "Informationen",
+        "Titel": "Protokollierung von Zugriffen auf sensible Daten",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Zugriffe auf sensible Daten müssen protokolliert, laufend überwacht und nachvollziehbar sein."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Zugriffe auf sensible Daten müssen protokolliert werden, laufend überwacht werden und nachvollziehbar sein."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Als sensible Daten gelten u.a.:"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "Authentifikationsdaten (Passwörter, Schlüssel, Zertifikate, etc.)",
+                "Konfigurationsdateien",
+                "Audit-Logs",
+                "Besonders schützenswerte Personendaten oder Persönlichkeitsprofilen (nach DSG)",
+                "GEHEIM-klassifizierte Informationen (nach ISchV)",
+                "Finanziell relevante Daten (Buchhaltungsdaten, Inventardaten, etc.)",
+                "Geschäftskritische Daten",
+                "Alle sonstigen Daten, welche in einer Schutzbedarfsanalyse als schützenswert bezüglich der Vertraulichkeit definiert wurden"
+              ]
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz T2.1"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Zugriffe auf sensible Daten Wird sichergestellt, dass protokolliert werden, laufend überwacht werden und nachvollziehbar sein?",
+          "Ist sichergestellt, dass authentifikationsdaten (Passwörter, Schlüssel, Zertifikate, etc.)?",
+          "Ist sichergestellt, dass konfigurationsdateien?",
+          "Ist sichergestellt, dass audit-Logs?",
+          "Ist sichergestellt, dass besonders schützenswerte Personendaten oder Persönlichkeitsprofilen (nach DSG)?",
+          "Ist sichergestellt, dass gEHEIM-klassifizierte Informationen (nach ISchV)?",
+          "Ist sichergestellt, dass finanziell relevante Daten (Buchhaltungsdaten, Inventardaten, etc.)?",
+          "Ist sichergestellt, dass geschäftskritische Daten?",
+          "Ist sichergestellt, dass alle sonstigen Daten, welche in einer Schutzbedarfsanalyse als schützenswert bezüglich der Vertraulichkeit definiert wurden?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "33",
+        "Thema": "Informationen",
+        "Titel": "Schutz von Geheimnissen",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Geheimnisse müssen bei der Bearbeitung von Log-Daten angemessen geschützt werden, um zu verhindern, dass sie geloggt werden."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Geheimnisse sind bei der Bearbeitung von Log-Daten angemessen zu schützen. Es muss sichergestellt werden, dass keine Geheimnisse (z.B. Passwörter, private Schlüssel, PIN Codes, etc.) geloggt werden. Werden Geheimnisse geloggt, müssen sie vorab angemessen obfuskiert oder maskiert werden, z.B. durch Hashing oder *********."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz I2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Geheimnisse sind bei der Bearbeitung von Log-Daten angemessen zu schützen. Es muss sichergestellt werden, dass keine Geheimnisse (z.B. Passwörter, private Schlüssel, PIN Codes, etc.) geloggt werden. Werden Geheimnisse geloggt, Wird sichergestellt, dass sie vorab angemessen obfuskiert oder maskiert werden, z.B. durch Hashing oder *********?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "34",
+        "Thema": "Informationen",
+        "Titel": "Bearbeitung von besonders schützenswerten Personendaten",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Bearbeitung von besonders schützenswerten Personendaten muss konform mit bundesweiten Vorgaben und Gesetzen sein."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Bearbeitung von besonders schützenswerten Personendaten muss konform mit den bundesweiten Vorgaben und Gesetze sein. Für jede Log-Datensammlung mit besonders schützenswerten Personendaten muss ein bewilligtes Datenschutzbearbeitungsreglement und ein bewilligtes Berechtigungskonzept existieren."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Des Weiteren muss eine Datenschutzvereinbarung zwischen dem Verantwortlichen und dem Auftragsbearbeiter abgeschlossen werden. Die Datenschutzvereinbarung muss folgende Punkte adressieren:"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "Zweck der Bearbeitung",
+                "Priorisierung der Datensicherheit",
+                "Meldungspflicht bei Feststellungen von allfälligen Gefährdungen der Datensammlung",
+                "Geheimhaltungsverpflichtung, inkl. nach Beendigung des Auftrags",
+                "Datenbekanntgabe an Dritte"
+              ]
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz I2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Ist sichergestellt, dass zweck der Bearbeitung?",
+          "Ist sichergestellt, dass priorisierung der Datensicherheit?",
+          "Ist sichergestellt, dass meldungspflicht bei Feststellungen von allfälligen Gefährdungen der Datensammlung?",
+          "Ist sichergestellt, dass geheimhaltungsverpflichtung, inkl. nach Beendigung des Auftrags?",
+          "Ist sichergestellt, dass datenbekanntgabe an Dritte?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "35",
+        "Thema": "Informationen",
+        "Titel": "Schutzbedarf",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Der Schutzbedarf der Log-Daten muss bekannt sein, um angemessene Maßnahmen zum Schutz der Log-Daten zu treffen."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Der Schutzbedarf der Log-Daten, muss bekannt sein, damit angemessenen Massnahmen zum Schutz der Log-Daten getroffen werden Der Schutzbedarf der Log-Daten ist vom Dateninhaber zu beurteilen und festzulegen."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz I2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Die Vorgabe 'Schutzbedarf' ist dokumentiert und implementiert."
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "36",
+        "Thema": "Informationen",
+        "Titel": "Transport",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Der Transport von Log-Daten muss möglichst zeitnah zur Erzeugung der Logs erfolgen, um eine Out-of-Band-Analyse zu ermöglichen."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Der Transport von Log-Daten muss möglichst zeitnah zur Erzeugung der Logs erfolgen, um eine Out-of-Band-Analyse zu ermöglichen. Der Zeitraum richtet sich nach den Sicherheits-Anforderungen und muss jeweils einzeln abgesprochen, bzw. geregelt werden. Log-Daten sind standardmässig in Echtzeit zu übermitteln. Für Transfers von grossen Log-Datenmengen sollen Randstunden gewählt werden."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Für die periodische offline-Datenübertragung kann ein Standard ZIP-File (Bzip, ZIP) verwendet werden."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz I2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Der Transport von Log-Daten muss möglichst zeitnah zur Erzeugung der Logs erfolgen, um eine Out-of-Band-Analyse zu ermöglichen. Der Zeitraum richtet sich nach den Sicherheits-Anforderungen und muss jeweils einzeln abgesprochen, bzw. geregelt werden. Log-Daten sind standardmässig in Echtzeit zu übermitteln. Für Transfers von grossen Log-Datenmengen Wird darauf geachtet, dass Randstunden gewählt werden?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "37",
+        "Thema": "Informationen",
+        "Titel": "Protokolle",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Für die Übertragung der Daten soll das Syslog-Protokoll eingesetzt werden, wobei TCP-Protokolle den UDP-Protokollen vorzuziehen sind."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Für die Übertragung der Daten soll das Syslog-Protokoll (RFC5424) eingesetzt werden, welches heute de facto einem Industriestandard entspricht, soweit keine herstellerspezifischen Vorgaben oder Empfehlungen (z.B. Eventforwarding unter Windows) existieren. Beispiel für eine entsprechende Software ist die freie Implementierung Syslog-NG. Für die Übertragung sind auf jeden Fall TCP-Protokolle den UDP-Protokollen vorzuziehen."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz I2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Für die Übertragung der Daten Wird sichergestellt, dass das Syslog-Protokoll (RFC5424) eingesetzt werden, welches heute de facto einem Industriestandard entspricht, soweit keine herstellerspezifischen Vorgaben oder Empfehlungen (z.B. Eventforwarding unter Windows) existieren. Beispiel für eine entsprechende Software ist die freie Implementierung Syslog-NG. Für die Übertragung sind auf jeden Fall TCP-Protokolle den UDP-Protokollen vorzuziehen?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "38",
+        "Thema": "Informationen",
+        "Titel": "Schutz der Log-Daten während des Transports",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Vertraulichkeit und Integrität der Log-Daten müssen auf dem Transportweg mittels geeigneter Technik gewährleistet werden."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Die Vertraulichkeit und die Integrität der Log-Daten müssen auf dem Transportweg mittels geeigneter Technik jederzeit gewährleistet werden. Die Transportwege müssen sicher sein und mit einem aktuellen TLS Protokoll geschützt werden. Ist dies nicht möglich, müssen die Daten auf andere Art kryptographisch geschützt werden (z.B. mittels verschlüsseltem ZIP-File). Solche Abweichungen müssen schriftlich dokumentiert werden."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz I2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Die Vertraulichkeit und die Integrität der Log-Daten Wird sichergestellt, dass auf dem Transportweg mittels geeigneter Technik jederzeit gewährleistet werden. Die Transportwege Wird sichergestellt, dass sicher sein und mit einem aktuellen TLS Protokoll geschützt werden. Ist dies nicht möglich, Wird sichergestellt, dass die Daten auf andere Art kryptographisch geschützt werden (z.B. mittels verschlüsseltem ZIP-File). Solche Abweichungen Wird sichergestellt, dass schriftlich dokumentiert werden?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "39",
+        "Thema": "Informationen",
+        "Titel": "Zonen mit tieferem Sicherheitsniveau",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten müssen in einer Zone aufbewahrt werden, deren Schutzniveau dem Schutzbedarf der Log-Daten entspricht."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten müssen in einer Zone aufbewahrt werden, deren Schutzniveau der Schutzbedarf der Log-Daten entspricht. Falls Log-Daten von einer Zone mit höherem Sicherheitsniveau nach einer Zone mit tieferem Sicherheitsniveau übermittelt werden müssen, muss sichergestellt werden, dass die Sicherheit der Log-Daten bei der Übertragung und bei der Aufbewahrung nicht wesentlich beeinträchtigt wird."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten dürfen in einer Zone mit tieferem Sicherheitsniveau übermittelt werden, sofern eine Risikoanalyse gezeigt hat, dass"
+            },
+            {
+              "typ": "liste",
+              "inhalt": [
+                "der Nutzen die daraus entstehenden Risiken überwiegt",
+                "die Risiken tragbar sind"
+              ]
+            },
+            {
+              "typ": "text",
+              "inhalt": "Sollte die Risikoanalyse wiederum zeigen, dass die Weiterleitung der Log-Daten nach einer Zone mit tieferem Sicherheitsniveau die Sicherheit der Log-Daten wesentlich beeinträchtigt, dürfen die Log-Daten nicht nach dieser Zone weitergeleitet werden."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz I2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Log-Daten Wird sichergestellt, dass in einer Zone aufbewahrt werden, deren Schutzniveau der Schutzbedarf der Log-Daten entspricht. Falls Log-Daten von einer Zone mit höherem Sicherheitsniveau nach einer Zone mit tieferem Sicherheitsniveau übermittelt werden Wird sichergestellt, dass, muss sichergestellt werden, dass die Sicherheit der Log-Daten bei der Übertragung und bei der Aufbewahrung nicht wesentlich beeinträchtigt wird?",
+          "Ist sichergestellt, dass der Nutzen die daraus entstehenden Risiken überwiegt?",
+          "Ist sichergestellt, dass die Risiken tragbar sind?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "40",
+        "Thema": "Informationen",
+        "Titel": "Datenbekanntgabe an Dritte",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Im Rahmen der Bearbeitung der Log-Daten durch einen Auftragsbearbeiter dürfen keine Daten an Dritte bekanntgegeben werden, sofern dies nicht zwingend erforderlich ist."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Im Rahmen der Bearbeitung der Log-Daten durch einen Auftragsbearbeiter dürfen keine Daten an Dritte bekanntgegeben werden, sofern dies nicht zwingend erforderlich ist."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Die Bekanntgabe von Daten an Dritte (z.B. Unterauftragnehmer) darf nur unter der vorgängigen Genehmigung des Dateninhabers erfolgen. Dies betrifft sowohl die Log-Datensammlung selbst als auch allfällige Metadaten, die mit der Log-Datensammlung verknüpft sind oder davon abgeleitet werden können."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Die Bekanntgabe von Log-Daten an Dritte darf nur erfolgen, falls die Bekanntgabe für die Zweckerfüllung der Bearbeitung zwingend erforderlich ist."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Die Bekanntgabe von Log-Daten an Dritte darf keine negativen Auswirkungen auf die Schutzziele Vertraulichkeit, Integrität, Verfügbarkeit und Nachvollziehbarkeit haben."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Werden Log-Daten an Dritte bekanntgegeben, bzw. durch Dritte bearbeitet, muss diese Bearbeitung vertraglich mit dem Verantwortlichen und Auftragsbearbeiter geregelt werden. Der Dateninhaber muss sich dabei vergewissern, dass die Sicherheit der Log-Daten bei ihrer Bearbeitung weiterhin gewährleistet wird."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz I2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Die Vorgabe 'Datenbekanntgabe an Dritte' ist dokumentiert und implementiert."
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "41",
+        "Thema": "Informationen",
+        "Titel": "Physische Trennung",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten dürfen nicht von der Person manipuliert oder gelöscht werden können, deren Aktivitäten die Erzeugung dieser Log-Daten hatte."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Log-Daten dürfen nicht von derjenigen Person manipuliert oder gelöscht werden können, deren Aktivitäten als direkte Konsequenz die Erzeugung dieser Log-Daten hatte. Hierzu müssen angemessene technische und organisatorische Massnahmen umgesetzt werden. Die umgesetzten Massnahmen sind schriftlich zu dokumentieren."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Sollte das nicht möglich sein, sind die Anforderungen *R066.5.12 Physische Trennung* und *R066.5.13 Erkennung von Manipulationen* zwingend einzuhalten."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz I2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Log-Daten dürfen nicht von derjenigen Person manipuliert oder gelöscht werden können, deren Aktivitäten als direkte Konsequenz die Erzeugung dieser Log-Daten hatte. Hierzu Wird sichergestellt, dass angemessene technische und organisatorische Massnahmen umgesetzt werden. Die umgesetzten Massnahmen sind schriftlich zu dokumentieren?"
+        ],
+        "Stichworte": []
+      },
+      {
+        "Nummer": "42",
+        "Thema": "Informationen",
+        "Titel": "Erkennung von Manipulationen",
+        "Kurztext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Allfällige Manipulationen von Log-Daten müssen erkennbar und nachvollziehbar sein, wobei das Schutzziel der Nachvollziehbarkeit erreicht werden muss."
+            }
+          ]
+        },
+        "Langtext": {
+          "Abschnitt": [
+            {
+              "typ": "text",
+              "inhalt": "Allfällige Manipulationen von Log-Daten müssen erkennbar und nachvollziehbar sein. Falls ein System weder schreibgeschützte Log-Daten (R066.5.10), Separation of Duties (R066.5.11) oder physische Trennung (R066.5.12) ermöglicht, ist diese Anforderung zwingend einzuhalten."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Für Log-Daten, die nicht gegen unberechtigte Manipulationen oder Löschungen geschützt werden können, muss auf jeden Fall das Schutzziel der Nachvollziehbarkeit erreicht werden. D.h., dass es festgestellt werden muss, ob die Daten manipuliert oder gelöscht wurden, und falls ja, von wem."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Die anfallenden Daten müssen mittels einer kryptografischen Hashfunktion geschützt werden. Der Hashwert (Fingerprint) soll auf einem anderen System als demjenigen, auf welchem die Logs erzeugt wurden zeitnah erstellt werden."
+            },
+            {
+              "typ": "text",
+              "inhalt": "Die Hashwerte sollen nicht mit dem gleichen technischen User erstellt werden, welche die Log-Daten entgegen nimmt/transferiert."
+            }
+          ]
+        },
+        "Referenz": [
+          "IT-Grundschutz I2"
+        ],
+        "Gueltigkeit": {
+          "Von": "2024-01-01",
+          "Bis": "2026-12-31"
+        },
+        "Checklistenfragen": [
+          "Allfällige Manipulationen von Log-Daten Wird sichergestellt, dass erkennbar und nachvollziehbar sein. Falls ein System weder schreibgeschützte Log-Daten (R066.5.10), Separation of Duties (R066.5.11) oder physische Trennung (R066.5.12) ermöglicht, ist diese Anforderung zwingend einzuhalten?",
+          "Die anfallenden Daten Wird sichergestellt, dass mittels einer kryptografischen Hashfunktion geschützt werden. Der Hashwert (Fingerprint) soll auf einem anderen System als demjenigen, auf welchem die Logs erzeugt wurden zeitnah erstellt werden?",
+          "Die Hashwerte Wird darauf geachtet, dass nicht mit dem gleichen technischen User erstellt werden, welche die Log-Daten entgegen nimmt/transferiert?"
+        ],
+        "Stichworte": []
+      }
+    ],
+    "Gueltigkeit": {
+      "Von": "2023-01-01",
+      "Bis": "2024-12-31"
+    }
+  }
+}

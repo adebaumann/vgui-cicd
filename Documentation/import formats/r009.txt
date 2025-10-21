@@ -1,0 +1,337 @@
+>>>Einleitung
+>>>text
+Dieser Standard unterliegt den Definitionen vom Zentraldokument für Standard IT-Sicherheit. Ziel & Zweck, Änderungswesen etc. sind da definiert und werden hier nicht ein zweites Mal aufgeführt.
+
+
+>>>geltungsbereich
+>>>text
+Dieser Standard dient als Umsetzungsanforderung für Richtlinien IT-Sicherheit zu Serversystemen im BIT. Betroffen sind von diesem Standard grundsätzlich alle Serversysteme . Einzelne, explizite Ausschlüsse werden in den Anforderungen spezifiziert
+
+>>>Vorgabe Organisation
+>>>Nummer 1
+>>>Titel
+R0009.2.1	CMDB-Erfassung
+>>>Kurztext
+>>>Text
+Die Konfigurationsmanagement-Datenbank stellt die integrierte Informationsgrundlage für das Service-Management BIT sicher und ist das IT-Repository fürs IT-Sicherheitsmanagement.
+>>>Langtext
+>>>Text
+Jedes Asset (Server, Gateway, Router, Switch usw.), dass sich im BIT-Netz befindet, muss in einer möglichst standardisierten Form dokumentiert sein. Ist die Betriebsverantwortung bei einem anderen Leistungserbringer, ist dies entsprechend zu dokumentieren und einzufordern.
+
+
+>>>Vorgabe Technik
+>>>Nummer 1
+>>>Titel
+Dienste und Protokolle
+>>>Kurztext
+>>>Text
+Nicht benötigte Dienste und Protokolle deaktivieren
+>>>Langtext
+>>>Text
+Nach einer Standardinstallation von Systemen und Softwareprodukten sind typischerweise lokale oder aus dem Netz erreichbare Dienste und Protokolle aktiv, die für den Betreib und die Funktionalität des Systems nicht notwendig sind. Hierzu gehören auch Dienste und Protokolle, die aufgrund ihrer bekannten Sicherheits-Schwachstellen, die gegebenen falls für die Verletzung von Schutzzielen wie Vertraulichkeit, Integrität und Verfügbarkeit genutzt werden können. Solche Dienste (wie z.B. SSL anstatt TLS) und Protokolle müssen auf einem System vollständig deaktiviert sein (System-Härtung). Dabei ist es wichtig zu beachten, dass die Deaktivierung auch nach einem Neustart des Systems bestehen bleibt.
+
+Als Referenz für System-Härtung sollen die spezifischen Hersteller Sicherheits-Konfigurationen und weitere Referenzen wie CIS-Workbench angewendet werden.
+
+>>>Vorgabe Technik
+>>>Nummer 2
+>>>Titel
+Einschränkungen Tools auf Serversystemen
+>>>Kurztext
+>>>Text
+Es dürfen keine Entwicklungstools, wie Compiler und Debugger, sowie Source Code Repositories auf einem produktiven Server vorhanden sein.
+>>>Langtext
+>>>Text
+Es dürfen keine Entwicklungstools, wie Compiler und Debugger, sowie Source Code Repositories auf einem produktiven Server vorhanden sein. Falls diese temporär benötigt werden (z.B. in einer krisenbedingten Restore-Situation) dürfen sie nur punktuell und so lange wie nötig auf den Systemen installiert werden.
+
+>>>Vorgabe Technik
+>>>Nummer 3
+>>>Titel
+Erreichbarkeit von Diensten
+>>>Kurztext
+>>>Text
+Dienste können nur eingeschränkt erreichbar sein und die Konfiguration darf nur autorisiert erfolgen.
+>>>Langtext
+>>>Text
+In der Regel sind aktivierte Dienste in der Grundkonfiguration über alle verfügbaren Schnittstellen eines Systems erreichbar und können von anderen Systemen in den angeschlossenen Netzen erreicht werden. Diese Erreichbarkeit ist funktional weder notwendig noch sinnvoll. Daher dürfen auf einem System die Dienste nur auf Schnittstellen aktiviert werden, auf denen deren Nutzung erforderlich ist. Auf den Schnittstellen, auf denen einen Dienst aktiv ist, muss dessen Erreichbarkeit auf legitime Kommunikationspartner eingeschränkt werden. Diese Einschränkung muss lokal, also ohne zusätzliche netzseitige Massnahmen, wie z. B. eine Firewall, erfolgen
+
+Dies kann zum Beispiel durch gegenseitige Authentisierung der Serversysteme mittels Zertifikats oder Key-Austausch erreicht werden.
+
+
+>>>Vorgabe Technik
+>>>Nummer 4
+>>>Titel
+Lokale Firewalls anwenden
+>>>Kurztext
+>>>Text
+Vorgeschaltete Firewwalls bieten keinen umfassenden Schutz.
+>>>Langtext
+>>>Text
+Zonen Übergreifende Firewall oder Netz-Segmentierung sind keine Garantie für eine effiziente Einschränkung an nur berechtigte Zugriffe.
+Ein lokaler Paketfilter (Firewall) stellt sicher, dass Dienste, insbesondere Management-Dienste, nur an den erforderlichen Schnittstellen erreichbar sind.
+
+Ist auch Teil der Grund-Konfiguration durch System-Härtung (R0009.T.1).
+
+
+>>>Vorgabe Informationen
+>>>Nummer 1
+>>>Titel
+BIT-Externer Betrieb
+>>>Kurztext
+>>>Text
+Die Verschlüsselung der Datenträger soll wo immer möglich verwendet werden. Es ist ein MUSS wo keine angepasste physische Zugriff Sicherheit gesichert werden kann.
+>>>Langtext
+>>>Text
+Falls sich das System nicht in einem BIT betriebenen RZ oder in einem abgesicherten Raum mit mindestens «Sehr hohem Schutzbedarf» befindet, müssen verwendete Datenträger vollständig verschlüsselt sein.
+
+Der Schutzbedarf oder auch die Schutzklassen (SK) sind in der (Richtlinie Informationssicherheit)[https://community.bit.admin.ch/team/eabit/Private/iktvorgaben/IKTVorgaben%20genehmigt/R0135_V5.2.pdf] BIT definiert.
+
+>>>Vorgabe Informationen
+>>>Nummer 2
+>>>Titel
+Vermeiden von Überlastsituationen
+>>>Kurztext
+>>>Text
+Das System muss sich gegen Überlastsituationen schützen
+>>>Langtext
+>>>Text
+Ein System muss über Schutzmechanismen verfügen, die Überlastsituationen soweit wie möglich verhindern. Insbesondere ist eine partielle oder komplette Beeinträchtigung der Verfügbarkeit des Systems zu vermeiden. Beispiele für mögliche Schutzmassnahmen sind:
+>>>Liste-ungeordnet
+Begrenzung auf Netzwerkzonen
+Begrenzung des pro Anwendung verfügbaren Arbeitsspeichers
+Begrenzung der maximalen Sessions einer Web-Anwendung
+Festlegen der maximalen Grösse eines Datensatzes
+Begrenzung von CPU-Ressourcen pro Prozess
+Priorisieren von Prozessen
+>>>Text
+Begrenzung der Anzahl oder der Grösse von Transaktionen eines Benutzers oder von einer IP-Adresse in einem bestimmten Zeitraum.
+
+
+>>>Vorgabe Informationen
+>>>Nummer 3
+>>>Titel
+Reaktion auf Überlastsituationen
+>>>Kurztext
+>>>Text
+Falls eine Überlastsituation nicht verhindert werden kann muss sich das System berechenbar verhalten.
+>>>Langtext
+>>>Text
+Ein System muss so konzipiert sein, dass es mit Überlastsituationen in kontrollierter Weise umgeht. Trotzdem kann es zu Situationen kommen, bei denen die Schutzmassnahmen gegen Überlastungen nicht mehr 
+ausreichend sind.
+
+In einem solchen Fall muss sichergestellt sein, dass das System nicht in einen undefinierten und möglicherweise unsicheren Zustand gerät. Dies kann im Extremfall bedeuten, dass ein kontrolliertes Herunterfahren des Systems eher hinnehmbar ist als ein unkontrolliertes Versagen der Sicherheitsfunktionen und somit ein Verlust des 
+Systemschutzes.
+
+
+>>>Vorgabe Informationen
+>>>Nummer 4
+>>>Titel
+Dynamische Inhalte
+>>>Kurztext
+>>>Text
+Zunehmende (dynamische) Inhalte dürfen Systemfunktionen nicht beeinträchtigen.
+>>>Langtext
+>>>Text
+Zunehmende Logdaten oder Uploads dürfen die Funktionalität des Systems nicht beeinträchtigen.
+
+>>>Vorgabe Informationen
+>>>Nummer 5
+>>>Titel
+IP-Schnittstellen
+>>>Kurztext
+>>>Text
+Das System darf keine IP-Pakete verarbeiten, deren Absenderadresse nicht über die Schnittstelle erreicht wird, an der das Paket eingegangen ist.
+>>>Langtext
+>>>Text
+Es muss darauf geachtet werden, dass Systeme nicht über unnötige Default-Routen verfügen, was z. B. der Fall ist, wenn Systeme nur intern verwendet werden.
+>>>Text
+In einer solchen Konstellation handelt es sich i. d. R. um Pakete mit gefälschten Absenderadressen oder einen Fehler im Routing. Das eintreffende Paket muss als nicht vertrauenswürdig verworfen werden, Ein Umsetzungsbeispiel: Die Verwendung der Funktion «Reverse Path Filter» (RPF), die dafür sorgt, dass genau solche Pakete verworfen werden.
+
+>>>Vorgabe Informationen
+>>>Nummer 6
+>>>Titel
+Disaster Recovery Plan
+>>>Kurztext
+>>>Text
+Ein Wiederanlaufplan / Disaster Revovery Plan muss beschrieben und sichergestellt sein.
+>>>Langtext
+>>>Text
+Wiederaufsetz- und Neustart Prozeduren im Fehlerfall, sowie Notfallpläne müssen dokumentiert sein. Die Vorbereitung und das Testen von Routine-Betriebsabläufen müssen nach festgelegten Standards erfolgen. Definierte Sicherheitsmassnahmen müssen nachweislich wirksam implementiert sein. Verfahren zur Sicherstellung des Geschäftsbetriebs müssen definiert und geregelt sein.
+
+>>>Vorgabe Informationen
+>>>Nummer 7
+>>>Titel
+Partitionierung
+>>>Kurztext
+>>>Text
+Partitionen müssen, wenn möglich, getrennt werden.
+>>>Langtext
+>>>Text
+Daten-, Applikations- und Systempartitionen müssen, wenn möglich, getrennt werden. Eine Trennung der Daten liefert einen zusätzlichen Sicherheitslayer, sollte es zu Systemausfällen oder Malware-Befall kommen.
+Abhängig vom Schutzbedarf sollte auch entsprechend sichergestellt werden, dass die einzelnen Partitionen mit einer RAID-Funktionalität geschützt werden.
+
+
+>>>Vorgabe Systeme
+>>>Nummer 1
+>>>Titel
+Softwareinstallation
+>>>Kurztext
+>>>Text
+Nicht benötigte (autorisierte) Software darf nicht installiert oder muss deinstalliert werden
+>>>Langtext
+>>>Text
+Bei der Installation eines Systems werden oftmals Software-Komponenten installiert oder auch einzelne Teile einer Software aktiviert, die für den Betrieb und die Funktion des Systems nicht notwendig sind. Hierzu zählen auch Teile einer Software, die als Anwendungsbeispiele (z. B. Default-Web-Seiten, Beispieldatenbanken, Testdaten) installiert werden, aber typischerweise nicht verwendet werden. Solche Komponenten dürfen entweder bei der Installation nicht mit installiert werden oder müssen im Anschluss an die Installation gelöscht werden. Des Weiteren ist es nicht erlaubt Software auf einem System zu installieren, die nicht für den Betrieb, die Wartung oder Funktion des Systems notwendig ist
+
+
+>>>Vorgabe Systeme
+>>>Nummer 2
+>>>Titel
+Softwarefunktionen
+>>>Kurztext
+>>>Text
+Nicht benötigte Funktionen der eingesetzten Software und Hardware müssen deaktiviert werden
+>>>Langtext
+>>>Text
+Bei der Installation von Software und Hardware werden oftmals Funktionen aktiviert, die nicht für den Betrieb und die Funktionalität des Systems notwendig sind. Funktionen der Software sind meistens ein fester Bestandteil, der nicht einzeln gelöscht oder deinstalliert werden kann. Solche Funktionen müssen über die Konfiguration oder Einstellungen dauerhaft deaktiviert werden
+
+Neben Funktionen der Software sind nach der Systeminstallation oftmals Hardware-Funktionen aktiviert, die nicht für den Einsatz des Systems benötigt werden. Solche Funktionen, wie beispielsweise nicht benötigte Schnittstellen, müssen dauerhaft deaktiviert werden, so dass sie auch nach einem Neustart deaktiviert bleiben.
+
+
+>>>Vorgabe Systeme
+>>>Nummer 3
+>>>Titel
+Netzwerkprotokolle
+>>>Kurztext
+>>>Text
+Die IPv4-/IPv6-Adressen aller Schnittstellen eines Servers müssen fest konfiguriert werden
+>>>Langtext
+>>>Text
+IP-Adressen, auf denen Dienste angeboten werden, dürfen nicht durch äussere Einflüsse verändert werden können, auch nicht bei einem erzwungenen Reboot. Eine automatische Zuweisung von IP-Adressen, z. B. mittels DHCPv4/v6 oder IPv6-Autokonfiguration, ist nur dann zulässig, wenn sie nach initialer Vergabe der Adresse(n) abgeschaltet oder anderweitig abgesichert wird. IPv6 Router Advertisements müssen ignoriert werden.
+Es wird empfohlen den Host-Anteil der IPv6-Adressen zufällig zu bilden, da auf Grund des sehr grossen Adressbereiches von IPv6 ein Auffinden von Systemen für einen Angreifer durch Scans sehr aufwändig ist.
+
+Nicht benutzte Protokolle (z.B. IPv6) können komplett abgeschaltet werden.
+
+
+>>>Vorgabe Systeme
+>>>Nummer 4
+>>>Titel
+Netzwerkfunktionen
+>>>Kurztext
+>>>Text
+Netzfunktionen im Betriebssystemkern, die für den Betrieb als Server nicht benötigt werden, müssen abgeschaltet werden (Kernel Parameter).
+>>>Langtext
+>>>Text
+Ein Server braucht nicht zu routen, daher muss die Routing-Funktion abgeschaltet sein. Ebenso muss das 
+Antworten auf Broadcast-ICMP-Pakete abgeschaltet sein. Diese und weitere Netzfunktionen sind normalerweise bereits im Auslieferungszustand korrekt gesetzt.
+
+
+>>>Vorgabe Systeme
+>>>Nummer 5
+>>>Titel
+Autorun-Funktionen
+>>>Kurztext
+>>>Text
+Das automatische Starten von Anwendungen auf Wechseldatenträgern muss abgeschaltet werden.
+>>>Langtext
+>>>Text
+Wechseldatenträger – etwa CD-, DVD-, USB-Sticks oder USB-Laufwerke – dürfen darauf enthaltene Anwendungen nicht automatisch starten.
+
+>>>Vorgabe Systeme
+>>>Nummer 6
+>>>Titel
+Verarbeitung von transferierten Daten
+>>>Kurztext
+>>>Text
+Die Verarbeitung von ICMPv4-/ICMPv6-Paketen, die für den Betrieb nicht benötigt werden, muss deaktiviert werden.
+>>>Langtext
+>>>Text
+Es gibt verschiedene Typen von ICMPv4 und ICMPv6, die in den meisten Netzen nicht verwendet werden, aber ein potentielles Risiko darstellen. Diese Typen müssen deaktiviert oder gefiltert werden.
+>>>text
+Folgende ICMP-Typen sind erlaubt und dürfen genutzt werden:
+>>>Liste ungeordnet
+Echo Request [Type 8 (v4), Type 128 (v6)]
+Echo Reply [Type 0 (v4), Type 129 (v6) ]
+Destination Unreachable [Type 3 (v4), Type 1 (v6)]
+Time Exceeded [Type 11 (v4), Type 3 (v6)]
+Parameter Problem [Type 12 (v4), Type 4 (v6)]
+Packet Too Big [Type 2 (nur v6)]
+Neighbor Solicitation [Type 135 (nur v6)]
+Neighbor Advertisement [Type 136 (nur v6)]
+>>>text
+Es besteht die Möglichkeit, dass weitere Typen notwendig sind. Dies ist im Einzelfall zu prüfen.
+
+In *keinem Fall* dürfen beantwortet oder verarbeitet werden:
+>>>Liste ungeordnet
+Timestamp Reply [Type 14 (v4)]
+Netmask Reply [Type 18 (v4)]
+Information Reply [Type 16 (v4)]
+Redirect [Type 5 (v4), Type 137 (v6)]
+Router Solicitation [Type 133 (v6)]
+Router Advertisement [Type 134 (v6)]
+
+
+>>>Vorgabe Systeme
+>>>Nummer 7
+>>>Titel
+IP-Headers
+>>>Kurztext
+>>>Text
+IP-Pakete mit nicht benötigten Optionen oder Erweiterungs-Headern dürfen nicht bearbeitet werden.
+>>>Langtext
+>>>Text
+IP Optionen und Erweiterungs-Header (z. B. Source Routing) werden nur in seltenen Ausnahmefällen benötigt. Somit sind alle Pakete mit gesetzten IP-Optionen und Erweiterungs-Headern auf Standard-Servern zu filtern.
+
+>>>Vorgabe Systeme
+>>>Nummer 8
+>>>Titel
+Default-Konten
+>>>Kurztext
+>>>Text
+Vordefinierte Konten müssen gelöscht oder deaktiviert werden.
+>>>Langtext
+>>>Text
+Auf vielen Systemen existieren vordefinierte Konten (z. B. Gast, Admin) die teilweise ohne oder mit bekannten Passwörtern vorkonfiguriert sind. Diese Standardbenutzer müssen gelöscht oder deaktiviert werden. Sollten diese Massnahmen nicht umsetzbar sein, so sind solche Konten für einen Fernzugriff zu sperren. In jedem Fall müssen gesperrte und deaktivierte Konten mit einem möglichst komplexen Passwort (12 Zeichen und mehr, Nutzung von Gross-/ Kleinbuchstaben, Zahlen und Sonderzeichen) versehen werden, so dass auch im Falle eine Fehlkonfiguration die unberechtigte Nutzung eines solchen Kontos verhindert wird.
+
+Ausgenommen von der Anforderung, Konten zu löschen oder zu deaktivieren, sind Konten, die ausschliesslich der internen Nutzung auf dem entsprechenden System dienen und die für die Funktionalität einer oder mehrerer Anwendungen des Systems notwendig sind. Auch für ein solches Konto muss sichergestellt werden, dass ein Fernzugriff oder eine lokale Anmeldung nicht möglich ist und dass ein Benutzer des Systems ein solches Konto nicht missbräuchlich nutzen kann.
+
+
+>>>Vorgabe Anwendungen
+>>>Nummer 1
+>>>Titel
+Wartung und Pflege
+>>>Kurztext
+>>>Text
+Software- und Hardware-Komponenten, für die es keine Wartung oder Pflege durch den Lieferanten, Hersteller oder Entwickler gibt, dürfen nicht verwendet werden
+>>>Langtext
+>>>Text
+Es dürfen auf einem System nur Betriebssystem-, Middleware- und Anwendungs-Software sowie Hardware- Komponenten eingesetzt werden, für die ein Support durch Lieferanten, Hersteller, Entwickler oder anderen Vertragspartner besteht. Komponenten die End-of-Life oder End-of-Support sind dürfen nicht eingesetzt werden. Ausgenommen hiervon sind Komponenten für die ein spezieller Support-Vertrag abgeschlossen wurde, durch den auch über den Lebendzyklus des Produkts hinaus die Behebung von Sicherheitsschwachstellen gewährleistet ist und von SI-SUR so genehmigt wurdeWeiterführende Informationen
+
+
+>>>Vorgabe Anwendungen
+>>>Nummer 2
+>>>Titel
+Schwachstellen
+>>>Kurztext
+>>>Text
+Bekannt gewordene Schwachstellen in der Software oder Hardware des Systems müssen behoben oder abgesichert werden
+>>>Langtext
+>>>Text
+Vor der Installation einer Software- oder auch Hardware-Komponente muss überprüft werden, ob bereits Schwachstellen in der einzusetzenden Version gefunden und veröffentlicht wurden. Sollte die entsprechende Komponente von einer Schwachstelle betroffen sein, darf sie nicht installiert oder verwendet werden. Eine Ausnahme hiervon sind Komponenten, für die bereits eine Massnahme zum Beheben der Schwachstelle wie z. B. ein Patch, ein Update oder ein Workaround vom Hersteller zur Verfügung gestellt wurde. In diesem Fall muss die zusätzliche Massnahme auf dem System umgesetzt werden. Zudem ist dies ein fortlaufender Prozess während des kompletten Life-Cycles des Systems, um auftretende Schwachstellen zeitnah zu beheben.
+
+Zeitvorgaben für das beheben von entsprechenden Schwachstellen werden vom SI-SUR-CSIRT vorgegeben
+
+
+>>>Vorgabe Zonen
+>>>Nummer 1
+>>>Titel
+Abgesicherte Räume
+>>>Kurztext
+>>>Text
+Falls sich das System nicht in einem BIT-betriebenen abgesicherten Raum (RZ) befindet, muss der Schutzbedarf «sehr hoher Schutzbedarf (SN3)» gewährleistet werden. Das BIOS muss vor nicht autorisierten Veränderungen geschützt werden.
+>>>Langtext
+>>>Text
+Server, die öffentlich oder in Räumlichkeiten von Kunden installiert sind, müssen besonders vor unautorisiertem Zugriff und Veränderungen geschützt werden: Es müssen die Einstellungen des BIOS gegen Auslesen und 
+Manipulation geschützt werden. Bei Verwendung eines Passworts muss dieses exklusiv für den einzelnen Server sein und darf keine Rückschlüsse auf ein Unterscheidungsmerkmal des Servers ermöglichen.
+Das BIOS muss so konfiguriert sein, dass sich darüber ausschliesslich das vorgesehene Betriebssystem von der dafür vorgesehenen Partition starten lässt
+
+
+

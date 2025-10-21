@@ -1,0 +1,629 @@
+>>>Einleitung
+>>>text
+Hier ist die Einleitung
+>>>geltungsbereich
+>>>text
+Container-Sicherheit startet bei fundamentalen Themen wie dem Härten der Systeme, wobei der gesamte Container-Stack hierzu sinnvollerweise in Schichten
+zu betrachten ist. Ausgehend von einer Planungsphase müssen alle vorhandenen Schichten des Container-Stacks betrachtet und gehärtet werden.
+>>>text
+Wir unterscheiden die untenstehenden Schichten:
+>>>liste geordnet
+Container Host
+Container Runtime
+Container Registry
+Container Images
+Container Orchestrator
+Persistent Storage
+>>>text
+In diesem Standard geht es ausschliesslich um die Sicherheitsanforderung zur Einrichtung und Betrieb von Containern (Schicht 2-5). Er konkretisiert den IT-Grundschutz und ergänzt den Standard IT-Sicherheit Serversysteme und die jeweiligen Richtlinien der IT-Sicherheit um Spezifika von Containern. Die Anforderungen der erwähnten Richtlinien sollten von den Container-Hosts (Schicht 1) erfüllt werden, unabhängig davon, ob diese selbst auf physischen Servern ausgeführt werden oder virtualisiert sind. Sicherheitsanforderungen möglicher Server-Funktionen wie Webserver oder Groupware usw. sind Gegenstand eigener Sicherheitsrichtlinien. Der Schwerpunkt des Standards IT-Sicherheit Container liegt auf dem Betrieb von Container-Virtualisierung. Die Installation von Anwendungen innerhalb von Containern wird darin nicht vollständig abgedeckt.
+
+
+>>>Vorgabe Organisation
+>>>Titel
+Resilienz
+>>>Nummer 1
+>>>Kurztext
+>>>Text
+Es muss davon ausgegangen werden, dass nicht immer alle Kommunikationspartner zur Verfügung stehen. Dies muss bereits im Design eines Microservices berücksichtigt werden.
+>>>Langtext
+>>>Text
+In einem verteilten System können Netzwerkprobleme auftreten, z. B. Verzögerungen, Paketverluste oder temporäre Verbindungsabbrüche. Ein Microservice sollte daher darauf vorbereitet sein, dass andere Services zeitweise nicht erreichbar sind oder langsamer reagieren. Wenn jeder Service darauf angewiesen ist, dass alle anderen ständig verfügbar sind, entsteht eine starke Kopplung, die den Vorteil der Microservices-Architektur untergräbt. Services sollten unabhängig voneinander laufen und auch dann ihre Kernfunktionen erfüllen können, wenn andere Teile des Systems ausfallen.
+
+Indem man von vornherein davon ausgeht, dass nicht alle Services jederzeit verfügbar sind, wird die Gesamtarchitektur stabiler, flexibler und besser auf reale Betriebsbedingungen vorbereitet. Für jeden Microservice mit Abhängigkeiten muss daher festgelegt werden, wie er auf Nichterreichbarkeit der Abhängigkeiten reagiert (z.B. "Läuft weiter", "arbeitet die Queue ab und nimmt keine neuen Aufträge entgegen", "stoppt sofort alle Prozesse" oder ähnlich).
+
+
+>>>Vorgabe Organisation
+>>>Nummer 2
+>>>Titel
+Service Discovery
+>>>Kurztext
+>>>Text
+Der Netzwerkstandort einer Microservice-Instanz ist verfügbar und aktuell.
+
+Ein Schlüsselelement bei Service Discovery ist die Service Registry. Weiterhin kennt das Service Discovery alle laufenden Microservices und führt nach, auf welcher IP/Port Kombination diese gerade laufen.
+>>>Langtext
+>>>Text
+Die Verfügbarkeit und Aktualität des Netzwerkstandorts eines Microservices ist ein zentrales Element in Microservices-Architekturen. Mithilfe einer Service Registry und einem effizienten Service Discovery-Mechanismus wird sichergestellt, dass alle Microservices zuverlässig miteinander kommunizieren können, auch in dynamischen und skalierbaren Umgebungen. Dies fördert Resilienz, Flexibilität und Skalierbarkeit des gesamten Systems.
+
+Die Microservices stellen sicher, dass die Service Discovery die entsprechenden Informationen aus den Microservices herauslesen kann.
+
+>>>Vorgabe Organisation
+>>>Nummer 3
+>>>Titel
+Deployment in Container
+>>>Kurztext
+>>>Text
+Als Best Practice gilt ein Microservice pro Container.
+>>>Langtext
+>>>Text
+Das Deployment der Microservices erfolgt in Containern, welche dynamisch bereitgestellt und abgebaut werden, je nach Skalierungsanforderung. Daher gilt als Grundsatz, dass pro Microservice ein eigener Container aufgebaut wird und vice versa in jedem Container ein Microservice läuft. So wird das Deployment neuer Microservices und Microservice Updates vereinfacht.
+
+Zusätzlich reduziert diese Isolation Konflikte zwischen Abhängigkeiten verschiedener Microservices und vereinfacht die Verwaltung.
+>>>Stichworte
+Deployment, Microservice, Isolation
+
+>>>Vorgabe Technik
+>>>Nummer 1
+>>>Titel
+Implementation
+>>>Kurztext
+>>>Text
+Technologien, die bedingen, dass interne Details exponiert werden, müssen vermieden werden.
+>>>Langtext
+>>>Text
+Wie ein Microservice implementiert ist, darf gegen aussen keine Rolle spielen und sollte als Grundsatz nicht offengelegt werden. Die API muss dokumentiert sein, sollte aber nach Möglichkeit keine Rückschlüsse auf die Implementation zulassen.
+
+>>>Vorgabe Technik
+>>>Nummer 2
+>>>Titel
+Microservice-Aufrufe
+>>>Kurztext
+>>>Text
+Microservices kommunizieren über APIs und benutzen, je nach Anwendungs-Scope, den API-Gateway für die Kommunikation.
+>>>Langtext
+>>>Text
+Microservice-zu-Microservice Aufrufe im Kontext derselben Fachanwendung erfolgen direkt von Microservice zu Microservice und gehen nicht über den API Gateway. Microservice Aufrufe, die den Kontext einer Fachanwendung verlassen, gehen über den API Gateway. Dazu bietet jeder Microservice eine Schnittstelle, die nach Bedarf über einen API Microgateway angeboten werden kann. Die Schnittstellen müssen so realisiert sein, dass ein Microservice nicht direkt von den Implementierungsdetails eines anderen Microservice abhängt, wie z. B. dem Datenmodell in der Datenbank (lose Kopplung). Die Kommunikation zwischen Microservices (auch über API Gateway) muss auf einige Protokolle wie REST oder Messaging begrenzt sein.
+
+>>>Vorgabe Technik
+>>>Nummer 3
+>>>Titel
+Identity Provider
+>>>Kurztext
+>>>Text
+Die Authentisierung erfolgt über den Identity Provider.
+>>>Langtext
+>>>Text
+Benutzer-Anfragen werden via IAM Infrastruktur authentifiziert. Benutzer-Identitäten und -Rollen werden zentral in der IAM-Infrastruktur verwaltet.
+
+>>>Vorgabe Technik
+>>>Nummer 4
+>>>Titel
+Authentisierungs-Token
+>>>Kurztext
+>>>Text
+Bei erfolgreicher Authentisierung wird ein Authentisierungs-Token erstellt und signiert, das den Anfrager bei allen folgenden Serviceaufrufen authentisiert.
+>>>Langtext
+>>>Text
+Bei erfolgreicher Authentisierung wird ein Authentisierungs-Token erstellt und signiert, welches den Anfrager bei allen folgenden Serviceaufrufen authentisiert.
+>>>Text
+Die Authentisierungs-Tokens haben mindestens folgende Merkmale:
+>>>Liste-ungeordnet
+Sie müssen eine lokale Validierung durch den Empfänger unterstützen
+Sie müssen leichtgewichtig sein (einfach zu parsen, …)
+Sie müssen klein sein (und können Teil jeder Anfrage sein)
+>>>Text
+Die Authentisierungs-Tokens sollten über eine möglichst kurze Lebensdauer verfügen, damit eine regelmässige Re-Authentisierung forciert wird.
+
+>>>Vorgabe Technik
+>>>Nummer 5
+>>>Titel
+Service-zu-Service-Kommunikation
+>>>Kurztext
+>>>Text
+Service-zu-Service-Kommunikation wird mittels technischem User und Client-Zertifikaten authentisiert.
+>>>Langtext
+>>>Text
+Service-zu-Service-Kommunikation wird mittels technischem User und Client-Zertifikaten authentisiert.
+
+Bei Service zu Service Kommunikation kann die Authentisierung und Autorisierung delegiert werden. Welche Service zu Service Kommunikation mittels Delegation erfolgt, muss fallweise bestimmt werden.
+
+
+>>>Vorgabe Technik
+>>>Nummer 26
+>>>Titel
+Autorisierung durch Microservice und Autorisierungsmechanismen
+>>>Kurztext
+>>>Text
+>>>Langtext
+>>>Text
+Jeder Microservice muss jeden Request autorisieren (anhand AuthToken), da nur der Microservice selbst die Autorisierung auf die Daten vornehmen kann. Diese Aufgabe kann weder an einen API-Gateway noch an ein Service Mesh delegiert werden.
+>>>Liste-ungeordnet
+Die Autorisierungsmechanismen haben folgende Merkmale:
+Sie müssen Rollenbasiert sein
+Sie müssen Genehmigungen / Claims unterstützen
+Sie müssen die unabhängige Entwicklung der Microservices unterstützen
+Es gibt eine zentrale Übersicht und Verwaltung der Rollen und Genehmigungen / Claims
+Sie müssen eine Delegation der Autorisierung unterstützen
+
+
+>>>Vorgabe Technik
+>>>Nummer  7
+>>>Titel
+Persistenz
+>>>Kurztext
+>>>Text
+Microservices sollen ihre Daten selbst führen.
+>>>Langtext
+>>>Text
+In der Regel wird ein Data Store pro Microservice geführt. Mit welcher Art von Datenspeicherung (Relationale Datenbank, Distributed Datenbank, In-Memory Data Store) die Persistenz realisiert wird, ist abhängig von den Anforderungen der Microservices sowie den Technologievorgaben des BIT. Die Abläufe, die diese Data Stores verwalten, sind separate Services.
+
+>>>Vorgabe Technik
+>>>Nummer 8 
+>>>Titel
+Message Oriented Middleware / Event Broker Services
+>>>Kurztext
+>>>Text
+Die Kommunikation zwischen Microservices erfolgt über die MOM. Events werden mit dedizierten Event Broker Services abgefangen und propagiert.
+>>>Langtext
+>>>Text
+Die Message Oriented Middleware (MOM) muss hochverfügbar sein und einen hohen Durchsatz bieten. Einen Datenabgleich zwischen den verschiedenen Microservices und ihren Data Stores erfolgt Event basiert über die MOM.
+
+Eine Event-basierende Kollaboration führt dazu, dass Geschäftslogik nicht zentralisiert, sondern verteilt ist. In einer Event-basierenden Kollaboration sind die Microservices in hohem Masse voneinander entkoppelt. Der Event Broker übernimmt somit die Rolle eines Vermittlers.
+
+
+>>>Vorgabe Technik
+>>>Nummer 9
+>>>Titel
+Correlation IDs
+>>>Kurztext
+>>>Text
+Standardisierte Correlation IDs werden verwendet, damit Microservices-Aufruf-Ketten ausgewertet werden können.
+>>>Langtext
+>>>Text
+In einer Microservice Architektur interagieren in der Regel immer mehrere Microservices, um eine Geschäftsfunktion zu erfüllen. Correlation-IDs werden beim ersten Anruf generiert, in der Kette entlang weitergegeben und jeweils geloggt.
+
+>>>Vorgabe Technik
+>>>Nummer 10 
+>>>Titel
+Monitoring und Logging
+>>>Kurztext
+>>>Text
+Alle Services müssen Monitoring-Metriken und Logs in einer einheitlichen Art und Weise (wenn möglich in Standardformaten) abgeben oder zugänglich machen.
+>>>Langtext
+>>>Text
+Alle Services müssen Monitoring-Metriken und Logs in einer einheitlichen Art und Weise (wenn möglich in Standardformaten) abgeben oder zugänglich machen. Das Monitoring greift dabei auf standardisierte Messpunkte in den Elementen der inneren Architektur (Microservices, APIs) zu. Logs müssen standardisiert erfasst werden. Zusammen mit dem Service Mesh (mit Service Discovery / Registry) wird eine dynamische Übersicht der aktuell instanziierten Microservices geliefert. Auch Metadaten, z. B. zur Authentifizierung müssen standardisiert sein.
+
+Das Monitoring muss ein Synthetic (Semantic) Monitoring unterstützen. Das bedeutet, es muss regelmässig eine Submenge der automatisierten Fachanwendungstests in der Produktionsumgebung durchgeführt werden können. Die Resultate daraus werden in das Monitoring und Event Management eingespielt, welches bei Fehlerfall Alerts ausführt.
+>>>Text
+Folgende weitere Punkte müssen minimal berücksichtigt werden:
+>>>Liste-ungeordnet
+Antwortzeiten und Fehlerraten von Service-Aufrufen werden aufgezeichnet.
+Antworten von Downstream-Aufrufen (weiterführende Service-Aufrufe) werden aufgezeichnet. Im Minimum die Antwortzeiten der weiterführenden Service-Aufrufe.
+Das darunterliegende OS und dessen Prozesse müssen überwacht werden (Host), damit eine Kapazitätsplanung möglich wird.
+Host-Level, Microservices-Level und System-Level-Metriken können aggregiert werden.
+Die Metriken müssen lange genug verfügbar bleiben, damit Trends erkannt werden können.
+>>>Text
+Logs müssen gespeichert und ausgewertet resp. aggregiert werden können. Dabei sind die entsprechenden Vorgaben betreffend die zentrale Logging-Infrastruktur und die übrigen zu protokollierenden Daten zu berücksichtigen.
+
+
+>>>Vorgabe Technik
+>>>Nummer 11 
+>>>Titel
+Sicherheit des Basis-Images
+>>>Kurztext
+>>>Text
+Alle nicht benötigten Bestandteile der Software, die im Container ausgeführt wird, müssen deinstalliert werden. Die Konfiguration der Software muss gehärtet werden. Images externer Lieferanten müssen einen staging-Prozess durchlaufen.
+>>>Langtext
+>>>Text
+Die für den Container verwendeten Basis-Images müssen bekannt sein und dessen Sicherheits- und Schwachstellenstatus bewertet werden.
+
+Basis-Images müssen aus für das BIT vertrauenswürdigen Quellen stammen und regelmässig aktualisiert und mit den aktuellsten Sicherheits-Patches versehen werden.
+
+Das Image darf nur die für die Lösung/Anforderungen erforderlichen Package-Komponenten/Bibliotheken/Hilfsprogramme enthalten.
+
+_Hinweis:_ Aus Gründen der Unterstützung (Support-Verträge) durch Red Hat empfehlen wir, nur Red Hat UBI-Images als Basis-Images für selbst entwickelte Anwendungen zu verwenden. Es gibt kleinere Versionen von UBI, und es gibt UBI-Images, die Middleware-Pakete und von Red Hat unterstützte Sprachframeworks enthalten. Es gibt keine allgemeine Sicherheitsempfehlung für oder gegen UBI; entscheidend ist die Reduzierung der Angriffsfläche. Ein weiterer Vorteil eines Einsatzes von RedHat Images ist, dass sie VEX Files und die entsprechende Analyse mitliefern, was die Beurteilung von Vulnerabilities stark beschleunigt und unterstützt: https://www.cisa.gov/sites/default/files/2023-01/VEX_Use_Cases_Aprill2022.pdf
+
+Für die Anlieferung von Container Images externer Lieferanten muss ein dedizierter Staging Prozess verwendet werden, damit potentielle Schwachstellen frühzeitig erkannt und behoben werden können. Erst nach erfolgreichem Durchlaufen dieses Prozesses dürfen solche externe Container Images in den BIT internen Entwicklungsprozess und in produktive Umgebungen eingefügt werden.
+
+
+>>>Vorgabe Technik
+>>>Nummer 12
+>>>Titel
+Orchestrator-Installation nur aus offiziellen und vertrauten Quellen
+>>>Kurztext
+>>>Text
+Die Software des Orchestrators muss von einer offiziellen und vertrauten Quelle stammen.
+>>>Langtext
+>>>Text
+Die Software des Orchestrators muss von einer offiziellen und vertrauten Quelle stammen. Dies muss mit einer geeigneten Checksumme oder einem geeigneten Hash mit dem Softwarelieferanten gegengeprüft werden.
+
+>>>Vorgabe Technik
+>>>Nummer 13
+>>>Titel
+Hochverfügbarkeit (HA)
+>>>Kurztext
+>>>Text
+Der Container Orchestrator soll die Verfügbarkeit der Container ihrem Schutzbedarf entsprechend sicherstellen.
+>>>Langtext
+>>>Text
+Der Container Orchestrator sollte alle Container mit hohen oder sehr hohen Anforderungen an die Verfügbarkeit bei Ausfall von einem oder mehrere Knoten automatisch auf noch verfügbaren Knoten neu starten
+
+Der Orchestrator muss für HA, bzw. automatisches Failover konzipiert, bzw. konfiguriert sein.
+
+
+>>>Vorgabe Technik
+>>>Nummer  14
+>>>Titel
+Integritätsschutz für Container Images
+>>>Kurztext
+>>>Text
+Die Integrität der Container-Images muss gewährleistet und überprüfbar sein.
+>>>Langtext
+>>>Text
+Alle angelieferten Container Images müssen entweder signiert (nicht self-signed) sein oder der Hashwert des Container Images muss separat mitgeliefert oder auf der Webseite des Herstellers abrufbar sein.
+
+Wenn eine digitale Signatur vorhanden ist, muss diese geprüft werden, um seine Integrität und Authentizität sicherzustellen. Wenn der Container statt nach Tag nach Hash gezogen wird, ist eine Prüfung nicht erforderlich.
+
+
+>>>Vorgabe Technik
+>>>Nummer 15
+>>>Titel
+Durchführung von Image Rebuilds
+>>>Kurztext
+>>>Text
+Updates von Packages innerhalb eines Containers sind nicht erlaubt.
+>>>Langtext
+>>>Text
+Es ist nicht erlaubt, Updates von Packages durchzuführen, wenn diese Packages Bestandteil des Container Images sind. Der Grund liegt darin, dass falls eine Update Instruktion in einem Dockerfile vorhanden ist, derselbe Update Layer verwendet wird, der sich im Cache befindet. Dies verhindert, dass ein neueres Update nicht Bestandteil von nachfolgenden Builds wird. Dies gilt ebenso für applikatorische Build Images, diese müssen neu gebildet werden und dürfen nicht in einem laufenden Container gepatched werden.
+
+>>>Vorgabe Technik
+>>>Nummer 16
+>>>Titel
+Verwendung von expliziten Versionen bei Basis-Images
+>>>Kurztext
+>>>Text
+Images sollen mit expliziten Versionen geführt werden.
+>>>Langtext
+>>>Text
+Es muss jederzeit verifizierbar sein, welche Versionen der Images im Einsatz sind, dies um die Nachvollziehbarkeit und Reproduzierbarkeit der Images sicher zu stellen. Es muss eine explizite Version angegeben werden. Z. B. ist die Verwendung von Tags wie "latest" nicht zulässig.
+
+Von einer Verwendung des "Stable"-Tags wird ebenfalls abgeraten, da die Absenz einer expliziten Versionsnummern potenzielle Inkompatibilitäten zur Folge hat, und da eine Inventarisierung nach Versionsnummern so erschwert wird.
+
+
+>>>Vorgabe Technik
+>>>Nummer 17
+>>>Titel
+Container-Konfiguration
+>>>Kurztext
+>>>Text
+Die Konfiguration des Containers mit den Sicherheitsanforderungen der Applikation übereinstimmen.
+>>>Langtext
+>>>Text
+Die Konfiguration des Containers muss auf offene Ports, Volume-Mounts, Umgebungsvariablen, Einstiegspunkt, etc. geprüft werden und ob diese mit der beabsichtigten Funktionalität und den Sicherheitsanforderungen übereinstimmen.
+>>>text
+Folgende Vorgaben müssen immer umgesetzt sein:
+>>>Liste-geordnet
+Um potentielle Attacken zu minimieren dürfen nicht verwendete Ports nicht exponiert werden. Es dürfen nur Ports exponiert werden, die auch von der Anwendung gebraucht werden.
+Der Port 22 darf nicht verwendet werden. Auch ist die interaktive Verwendung von SSH in der Produktion nur mit einer Ausnahmebewilligung erlaubt.
+Unter 1024 dürfen nur die Standard-Ports verwendet werden. Über 1024 sollten Standard-Ports verwendet werden (siehe Service Name and Transport Protocol Port Number Registry (iana.org)).
+Die Default Security Context Constraints (SCC) unter RedHat dürfen nicht verändert werden (Creating security context constraints).
+
+
+>>>Vorgabe Technik
+>>>Nummer 18
+>>>Titel
+Health-Check
+>>>Kurztext
+>>>Text
+Die Anweisung "HEALTHCHECK" oder ähnliche Funktionalität muss jedem Container-Image hinzugefügt sein.
+>>>Langtext
+>>>Text
+Jeder Container muss über eine Funktionalität verfügen, über welche die aktuelle "Gesundheit" des Containers abgefragt werden kann. Diese Funktionalität muss von der Orchestrierungsinfrastruktur gelesen und ausgewertet werden können. Idealerweise ist die Funktionalität über die Infrastruktur so standardisiert wie möglich.
+
+>>>Vorgabe Technik
+>>>Nummer 19
+>>>Titel
+Konfiguration der Netzwerke
+>>>Kurztext
+>>>Text
+Container-Netzwerkverkehr muss segmentiert werden.
+>>>Langtext
+>>>Text
+Container-Netzwerkverkehr muss mittels Netzwerk Policies beschränkt werden (ein- und ausgehend). Der Ost-West und Nord-Süd-Verkehr muss segmentiert werden, um die Angriffsfläche zu minimieren und den Informationsfluss zu kontrollieren.
+
+Der Datenverkehr innerhalb der Namespaces muss mittels Netzwerk Policies gesteuert werden, um die Kommunikation zwischen Pods auf ein notwendiges Minimum zu beschränken.
+
+
+>>>Vorgabe Anwendungen
+>>>Nummer 1
+>>>Titel
+Persistenz von Zwischenergebnissen
+>>>Kurztext
+>>>Text
+Zwischenergebnisse, auf die die Anwendungen im Container zugreifen, müssen persistent ausserhalb des Containers gespeichert werden.
+>>>Langtext
+>>>Text
+Zwischenergebnisse, auf die die Anwendungen im Container zugreifen, müssen persistent ausserhalb des Containers gespeichert werden.
+
+Nutzdaten der Anwendung werden in der Regel auf einem Persistenten Volume ausserhalb des Containers abgelegt und angehängt und entsprechend gesichert. Zwischenergebnisse oder dateibasierten Protokolldaten, der Verarbeitung fällt eine fehlende Datensicherung oft nur dann auf, wenn ein Container beendet und entfernt ist und die enthaltenen Daten unwiderruflich verloren sind. Sind die Protokolldaten oder Zwischenergebnisse verloren, kann die Verarbeitung nicht lückenlos dokumentiert und somit deren Ergebnisse nicht mehr nachvollzogen werden.
+
+
+>>>Vorgabe Anwendungen
+>>>Nummer 2
+>>>Titel
+Kontinuierliche Container-Laufzeit-Überwachung
+>>>Kurztext
+>>>Text
+Das Laufzeitverhalten der Container muss auf Anomalien hin überwacht werden.
+>>>Langtext
+>>>Text
+Das Laufzeitverhalten der Container muss auf Anomalien hin überwacht werden. Dies umfasst beispielsweise Punkte wie:
+>>>Liste-ungeordnet
+Container kann nicht gestartet werden
+Container starten nicht wie erwartet
+Fehler bei liveness probes
+Überschreitung von Limiten (z.B. Ressourcen)
+
+
+>>>Vorgabe Anwendungen
+>>>Nummer 3
+>>>Titel
+Lizenzen
+>>>Kurztext
+>>>Text
+Die auf den Containern laufende Software muss lizenziert sein.
+>>>Langtext
+>>>Text
+Eine Übersicht der Lizenzbedingungen der eingesetzten Softwarekomponenten muss vorhanden sein und die Bestätigung, dass die Komponenten in der Bundesverwaltung eingesetzt werden dürfen (kommerzielles Einsatzgebiet).
+
+Eine nach Möglichkeit automatisierte Lizenzverwaltung für sämtliche im Container Image enthaltenen Software- Komponenten muss geführt werden.
+
+
+>>>Vorgabe Informationen
+>>>Nummer 1
+>>>Titel
+Container-Image-Metadaten
+>>>Kurztext
+>>>Text
+Die Metadaten der Container Images müssen in aktueller Version vorliegen und gepflegt werden.
+>>>Langtext
+>>>Text
+Die Metadaten des Container Images müssen geprüft werden (z. B. den Namen, die Version und die Beschreibung), um sicher zu stellen, dass die Metadaten den Zweck und den Inhalt des Containers genau wiedergeben.
+
+Für die Nachverfolgung (Nachvollziehbarkeit) und für die Behebung von Schwachstellen ist es notwendig die Images mit folgenden Informationen (Labels) zu ergänzen: Besitzer, Entwicklerteam, Lizenzinformation, Herleitung, Abhängigkeiten.
+
+
+>>>Vorgabe Informationen
+>>>Nummer 2
+>>>Titel
+Umgang mit Secrets
+>>>Kurztext
+>>>Text
+Container müssen auf Secrets gescannt werden.
+>>>Langtext
+>>>Text
+Container Images müssen regelmässig auf offengelegte Geheimnisse (Secrets, Passwörter, Schlüssel, etc.) gescannt werden. Secrets, Passwörter und Schlüssel dürfen nicht in Dockerfiles geschrieben werden.
+
+
+>>>Vorgabe Systeme
+>>>Nummer 1
+>>>Titel
+Identitätsmanagement der Administratoren
+>>>Kurztext
+>>>Text
+Alle administrativen Zugänge zum Container-Diensten muss durch personenbezogene Accounts und starke Authentisierung geschützt sein.
+>>>Langtext
+>>>Text
+Alle administrativen Zugänge zum Container-Diensten muss durch personenbezogene Accounts und starke Authentisierung geschützt sein. Zugänge, die von der Verwaltungssoftware genutzt werden, sollten ebenfalls durch separate Accounts und starke Authentisierung geschützt sein.
+
+Benutzerkonten und die zugehörigen Berechtigungen werden im BIT auf zentralen Systemen für das Identity-Management verwaltet. Damit diese Berechtigungsinformationen provisioniert werden können, muss das System entweder zentrale Schnittstellen (z. B. EIAM zur Autorisierung, Kerberos zur Authentisierung, Sperrlisteninformation bei Zertifikaten) oder dezentrale Mechanismen (z. B. Public-Key-Authentifizierung) unterstützen. Eine zentrale Lösung für das Identity-Management ist vorrangig zu nutzen.
+
+
+>>>Vorgabe Systeme
+>>>Nummer 2
+>>>Titel
+Accounts der Anwendungsdienste
+>>>Kurztext
+>>>Text
+Die Accounts innerhalb der Container dürfen keine Berechtigungen auf den Container-Host haben.
+>>>Langtext
+>>>Text
+Die Accounts innerhalb der Container dürfen keine Berechtigungen auf den Container-Host haben. Idealerweise sind die Accounts auf den Containern komplett auf die Container isoliert. Wenn es technisch notwendig ist, können Accounts über Container im gleichen Namespace geteilt werden.
+
+>>>Vorgabe Systeme
+>>>Nummer 3
+>>>Titel
+Verwendung einer Trusted Registry
+>>>Kurztext
+>>>Text
+Es muss sichergestellt sein, dass Images nur aus vertrauenswürdigen Quellen stammen.
+>>>Langtext
+>>>Text
+Die Container Images müssen in die Private Registry des BIT eingebunden werden können. Der Lieferant/Entwickler/Hersteller muss bestätigen, dass für alle im Container Image enthaltenen Software-Komponenten dies rechtlich in Ordnung ist. Alle Images werden vor der Aufnahme in die Private Registry auf Schwachstellen gescannt, bei schwerwiegenden Schwachstellen müssen die Container-Images vor der Aufnahme überarbeitet werden.
+
+Es dürfen keine Images von unbekannten Registries verwendet werden.
+
+
+>>>Vorgabe Systeme
+>>>Nummer 4
+>>>Titel
+Speicherung von Zugangsdaten für die Repositories
+>>>Kurztext
+>>>Text
+Zugangsdaten müssen so gespeichert und verwaltet werden, dass nur berechtigte Personen hierauf zugreifen können.
+>>>Langtext
+>>>Text
+Zugangsdaten müssen so gespeichert und verwaltet werden, dass nur berechtigte Personen hierauf zugreifen können. Insbesondere muss bei der Verwaltung der Images und der in den Images betriebenen Anwendungen darauf geachtet werden, dass die Zugangsdaten nur an zugangsgeschützten Orten gespeichert werden. Die von der Container-Software bereitgestellten Verwaltungsmechanismen für Zugangsdaten sollten eingesetzt werden.
+>>>Text
+Folgende Zugangsdaten müssen mindestens berücksichtigt werden:
+>>>Liste-ungeordnet
+Passwörter jeglicher Accounts,
+API-Keys für von der Anwendung genutzte Dienste sowie Private Schlüssel bei Public-Key Authentisierung
+
+
+>>>Vorgabe Systeme
+>>>Nummer 5
+>>>Titel
+Freigabe von Images (Containerfile)
+>>>Kurztext
+>>>Text
+Alle Containerfiles für den produktiven Betrieb müssen einen geeigneten Freigabeprozess durchlaufen.
+>>>Langtext
+>>>Text
+Alle Containerfiles für den produktiven Betrieb müssen einen geeigneten Freigabeprozess durchlaufen.
+
+Containerfiles enthalten die Bauanleitung für ein Image. D.h. enthält die notwendigen Anweisungen zum Erstellen eines Images und stellt so die Reproduzierbarkeit eines Images bei jeder neuen Erstellung sicher. Images sollten stets nur ein absolutes Minimum an Code beinhalten, gerade so viel, wie zwingend erforderlich ist, um den Service oder die Applikation auszuführen, für den das Image gedacht ist.
+
+
+>>>Vorgabe Systeme
+>>>Nummer 6
+>>>Titel
+Updates von Containern
+>>>Kurztext
+>>>Text
+Wenn sicherheitsrelevante Updates der zugrundeliegenden Images oder der betriebenen Software des Anwendungsdienstes erscheinen, müssen die Images für die Container neu erstellt und daraus neue Container instanziiert werden.
+>>>Langtext
+>>>Text
+Wenn sicherheitsrelevante Updates der zugrundeliegenden Images oder der betriebenen Software des Anwendungsdienstes erscheinen, müssen die Images für die Container neu erstellt und daraus neue Container instanziiert werden.
+
+Von extern bezogene Images sollten nur dann eingesetzt werden, wenn der Anbieter für diese Images auch regelmässig und bei sicherheitsrelevanten Änderungen schnell neue Versionen bereitstellt. Besser ist, wenn eine eigene Trusted Registry (z.B. Docker Trusted Registry DTR) bereitgestellt wird. Diese erweitert die klassische Registry um ein rollenbasiertes Zugangsmodell (RBAC), die Möglichkeit, Images digital zu signieren, und einen eingebauten Image-Scanner. Dabei sollte nebst den technische Massnahmen sichergestellt sein, dass nur Images aus dieser Registry eingesetzt werden.
+
+Hierbei hilft der Image-Scanner, die bekannten Verwundbarkeiten in Container-Images zu finden.
+
+
+>>>Vorgabe Systeme
+>>>Nummer 7
+>>>Titel
+Einbinden von Volumes
+>>>Kurztext
+>>>Text
+Die Container dürfen nur auf die für den Betrieb notwendigen Volumes und Verzeichnisse zugreifen können.
+>>>Langtext
+>>>Text
+Die Container dürfen nur auf die für den Betrieb notwendigen Volumes und Verzeichnisse zugreifen können. Wenn Schreibrechte nicht benötigt werden, müssen diese eingeschränkt werden. Der private Modus von Volumes muss genutzt werden, sofern es keine Notwendigkeit für den Shared-Modus gibt. Meist benötigen Container gar keinen Schreib-Zugriff auf ein Container-Directory im Shared-Storage-Modus. Gut ist es auch, wenn das verwendete Dateisystem Roll-Backs unterstützt.
+
+>>>Vorgabe Systeme
+>>>Nummer 8
+>>>Titel
+Sicherer Zugang zur Registry
+>>>Kurztext
+>>>Text
+Der Zugriff auf die Registry muss abgesichert werden.
+>>>Langtext
+>>>Text
+Der Zugriff auf die Registry muss zusätzlich zu den weiteren relevanten Vorgaben (z. B. IT-Grundschutz) wie folgt abgesichert werden:
+>>>Liste-ungeordnet
+Admin Zugriffe müssen via Privileged Access Management (PAM) erfolgen.
+RBAC (Role Based Access Management)
+
+
+>>>Vorgabe Systeme
+>>>Nummer 9
+>>>Titel
+Mengengerüst
+>>>Kurztext
+>>>Text
+Requests und Limits müssen entsprechend den Anforderungen der Anwendungen definiert sein.
+>>>Langtext
+>>>Text
+Requests und Limits müssen entsprechend den Anforderungen der Anwendungen definiert sein.
+>>>text
+Bedeutung:
+>>>Liste-ungeordnet
+Angemessene CPU- und Speicheranforderungen und Grenzwerte für Pods auf der Grundlage der erwarteten Last müssen definiert sein.
+Es muss ein Kapazitätsmanagement-/Rechte-Sizing-Prozess definiert und angewandt werden. Der Ressourcenverbrauch der Pods muss regelmässig überprüft und an die Anforderungen/Limits angepasst werden.
+Ein Leistungstest kann definiert und durchgeführt werden, um zu verstehen, wo die Grenzen der Anwendung liegen und wie hoch die durchschnittliche Arbeitslast ist.
+Deployments müssen über mindestens zwei RZ bereitgestellt sein.
+>>>text
+Mehr Information: [RedHat OpenShift](https://docs.openshift.com/container-platform/4.12/applications/quotas/quotas-setting-per-project.html)
+
+
+>>>Vorgabe Systeme
+>>>Nummer 10
+>>>Titel
+Externe Libraries
+>>>Kurztext
+>>>Text
+Externe Libraries müssen sicherheitsüberprüft sein
+>>>Langtext
+>>>Text
+Externe Libraries müssen sicherheitsüberprüft sein
+>>>Liste-ungeordnet
+Ein automatisiertes Dependency Scanning der im Container Image enthaltenen Third Party Libraries muss durchgeführt werden.
+Es muss geprüft werden, ob es veraltete oder anfällige Komponenten gibt. Für diese Pakete müssen die neuesten Sicherheitspatches eingepflegt werden, bevor sie in Produktion gehen.
+
+
+>>>Vorgabe Systeme
+>>>Nummer 11
+>>>Titel
+Schwachstellenanalyse für Container Images
+>>>Kurztext
+>>>Text
+Container-Images müssen auf Schwachstellen gescannt werden.
+>>>Langtext
+>>>Text
+Container Images sollten zum Zeitpunkt der Erstellung, in der Registrierung, bei der Bereitstellung und während der Laufzeit regelmässig gescannt werden, um neue Schwachstellen im Laufe der Zeit (Drift) erkennen zu können.
+
+>>>Vorgabe Systeme
+>>>Nummer 12
+>>>Titel
+Bekannte Schwachstellen
+>>>Kurztext
+>>>Text
+Deployment aktualisierter Container Images mit bekannten Schwachstellen wird eingeschränkt
+>>>Langtext
+>>>Text
+Eine aktualisierte Version eines Container Images mit bekannten Schwachstellen, welches heute bereits in Produktion ist, darf nur eingespielt werden, wenn die aktualisierte Version nur die gleichen Schwachstellen oder (besser) weniger Schwachstellen aufweist. Dies muss durch den ISBO des Data Owners abgenommen sein.
+
+>>>Vorgabe Systeme
+>>>Nummer 13
+>>>Titel
+Registries / Partitionen für die Bereitstellung
+>>>Kurztext
+>>>Text
+Produktive und nicht-produktive Umgebungen müssen getrennt werden.
+>>>Langtext
+>>>Text
+Produktionsumgebungen müssen von Entwicklungs- und/oder nicht-Produktiven Umgebungen getrennt werden, das heisst es müssen separate Registries oder Partitionen verwendet werden.
+
+>>>Vorgabe Systeme
+>>>Nummer 14
+>>>Titel
+Privilegien / Zugriffsrechte
+>>>Kurztext
+>>>Text
+Das "Least Privilege"-Prinzip muss auf Containern umgesetzt werden.
+>>>Langtext
+>>>Text
+Container müssen als Nicht-Root-Benutzer ausgeführt werden (z.B. USER ${UID} for OpenShift "mustRunAsNonRoot"). Container werden standardmäßig als "root" ausgeführt, dies ist ein Risiko, insbesondere wenn der Container mit erhöhten Privilegien ausgeführt wird.
+
+Container müssen immer mit so wenig Privilegien wie möglich ausgestattet sein. Es dürfen nur ein minimales Set an privilegierten Zugriffen vorhanden sein und diese sind nur für die Behandlung von Notfällen vorgesehen. Namespaces müssen als "read-only" laufen.
+
+Für die Definition von Rollen darf nur das notwendige Set an Ressourcen und Manipulationen verwendet werden.
+
+
+
+>>>Vorgabe Zonen
+>>>Nummer 1
+>>>Titel
+Separierung der Netze
+>>>Kurztext
+>>>Text
+Die Netze müssen der jeweiligen Zonen-Policy der Bundesverwaltung entsprechen.
+>>>Langtext
+>>>Text
+Die Netze für die Administration des Hosts, die Administration der Container- und die einzelnen Netze der Anwendungsdienste müssen den jeweiligen Zonenpolicies entsprechen. Wenn Unbefugte auf das Datennetz oder auf den Containern-Hosts zugreifen, können sie nicht über ungeschützte administrative Zugänge Befehle ausführen, die der Verfügbarkeit, Vertraulichkeit und Integrität der verarbeitenden Daten schaden.
+
+>>>Vorgabe Zonen
+>>>Nummer 2
+>>>Titel
+Verschlüsselung der Netzkommunikation
+>>>Kurztext
+>>>Text
+Daten, die über virtuelle oder physische Netze zwischen den Containern übertragen werden, müssen verschlüsselt sein.
+>>>Langtext
+>>>Text
+Mechanismen zur Authentisierung und Verschlüsselung der Zugänge sind häufig vorhanden, aber nicht standardmässig aktiviert. Entwickler müssen sich auf das „Absichern” der Applikation konzentrieren, als sich auf physische Netzwerk-Security-Tools zu verlassen. Physische Firewalls und andere Arten von Perimeter-Netzwerken/DMZs funktionieren nämlich in einer Container-basierten Umgebung meist nicht.
+>>>Stichworte Netzwerkkommunikation, Verschlüsselung
+>>>Checkliste
+Die Netzkommunikation ist verschlüsselt.
