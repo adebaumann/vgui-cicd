@@ -15,27 +15,6 @@
                placeholder="Suchbegriff eingeben …"
                required>
       </div>
-
-      <!-- Check-box group -->
-      <fieldset class="mb-4">
-        <legend class="h6 mb-2">In folgenden Bereichen suchen:</legend>
-
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="kurztext" id="kurztext" name="suchbereich[]" checked>
-          <label class="form-check-label" for="kurztext">Kurztext</label>
-        </div>
-
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="langtext" id="langtext" name="suchbereich[]" checked>
-          <label class="form-check-label" for="langtext">Langtext</label>
-        </div>
-
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="geltungsbereich" id="geltungsbereich" name="suchbereich[]">
-          <label class="form-check-label" for="geltungsbereich">Geltungsbereich</label>
-        </div>
-      </fieldset>
-
       <button type="submit" class="btn btn-primary">Suchen</button>
     </form>
    {% endblock %}

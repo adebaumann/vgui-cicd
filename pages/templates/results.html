@@ -12,9 +12,9 @@
 {% endfor %}
 {% endif %}
 
-{% if resultat.kurztext %}
-    <h2>Vorgaben mit "{{ suchbegriff }}" im Kurztext</h2>
-    {% for standard, vorgaben in resultat.kurztext.items %}
+{% if resultat.all %}
+    <h2>Vorgaben mit "{{ suchbegriff }}"</h2>
+    {% for standard, vorgaben in resultat.all.items %}
         <h4>{{ standard }}</h4>
         <ul>
             {% for vorgabe in vorgaben %}
@@ -24,18 +24,7 @@
     {% endfor %}
 {% endif %}
 
-{% if resultat.langtext %}
-    <h2>Vorgaben mit "{{ suchbegriff }}" im Langtext</h2>
-    {% for standard, vorgaben in resultat.langtext.items %}
-        <h4>{{ standard }}</h4>
-        <ul>
-            {% for vorgabe in vorgaben %}
-            <li><a href="{% url 'standard_detail' nummer=vorgabe.dokument.nummer %}#{{vorgabe.Vorgabennummer}}">{{vorgabe}}</a></li>
-        {% endfor %}
-        </ul>
-    {% endfor %}
-{% endif %}
-{% if not resultat.langtext and not resultat.kurztext and not resultat.geltungsbereich %}
+{% if not resultat.all %}
     <h2>Keine Resultate für "{{suchbegriff}}"</h2>
 {% endif %}
 {% endblock %}
