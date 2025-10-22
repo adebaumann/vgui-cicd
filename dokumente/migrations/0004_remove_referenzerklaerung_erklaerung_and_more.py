@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('referenzen', '0001_initial'),
-        ('standards', '0003_einleitung_order_geltungsbereich_order_and_more'),
+        ('dokumente', '0003_einleitung_order_geltungsbereich_order_and_more'),
     ]
 
     operations = [

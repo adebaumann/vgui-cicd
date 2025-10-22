@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('rollen', '0001_initial'),
-        ('standards', '0004_remove_referenzerklaerung_erklaerung_and_more'),
+        ('dokumente', '0004_remove_referenzerklaerung_erklaerung_and_more'),
     ]
 
     operations = [

@@ -19,7 +19,7 @@ from django.urls import include, path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from diagramm_proxy.views import DiagrammProxyView
-import standards.views
+import dokumente.views
 import pages.views
 import referenzen.views
 
@@ -28,7 +28,7 @@ admin.site.site_header="Autorenumgebung"
 urlpatterns = [
     path('',pages.views.startseite),
     path('search/',pages.views.search),
-    path('standards/', include("standards.urls")),
+    path('dokumente/', include("dokumente.urls")),
     path('autorenumgebung/', admin.site.urls),
     path('stichworte/', include("stichworte.urls")),
     path('referenzen/', referenzen.views.tree, name="referenz_tree"),

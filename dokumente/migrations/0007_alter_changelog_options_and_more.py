@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('standards', '0006_rename_standard_dokument_alter_dokument_options'),
+        ('dokumente', '0006_rename_standard_dokument_alter_dokument_options'),
     ]
 
     operations = [

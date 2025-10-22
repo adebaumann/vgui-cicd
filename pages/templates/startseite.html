@@ -3,7 +3,7 @@
 <h1>Vorgaben Informatiksicherheit BIT</h1>
 <h2>Aktuell erfasste Standards</h2>
 <ul>
-    {% for standard in standards %}
+    {% for standard in dokumente %}
     <li><a href="{% url 'standard_detail' nummer=standard.nummer %}">{{ standard }}</a></li>
     {% endfor %}
 </ul>

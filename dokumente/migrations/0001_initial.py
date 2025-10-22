@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
                 ('rght', models.PositiveIntegerField(editable=False)),
                 ('tree_id', models.PositiveIntegerField(db_index=True, editable=False)),
                 ('level', models.PositiveIntegerField(editable=False)),
-                ('oberreferenz', mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='unterreferenzen', to='standards.referenz')),
+                ('oberreferenz', mptt.fields.TreeForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='unterreferenzen', to='dokumente.referenz')),
             ],
             options={
                 'verbose_name_plural': 'Referenzen',
@@ -65,7 +65,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('inhalt', models.TextField(blank=True, null=True)),
                 ('abschnitttyp', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='abschnitte.abschnitttyp')),
-                ('erklaerung', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='standards.referenz')),
+                ('erklaerung', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dokumente.referenz')),
             ],
             options={
                 'verbose_name': 'Erklärung',
@@ -80,9 +80,9 @@ class Migration(migrations.Migration):
                 ('gueltigkeit_bis', models.DateField(blank=True, null=True)),
                 ('signatur_cso', models.CharField(blank=True, max_length=255)),
                 ('anhaenge', models.TextField(blank=True)),
-                ('autoren', models.ManyToManyField(related_name='verfasste_dokumente', to='standards.person')),
-                ('dokumententyp', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='standards.dokumententyp')),
-                ('pruefende', models.ManyToManyField(related_name='gepruefte_dokumente', to='standards.person')),
+                ('autoren', models.ManyToManyField(related_name='verfasste_dokumente', to='dokumente.person')),
+                ('dokumententyp', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='dokumente.dokumententyp')),
+                ('pruefende', models.ManyToManyField(related_name='gepruefte_dokumente', to='dokumente.person')),
             ],
             options={
                 'verbose_name': 'Standard',
@@ -95,7 +95,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('inhalt', models.TextField(blank=True, null=True)),
                 ('abschnitttyp', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='abschnitte.abschnitttyp')),
-                ('geltungsbereich', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='standards.standard')),
+                ('geltungsbereich', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dokumente.standard')),
             ],
             options={
                 'verbose_name': 'Geltungsbereichs-Abschnitt',
@@ -108,8 +108,8 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('datum', models.DateField()),
                 ('aenderung', models.TextField()),
-                ('autoren', models.ManyToManyField(to='standards.person')),
-                ('dokument', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='changelog', to='standards.standard')),
+                ('autoren', models.ManyToManyField(to='dokumente.person')),
+                ('dokument', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='changelog', to='dokumente.standard')),
             ],
         ),
         migrations.CreateModel(
@@ -120,10 +120,10 @@ class Migration(migrations.Migration):
                 ('titel', models.CharField(max_length=255)),
                 ('gueltigkeit_von', models.DateField()),
                 ('gueltigkeit_bis', models.DateField(blank=True, null=True)),
-                ('dokument', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='vorgaben', to='standards.standard')),
-                ('referenzen', models.ManyToManyField(blank=True, to='standards.referenz')),
+                ('dokument', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='vorgaben', to='dokumente.standard')),
+                ('referenzen', models.ManyToManyField(blank=True, to='dokumente.referenz')),
                 ('stichworte', models.ManyToManyField(blank=True, to='stichworte.stichwort')),
-                ('thema', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='standards.thema')),
+                ('thema', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='dokumente.thema')),
             ],
             options={
                 'verbose_name_plural': 'Vorgaben',
@@ -134,7 +134,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('frage', models.CharField(max_length=255)),
-                ('vorgabe', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='checklistenfragen', to='standards.vorgabe')),
+                ('vorgabe', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='checklistenfragen', to='dokumente.vorgabe')),
             ],
             options={
                 'verbose_name_plural': 'Fragen für Checkliste',
@@ -145,7 +145,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('inhalt', models.TextField(blank=True, null=True)),
-                ('abschnitt', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='standards.vorgabe')),
+                ('abschnitt', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dokumente.vorgabe')),
                 ('abschnitttyp', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='abschnitte.abschnitttyp')),
             ],
             options={
@@ -158,7 +158,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('inhalt', models.TextField(blank=True, null=True)),
-                ('abschnitt', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='standards.vorgabe')),
+                ('abschnitt', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dokumente.vorgabe')),
                 ('abschnitttyp', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='abschnitte.abschnitttyp')),
             ],
             options={

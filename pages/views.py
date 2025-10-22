@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from abschnitte.utils import render_textabschnitte
-from standards.models import Dokument, VorgabeLangtext, VorgabeKurztext, Geltungsbereich
+from dokumente.models import Dokument, VorgabeLangtext, VorgabeKurztext, Geltungsbereich
 from itertools import groupby
 import datetime
 
 def startseite(request):
     standards=list(Dokument.objects.all())
-    return render(request, 'startseite.html', {"standards":standards,})
+    return render(request, 'startseite.html', {"dokumente":standards,})
 
 def search(request):
     if request.method == "GET":

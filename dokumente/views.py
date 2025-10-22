@@ -11,7 +11,7 @@ calendar=parsedatetime.Calendar()
 def standard_list(request):
     standards = Dokument.objects.all()
     return render(request, 'standards/standard_list.html',
-                  {'standards': standards}
+                  {'dokumente': standards}
                   )
 
 
