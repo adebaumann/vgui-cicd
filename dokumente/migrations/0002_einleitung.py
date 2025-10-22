@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('abschnitte', '0001_initial'),
-        ('standards', '0001_initial'),
+        ('dokumente', '0001_initial'),
     ]
 
     operations = [
@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('inhalt', models.TextField(blank=True, null=True)),
                 ('abschnitttyp', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='abschnitte.abschnitttyp')),
-                ('einleitung', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='standards.standard')),
+                ('einleitung', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dokumente.standard')),
             ],
             options={
                 'verbose_name': 'Einleitungs-Abschnitt',
