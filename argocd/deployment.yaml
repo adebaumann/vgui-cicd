@@ -32,22 +32,6 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /app/data
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8000
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 2
-            failureThreshold: 6
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8000
-            initialDelaySeconds: 20
-            periodSeconds: 20
-            timeoutSeconds: 2
-            failureThreshold: 3
       volumes:
         - name: data
           persistentVolumeClaim:
