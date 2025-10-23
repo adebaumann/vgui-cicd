@@ -2,10 +2,10 @@
 {% block content %}
 <h1>Standards Informatiksicherheit</h1>
 <ul>
-  {% for standard in standards %}
+  {% for dokument in dokumente %}
     <li>
-      <a href="{% url 'standard_detail' nummer=standard.nummer %}">
-        {{ standard.nummer }} – {{ standard.name }}
+      <a href="{% url 'standard_detail' nummer=dokument.nummer %}">
+        {{ dokument.nummer }} – {{ dokument.name }}
       </a>
     </li>
   {% endfor %}
