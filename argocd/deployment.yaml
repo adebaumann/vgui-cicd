@@ -19,19 +19,35 @@ spec:
       initContainers:
         - name: loader
           image: git.baumann.gr/adebaumann/vui-data-loader:0.8
-          command: [ "sh","-c","cp preload/preload.sqlite3 /data/db.sqlite3; chown -R 999:999 /data; ls -la /data; sleep 10; exit 0" ]
+          command: [ "sh","-c","cp -n preload/preload.sqlite3 /data/db.sqlite3; chown -R 999:999 /data; ls -la /data; sleep 10; exit 0" ]
           volumeMounts:
             - name: data
               mountPath: /data
       containers:
         - name: web
-          image: git.baumann.gr/adebaumann/vui:0.932
+          image: git.baumann.gr/adebaumann/vui:0.933
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
           volumeMounts:
             - name: data
               mountPath: /app/data
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
       volumes:
         - name: data
           persistentVolumeClaim:
