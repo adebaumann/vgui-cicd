@@ -10,3 +10,6 @@ keys/
 .idea/
 
 *.kate-swp
+
+# Diagram cache directory
+media/diagram_cache/
