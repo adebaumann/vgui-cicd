@@ -34,5 +34,11 @@ urlpatterns = [
     path('referenzen/', referenzen.views.tree, name="referenz_tree"),
     path('referenzen/<str:refid>/', referenzen.views.detail, name="referenz_detail"),
     re_path(r'^diagramm/(?P<path>.*)$', DiagrammProxyView.as_view()),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
 
+# Serve static files
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# Serve media files (including cached diagrams)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
