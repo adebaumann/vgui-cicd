@@ -3,6 +3,10 @@ import base64
 import zlib
 import re
 from textwrap import dedent
+from django.conf import settings
+
+# Import the caching function
+from diagramm_proxy.diagram_cache import get_cached_diagram
 
 DIAGRAMMSERVER="/diagramm"
 
@@ -25,15 +29,23 @@ def render_textabschnitte(queryset):
         elif typ == "tabelle":
             html = md_table_to_html(inhalt)
         elif typ == "diagramm":
-            temp=inhalt.splitlines()
-            diagramtype=temp.pop(0)
-            diagramoptions='width="100%"'
-            if temp[0][0:6].lower() == "option":
-                diagramoptions=temp.pop(0).split(":",1)[1]
-            rest="\n".join(temp)
-            html = '<p><img '+diagramoptions+' src="'+DIAGRAMMSERVER+"/"+diagramtype+"/svg/"
-            html += base64.urlsafe_b64encode(zlib.compress(rest.encode("utf-8"),9)).decode()
-            html += '"></p>'
+            temp = inhalt.splitlines()
+            diagramtype = temp.pop(0)
+            diagramoptions = 'width="100%"'
+            if temp and temp[0][0:6].lower() == "option":
+                diagramoptions = temp.pop(0).split(":", 1)[1]
+            rest = "\n".join(temp)
+            
+            # Use caching instead of URL encoding
+            try:
+                cache_path = get_cached_diagram(diagramtype, rest)
+                # Generate URL to serve from media/static
+                diagram_url = settings.MEDIA_URL + cache_path
+                html = f'<p><img {diagramoptions} src="{diagram_url}"></p>'
+            except Exception as e:
+                # Fallback to error message
+                html = f'<p class="text-danger">Error generating diagram: {str(e)}</p>'
+                
         elif typ == "code":
             html = "<pre><code>"
             html += markdown(inhalt, extensions=['tables', 'attr_list'])
