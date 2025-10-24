@@ -265,8 +265,7 @@ class VorgabeTextAbschnitteTest(TestCase):
             gueltigkeit_von=date.today()
         )
         self.abschnitttyp = AbschnittTyp.objects.create(
-            name="Paragraph",
-            format_string="<p>{}</p>"
+            abschnitttyp="Paragraph"
         )
     
     def test_vorgabe_langtext_creation(self):
@@ -274,22 +273,22 @@ class VorgabeTextAbschnitteTest(TestCase):
         langtext = VorgabeLangtext.objects.create(
             abschnitt=self.vorgabe,
             abschnitttyp=self.abschnitttyp,
-            content="This is a long text description",
+            inhalt="This is a long text description",
             order=1
         )
         self.assertEqual(langtext.abschnitt, self.vorgabe)
-        self.assertEqual(langtext.content, "This is a long text description")
+        self.assertEqual(langtext.inhalt, "This is a long text description")
     
     def test_vorgabe_kurztext_creation(self):
         """Test VorgabeKurztext creation"""
         kurztext = VorgabeKurztext.objects.create(
             abschnitt=self.vorgabe,
             abschnitttyp=self.abschnitttyp,
-            content="Short summary",
+            inhalt="Short summary",
             order=1
         )
         self.assertEqual(kurztext.abschnitt, self.vorgabe)
-        self.assertEqual(kurztext.content, "Short summary")
+        self.assertEqual(kurztext.inhalt, "Short summary")
 
 
 class DokumentTextAbschnitteTest(TestCase):
@@ -306,8 +305,7 @@ class DokumentTextAbschnitteTest(TestCase):
             name="Test Policy"
         )
         self.abschnitttyp = AbschnittTyp.objects.create(
-            name="Paragraph",
-            format_string="<p>{}</p>"
+            abschnitttyp="Paragraph"
         )
     
     def test_geltungsbereich_creation(self):
@@ -315,22 +313,22 @@ class DokumentTextAbschnitteTest(TestCase):
         geltungsbereich = Geltungsbereich.objects.create(
             geltungsbereich=self.dokument,
             abschnitttyp=self.abschnitttyp,
-            content="Applies to all employees",
+            inhalt="Applies to all employees",
             order=1
         )
         self.assertEqual(geltungsbereich.geltungsbereich, self.dokument)
-        self.assertEqual(geltungsbereich.content, "Applies to all employees")
+        self.assertEqual(geltungsbereich.inhalt, "Applies to all employees")
     
     def test_einleitung_creation(self):
         """Test Einleitung creation"""
         einleitung = Einleitung.objects.create(
             einleitung=self.dokument,
             abschnitttyp=self.abschnitttyp,
-            content="This document defines...",
+            inhalt="This document defines...",
             order=1
         )
         self.assertEqual(einleitung.einleitung, self.dokument)
-        self.assertEqual(einleitung.content, "This document defines...")
+        self.assertEqual(einleitung.inhalt, "This document defines...")
 
 
 class ChecklistenfrageModelTest(TestCase):
@@ -432,8 +430,7 @@ class ViewsTestCase(TestCase):
             gueltigkeit_von=date.today()
         )
         self.abschnitttyp = AbschnittTyp.objects.create(
-            name="Paragraph",
-            format_string="<p>{}</p>"
+            abschnitttyp="Paragraph"
         )
     
     def test_standard_list_view(self):
