@@ -6,7 +6,7 @@ from .models import (
     VorgabeLangtext, VorgabeKurztext, Geltungsbereich,
     Einleitung, Checklistenfrage, Changelog
 )
-from abschnitte.models import Abschnitttyp
+from abschnitte.models import AbschnittTyp
 from referenzen.models import Referenz
 from stichworte.models import Stichwort
 from rollen.models import Rolle
@@ -264,7 +264,7 @@ class VorgabeTextAbschnitteTest(TestCase):
             titel="Test Vorgabe",
             gueltigkeit_von=date.today()
         )
-        self.abschnitttyp = Abschnitttyp.objects.create(
+        self.abschnitttyp = AbschnittTyp.objects.create(
             name="Paragraph",
             format_string="<p>{}</p>"
         )
@@ -305,7 +305,7 @@ class DokumentTextAbschnitteTest(TestCase):
             dokumententyp=self.dokumententyp,
             name="Test Policy"
         )
-        self.abschnitttyp = Abschnitttyp.objects.create(
+        self.abschnitttyp = AbschnittTyp.objects.create(
             name="Paragraph",
             format_string="<p>{}</p>"
         )
@@ -431,7 +431,7 @@ class ViewsTestCase(TestCase):
             titel="Test Requirement",
             gueltigkeit_von=date.today()
         )
-        self.abschnitttyp = Abschnitttyp.objects.create(
+        self.abschnitttyp = AbschnittTyp.objects.create(
             name="Paragraph",
             format_string="<p>{}</p>"
         )
