@@ -17,18 +17,18 @@ class DokumententypModelTest(TestCase):
     
     def setUp(self):
         self.dokumententyp = Dokumententyp.objects.create(
-            name="Standard",
-            verantwortliche_ve="IT Department"
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
         )
     
     def test_dokumententyp_creation(self):
         """Test that Dokumententyp is created correctly"""
-        self.assertEqual(self.dokumententyp.name, "Standard")
-        self.assertEqual(self.dokumententyp.verantwortliche_ve, "IT Department")
+        self.assertEqual(self.dokumententyp.name, "Standard IT-Sicherheit")
+        self.assertEqual(self.dokumententyp.verantwortliche_ve, "SR-SUR-SEC")
     
     def test_dokumententyp_str(self):
         """Test string representation of Dokumententyp"""
-        self.assertEqual(str(self.dokumententyp), "Standard")
+        self.assertEqual(str(self.dokumententyp), "Standard IT-Sicherheit")
     
     def test_dokumententyp_verbose_name(self):
         """Test verbose name"""
@@ -152,11 +152,11 @@ class VorgabeModelTest(TestCase):
     
     def setUp(self):
         self.dokumententyp = Dokumententyp.objects.create(
-            name="Standard",
-            verantwortliche_ve="IT"
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
         )
         self.dokument = Dokument.objects.create(
-            nummer="STD-001",
+            nummer="R01234",
             dokumententyp=self.dokumententyp,
             name="IT Standard"
         )
@@ -177,12 +177,12 @@ class VorgabeModelTest(TestCase):
     
     def test_vorgabennummer(self):
         """Test Vorgabennummer generation"""
-        expected = "STD-001.S.1"
+        expected = "R01234.S.1"
         self.assertEqual(self.vorgabe.Vorgabennummer(), expected)
     
     def test_vorgabe_str(self):
         """Test string representation of Vorgabe"""
-        expected = "STD-001.S.1: Password Requirements"
+        expected = "R01234.S.1: Password Requirements"
         self.assertEqual(str(self.vorgabe), expected)
     
     def test_get_status_active(self):
@@ -248,11 +248,11 @@ class VorgabeTextAbschnitteTest(TestCase):
     
     def setUp(self):
         self.dokumententyp = Dokumententyp.objects.create(
-            name="Standard",
-            verantwortliche_ve="IT"
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
         )
         self.dokument = Dokument.objects.create(
-            nummer="STD-001",
+            nummer="R01234",
             dokumententyp=self.dokumententyp,
             name="Test Standard"
         )
@@ -336,7 +336,7 @@ class ChecklistenfrageModelTest(TestCase):
     
     def setUp(self):
         self.dokumententyp = Dokumententyp.objects.create(
-            name="Standard",
+            name="Standard IT-Sicherheit",
             verantwortliche_ve="QA"
         )
         self.dokument = Dokument.objects.create(
@@ -376,11 +376,11 @@ class ChangelogModelTest(TestCase):
     
     def setUp(self):
         self.dokumententyp = Dokumententyp.objects.create(
-            name="Standard",
-            verantwortliche_ve="IT"
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
         )
         self.dokument = Dokument.objects.create(
-            nummer="STD-001",
+            nummer="R01234",
             dokumententyp=self.dokumententyp,
             name="IT Standard"
         )
@@ -403,7 +403,7 @@ class ChangelogModelTest(TestCase):
     
     def test_changelog_str(self):
         """Test string representation"""
-        expected = f"{date.today()} – STD-001"
+        expected = f"{date.today()} – R01234"
         self.assertEqual(str(self.changelog), expected)
 
 
@@ -413,11 +413,11 @@ class ViewsTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.dokumententyp = Dokumententyp.objects.create(
-            name="Standard",
-            verantwortliche_ve="IT"
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
         )
         self.dokument = Dokument.objects.create(
-            nummer="STD-001",
+            nummer="R01234",
             dokumententyp=self.dokumententyp,
             name="Test Standard"
         )
@@ -437,13 +437,13 @@ class ViewsTestCase(TestCase):
         """Test standard_list view"""
         response = self.client.get(reverse('standard_list'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "STD-001")
+        self.assertContains(response, "R01234")
         self.assertIn('dokumente', response.context)
     
     def test_standard_detail_view(self):
         """Test standard_detail view"""
         response = self.client.get(
-            reverse('standard_detail', kwargs={'nummer': 'STD-001'})
+            reverse('standard_detail', kwargs={'nummer': 'R01234'})
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn('standard', response.context)
@@ -460,7 +460,7 @@ class ViewsTestCase(TestCase):
     def test_standard_checkliste_view(self):
         """Test standard_checkliste view"""
         response = self.client.get(
-            reverse('standard_checkliste', kwargs={'nummer': 'STD-001'})
+            reverse('standard_checkliste', kwargs={'nummer': 'R01234'})
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn('standard', response.context)
@@ -468,7 +468,7 @@ class ViewsTestCase(TestCase):
     
     def test_standard_history_view(self):
         """Test standard_detail with history (check_date)"""
-        url = reverse('standard_history', kwargs={'nummer': 'STD-001'})
+        url = reverse('standard_history', kwargs={'nummer': 'R01234'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
