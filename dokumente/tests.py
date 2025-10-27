@@ -1,4 +1,497 @@
-from django.test import TestCase
-from .models import Dokument
+from django.test import TestCase, Client
+from django.urls import reverse
+from datetime import date, timedelta
+from .models import (
+    Dokumententyp, Person, Thema, Dokument, Vorgabe,
+    VorgabeLangtext, VorgabeKurztext, Geltungsbereich,
+    Einleitung, Checklistenfrage, Changelog
+)
+from abschnitte.models import AbschnittTyp
+from referenzen.models import Referenz
+from stichworte.models import Stichwort
+from rollen.models import Rolle
 
-# Create your tests here.
+
+class DokumententypModelTest(TestCase):
+    """Test cases for Dokumententyp model"""
+    
+    def setUp(self):
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
+        )
+    
+    def test_dokumententyp_creation(self):
+        """Test that Dokumententyp is created correctly"""
+        self.assertEqual(self.dokumententyp.name, "Standard IT-Sicherheit")
+        self.assertEqual(self.dokumententyp.verantwortliche_ve, "SR-SUR-SEC")
+    
+    def test_dokumententyp_str(self):
+        """Test string representation of Dokumententyp"""
+        self.assertEqual(str(self.dokumententyp), "Standard IT-Sicherheit")
+    
+    def test_dokumententyp_verbose_name(self):
+        """Test verbose name"""
+        self.assertEqual(
+            Dokumententyp._meta.verbose_name,
+            "Dokumententyp"
+        )
+        self.assertEqual(
+            Dokumententyp._meta.verbose_name_plural,
+            "Dokumententypen"
+        )
+
+
+class PersonModelTest(TestCase):
+    """Test cases for Person model"""
+    
+    def setUp(self):
+        self.person = Person.objects.create(
+            name="Max Mustermann",
+            funktion="Manager"
+        )
+    
+    def test_person_creation(self):
+        """Test that Person is created correctly"""
+        self.assertEqual(self.person.name, "Max Mustermann")
+        self.assertEqual(self.person.funktion, "Manager")
+    
+    def test_person_str(self):
+        """Test string representation of Person"""
+        self.assertEqual(str(self.person), "Max Mustermann")
+    
+    def test_person_verbose_name_plural(self):
+        """Test verbose name plural"""
+        self.assertEqual(
+            Person._meta.verbose_name_plural,
+            "Personen"
+        )
+
+
+class ThemaModelTest(TestCase):
+    """Test cases for Thema model"""
+    
+    def setUp(self):
+        self.thema = Thema.objects.create(
+            name="Security",
+            erklaerung="Security related topics"
+        )
+    
+    def test_thema_creation(self):
+        """Test that Thema is created correctly"""
+        self.assertEqual(self.thema.name, "Security")
+        self.assertEqual(self.thema.erklaerung, "Security related topics")
+    
+    def test_thema_str(self):
+        """Test string representation of Thema"""
+        self.assertEqual(str(self.thema), "Security")
+    
+    def test_thema_blank_erklaerung(self):
+        """Test that erklaerung can be blank"""
+        thema = Thema.objects.create(name="Testing")
+        self.assertEqual(thema.erklaerung, "")
+
+
+class DokumentModelTest(TestCase):
+    """Test cases for Dokument model"""
+    
+    def setUp(self):
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Policy",
+            verantwortliche_ve="Legal"
+        )
+        self.autor = Person.objects.create(
+            name="John Doe",
+            funktion="Author"
+        )
+        self.pruefer = Person.objects.create(
+            name="Jane Smith",
+            funktion="Reviewer"
+        )
+        self.dokument = Dokument.objects.create(
+            nummer="DOC-001",
+            dokumententyp=self.dokumententyp,
+            name="Security Policy",
+            gueltigkeit_von=date.today(),
+            signatur_cso="CSO-123",
+            anhaenge="Appendix A, B"
+        )
+        self.dokument.autoren.add(self.autor)
+        self.dokument.pruefende.add(self.pruefer)
+    
+    def test_dokument_creation(self):
+        """Test that Dokument is created correctly"""
+        self.assertEqual(self.dokument.nummer, "DOC-001")
+        self.assertEqual(self.dokument.name, "Security Policy")
+        self.assertEqual(self.dokument.dokumententyp, self.dokumententyp)
+    
+    def test_dokument_str(self):
+        """Test string representation of Dokument"""
+        self.assertEqual(str(self.dokument), "DOC-001 – Security Policy")
+    
+    def test_dokument_many_to_many_relationships(self):
+        """Test many-to-many relationships"""
+        self.assertIn(self.autor, self.dokument.autoren.all())
+        self.assertIn(self.pruefer, self.dokument.pruefende.all())
+    
+    def test_dokument_optional_fields(self):
+        """Test optional fields can be None or blank"""
+        dokument = Dokument.objects.create(
+            nummer="DOC-002",
+            dokumententyp=self.dokumententyp,
+            name="Test Document"
+        )
+        self.assertIsNone(dokument.gueltigkeit_von)
+        self.assertIsNone(dokument.gueltigkeit_bis)
+        self.assertEqual(dokument.signatur_cso, "")
+        self.assertEqual(dokument.anhaenge, "")
+
+
+class VorgabeModelTest(TestCase):
+    """Test cases for Vorgabe model"""
+    
+    def setUp(self):
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
+        )
+        self.dokument = Dokument.objects.create(
+            nummer="R01234",
+            dokumententyp=self.dokumententyp,
+            name="IT Standard"
+        )
+        self.thema = Thema.objects.create(name="Security")
+        self.vorgabe = Vorgabe.objects.create(
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Password Requirements",
+            gueltigkeit_von=date.today() - timedelta(days=30)
+        )
+    
+    def test_vorgabe_creation(self):
+        """Test that Vorgabe is created correctly"""
+        self.assertEqual(self.vorgabe.nummer, 1)
+        self.assertEqual(self.vorgabe.dokument, self.dokument)
+        self.assertEqual(self.vorgabe.thema, self.thema)
+    
+    def test_vorgabennummer(self):
+        """Test Vorgabennummer generation"""
+        expected = "R01234.S.1"
+        self.assertEqual(self.vorgabe.Vorgabennummer(), expected)
+    
+    def test_vorgabe_str(self):
+        """Test string representation of Vorgabe"""
+        expected = "R01234.S.1: Password Requirements"
+        self.assertEqual(str(self.vorgabe), expected)
+    
+    def test_get_status_active(self):
+        """Test get_status returns 'active' for current vorgabe"""
+        status = self.vorgabe.get_status()
+        self.assertEqual(status, "active")
+    
+    def test_get_status_future(self):
+        """Test get_status returns 'future' for future vorgabe"""
+        future_vorgabe = Vorgabe.objects.create(
+            nummer=2,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Future Requirement",
+            gueltigkeit_von=date.today() + timedelta(days=30)
+        )
+        status = future_vorgabe.get_status()
+        self.assertEqual(status, "future")
+    
+    def test_get_status_expired(self):
+        """Test get_status returns 'expired' for expired vorgabe"""
+        expired_vorgabe = Vorgabe.objects.create(
+            nummer=3,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Old Requirement",
+            gueltigkeit_von=date.today() - timedelta(days=60),
+            gueltigkeit_bis=date.today() - timedelta(days=10)
+        )
+        status = expired_vorgabe.get_status()
+        self.assertEqual(status, "expired")
+    
+    def test_get_status_verbose(self):
+        """Test get_status with verbose=True"""
+        future_vorgabe = Vorgabe.objects.create(
+            nummer=4,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Future Test",
+            gueltigkeit_von=date.today() + timedelta(days=10)
+        )
+        status = future_vorgabe.get_status(verbose=True)
+        self.assertIn("Ist erst ab dem", status)
+        self.assertIn("in Kraft", status)
+    
+    def test_get_status_with_custom_check_date(self):
+        """Test get_status with custom check_date"""
+        vorgabe = Vorgabe.objects.create(
+            nummer=5,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Test Requirement",
+            gueltigkeit_von=date.today() - timedelta(days=60),
+            gueltigkeit_bis=date.today() - timedelta(days=10)
+        )
+        check_date = date.today() - timedelta(days=30)
+        status = vorgabe.get_status(check_date=check_date)
+        self.assertEqual(status, "active")
+
+
+class VorgabeTextAbschnitteTest(TestCase):
+    """Test cases for VorgabeLangtext and VorgabeKurztext"""
+    
+    def setUp(self):
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
+        )
+        self.dokument = Dokument.objects.create(
+            nummer="R01234",
+            dokumententyp=self.dokumententyp,
+            name="Test Standard"
+        )
+        self.thema = Thema.objects.create(name="Testing")
+        self.vorgabe = Vorgabe.objects.create(
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Test Vorgabe",
+            gueltigkeit_von=date.today()
+        )
+        self.abschnitttyp = AbschnittTyp.objects.create(
+            abschnitttyp="Paragraph"
+        )
+    
+    def test_vorgabe_langtext_creation(self):
+        """Test VorgabeLangtext creation"""
+        langtext = VorgabeLangtext.objects.create(
+            abschnitt=self.vorgabe,
+            abschnitttyp=self.abschnitttyp,
+            inhalt="This is a long text description",
+            order=1
+        )
+        self.assertEqual(langtext.abschnitt, self.vorgabe)
+        self.assertEqual(langtext.inhalt, "This is a long text description")
+    
+    def test_vorgabe_kurztext_creation(self):
+        """Test VorgabeKurztext creation"""
+        kurztext = VorgabeKurztext.objects.create(
+            abschnitt=self.vorgabe,
+            abschnitttyp=self.abschnitttyp,
+            inhalt="Short summary",
+            order=1
+        )
+        self.assertEqual(kurztext.abschnitt, self.vorgabe)
+        self.assertEqual(kurztext.inhalt, "Short summary")
+
+
+class DokumentTextAbschnitteTest(TestCase):
+    """Test cases for Geltungsbereich and Einleitung"""
+    
+    def setUp(self):
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Policy",
+            verantwortliche_ve="Legal"
+        )
+        self.dokument = Dokument.objects.create(
+            nummer="POL-001",
+            dokumententyp=self.dokumententyp,
+            name="Test Policy"
+        )
+        self.abschnitttyp = AbschnittTyp.objects.create(
+            abschnitttyp="Paragraph"
+        )
+    
+    def test_geltungsbereich_creation(self):
+        """Test Geltungsbereich creation"""
+        geltungsbereich = Geltungsbereich.objects.create(
+            geltungsbereich=self.dokument,
+            abschnitttyp=self.abschnitttyp,
+            inhalt="Applies to all employees",
+            order=1
+        )
+        self.assertEqual(geltungsbereich.geltungsbereich, self.dokument)
+        self.assertEqual(geltungsbereich.inhalt, "Applies to all employees")
+    
+    def test_einleitung_creation(self):
+        """Test Einleitung creation"""
+        einleitung = Einleitung.objects.create(
+            einleitung=self.dokument,
+            abschnitttyp=self.abschnitttyp,
+            inhalt="This document defines...",
+            order=1
+        )
+        self.assertEqual(einleitung.einleitung, self.dokument)
+        self.assertEqual(einleitung.inhalt, "This document defines...")
+
+
+class ChecklistenfrageModelTest(TestCase):
+    """Test cases for Checklistenfrage model"""
+    
+    def setUp(self):
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="QA"
+        )
+        self.dokument = Dokument.objects.create(
+            nummer="QA-001",
+            dokumententyp=self.dokumententyp,
+            name="QA Standard"
+        )
+        self.thema = Thema.objects.create(name="Quality")
+        self.vorgabe = Vorgabe.objects.create(
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Quality Check",
+            gueltigkeit_von=date.today()
+        )
+        self.frage = Checklistenfrage.objects.create(
+            vorgabe=self.vorgabe,
+            frage="Have all tests passed?"
+        )
+    
+    def test_checklistenfrage_creation(self):
+        """Test Checklistenfrage creation"""
+        self.assertEqual(self.frage.vorgabe, self.vorgabe)
+        self.assertEqual(self.frage.frage, "Have all tests passed?")
+    
+    def test_checklistenfrage_str(self):
+        """Test string representation"""
+        self.assertEqual(str(self.frage), "Have all tests passed?")
+    
+    def test_checklistenfrage_related_name(self):
+        """Test related name works correctly"""
+        self.assertIn(self.frage, self.vorgabe.checklistenfragen.all())
+
+
+class ChangelogModelTest(TestCase):
+    """Test cases for Changelog model"""
+    
+    def setUp(self):
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
+        )
+        self.dokument = Dokument.objects.create(
+            nummer="R01234",
+            dokumententyp=self.dokumententyp,
+            name="IT Standard"
+        )
+        self.autor = Person.objects.create(
+            name="John Doe",
+            funktion="Developer"
+        )
+        self.changelog = Changelog.objects.create(
+            dokument=self.dokument,
+            datum=date.today(),
+            aenderung="Initial version"
+        )
+        self.changelog.autoren.add(self.autor)
+    
+    def test_changelog_creation(self):
+        """Test Changelog creation"""
+        self.assertEqual(self.changelog.dokument, self.dokument)
+        self.assertEqual(self.changelog.aenderung, "Initial version")
+        self.assertIn(self.autor, self.changelog.autoren.all())
+    
+    def test_changelog_str(self):
+        """Test string representation"""
+        expected = f"{date.today()} – R01234"
+        self.assertEqual(str(self.changelog), expected)
+
+
+class ViewsTestCase(TestCase):
+    """Test cases for views"""
+    
+    def setUp(self):
+        self.client = Client()
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
+        )
+        self.dokument = Dokument.objects.create(
+            nummer="R01234",
+            dokumententyp=self.dokumententyp,
+            name="Test Standard"
+        )
+        self.thema = Thema.objects.create(name="Testing")
+        self.vorgabe = Vorgabe.objects.create(
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Test Requirement",
+            gueltigkeit_von=date.today()
+        )
+        self.abschnitttyp = AbschnittTyp.objects.create(
+            abschnitttyp="Paragraph"
+        )
+    
+    def test_standard_list_view(self):
+        """Test standard_list view"""
+        response = self.client.get(reverse('standard_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "R01234")
+        self.assertIn('dokumente', response.context)
+    
+    def test_standard_detail_view(self):
+        """Test standard_detail view"""
+        response = self.client.get(
+            reverse('standard_detail', kwargs={'nummer': 'R01234'})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('standard', response.context)
+        self.assertIn('vorgaben', response.context)
+        self.assertEqual(response.context['standard'], self.dokument)
+    
+    def test_standard_detail_view_404(self):
+        """Test standard_detail view returns 404 for non-existent document"""
+        response = self.client.get(
+            reverse('standard_detail', kwargs={'nummer': 'NONEXISTENT'})
+        )
+        self.assertEqual(response.status_code, 404)
+    
+    def test_standard_checkliste_view(self):
+        """Test standard_checkliste view"""
+        response = self.client.get(
+            reverse('standard_checkliste', kwargs={'nummer': 'R01234'})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('standard', response.context)
+        self.assertIn('vorgaben', response.context)
+    
+    def test_standard_history_view(self):
+        """Test standard_detail with history (check_date)"""
+        url = reverse('standard_history', kwargs={'nummer': 'R01234'})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+
+class URLPatternsTest(TestCase):
+    """Test URL patterns"""
+    
+    def test_standard_list_url_resolves(self):
+        """Test that standard_list URL resolves correctly"""
+        url = reverse('standard_list')
+        self.assertEqual(url, '/dokumente/')
+    
+    def test_standard_detail_url_resolves(self):
+        """Test that standard_detail URL resolves correctly"""
+        url = reverse('standard_detail', kwargs={'nummer': 'TEST-001'})
+        self.assertEqual(url, '/dokumente/TEST-001/')
+    
+    def test_standard_checkliste_url_resolves(self):
+        """Test that standard_checkliste URL resolves correctly"""
+        url = reverse('standard_checkliste', kwargs={'nummer': 'TEST-001'})
+        self.assertEqual(url, '/dokumente/TEST-001/checkliste/')
+    
+    def test_standard_history_url_resolves(self):
+        """Test that standard_history URL resolves correctly"""
+        url = reverse('standard_history', kwargs={'nummer': 'TEST-001'})
+        self.assertEqual(url, '/dokumente/TEST-001/history/')
