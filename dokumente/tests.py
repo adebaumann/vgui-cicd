@@ -114,7 +114,8 @@ class DokumentModelTest(TestCase):
             name="Security Policy",
             gueltigkeit_von=date.today(),
             signatur_cso="CSO-123",
-            anhaenge="Appendix A, B"
+            anhaenge="Appendix A, B",
+            aktiv=True
         )
         self.dokument.autoren.add(self.autor)
         self.dokument.pruefende.add(self.pruefer)
@@ -124,6 +125,7 @@ class DokumentModelTest(TestCase):
         self.assertEqual(self.dokument.nummer, "DOC-001")
         self.assertEqual(self.dokument.name, "Security Policy")
         self.assertEqual(self.dokument.dokumententyp, self.dokumententyp)
+        self.assertEqual(self.dokument.aktiv, True)
     
     def test_dokument_str(self):
         """Test string representation of Dokument"""
@@ -139,7 +141,8 @@ class DokumentModelTest(TestCase):
         dokument = Dokument.objects.create(
             nummer="DOC-002",
             dokumententyp=self.dokumententyp,
-            name="Test Document"
+            name="Test Document",
+            aktiv=True
         )
         self.assertIsNone(dokument.gueltigkeit_von)
         self.assertIsNone(dokument.gueltigkeit_bis)
@@ -158,7 +161,8 @@ class VorgabeModelTest(TestCase):
         self.dokument = Dokument.objects.create(
             nummer="R01234",
             dokumententyp=self.dokumententyp,
-            name="IT Standard"
+            name="IT Standard",
+            aktiv=True
         )
         self.thema = Thema.objects.create(name="Security")
         self.vorgabe = Vorgabe.objects.create(
@@ -254,7 +258,8 @@ class VorgabeTextAbschnitteTest(TestCase):
         self.dokument = Dokument.objects.create(
             nummer="R01234",
             dokumententyp=self.dokumententyp,
-            name="Test Standard"
+            name="Test Standard",
+            aktiv=True
         )
         self.thema = Thema.objects.create(name="Testing")
         self.vorgabe = Vorgabe.objects.create(
@@ -302,7 +307,8 @@ class DokumentTextAbschnitteTest(TestCase):
         self.dokument = Dokument.objects.create(
             nummer="POL-001",
             dokumententyp=self.dokumententyp,
-            name="Test Policy"
+            name="Test Policy",
+            aktiv=True
         )
         self.abschnitttyp = AbschnittTyp.objects.create(
             abschnitttyp="Paragraph"
@@ -342,7 +348,8 @@ class ChecklistenfrageModelTest(TestCase):
         self.dokument = Dokument.objects.create(
             nummer="QA-001",
             dokumententyp=self.dokumententyp,
-            name="QA Standard"
+            name="QA Standard",
+            aktiv=True
         )
         self.thema = Thema.objects.create(name="Quality")
         self.vorgabe = Vorgabe.objects.create(
@@ -382,7 +389,8 @@ class ChangelogModelTest(TestCase):
         self.dokument = Dokument.objects.create(
             nummer="R01234",
             dokumententyp=self.dokumententyp,
-            name="IT Standard"
+            name="IT Standard",
+            aktiv=True
         )
         self.autor = Person.objects.create(
             name="John Doe",
@@ -419,7 +427,8 @@ class ViewsTestCase(TestCase):
         self.dokument = Dokument.objects.create(
             nummer="R01234",
             dokumententyp=self.dokumententyp,
-            name="Test Standard"
+            name="Test Standard",
+            aktiv=True
         )
         self.thema = Thema.objects.create(name="Testing")
         self.vorgabe = Vorgabe.objects.create(
