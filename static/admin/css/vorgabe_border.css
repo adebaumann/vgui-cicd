@@ -23,13 +23,13 @@
 }
 
 /* Make Vorgabe identifier in tabular view prominent */
-.djn-dynamic-form-Standards-vorgabe td.original,
-.djn-dynamic-form-dokumente-vorgabe td.original,
-.djn-dynamic-form-Standards-vorgabe td.original p,
-.djn-dynamic-form-dokumente-vorgabe td.original p {
-    font-size: 16px;
-    font-weight: 700;
-    color: #2c5aa0;
+tbody.djn-dynamic-form-Standards-vorgabe td.original,
+tbody.djn-dynamic-form-dokumente-vorgabe td.original,
+tbody.djn-dynamic-form-Standards-vorgabe td.original p,
+tbody.djn-dynamic-form-dokumente-vorgabe td.original p {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #2c5aa0 !important;
 }
 
 /* Optional: Slight padding for inner fieldsets (e.g., Langtext/Kurztext inlines) */
