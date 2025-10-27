@@ -13,4 +13,4 @@ class ReferenzerklaerungInline(NestedStackedInline):
 class ReferenzAdmin(NestedModelAdmin):
     inlines=[ReferenzerklaerungInline]
     list_display =['Path']
-    search_fields=("referenz",)
+    search_fields=("referenz","path")

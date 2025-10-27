@@ -61,7 +61,7 @@ class EinleitungInline(NestedTabularInline):
         classes = ['collapse']
 
 class VorgabeForm(forms.ModelForm):
-    # referenzen = TreeNodeMultipleChoiceField(queryset=Referenz.objects.all(), required=False)
+    referenzen = TreeNodeMultipleChoiceField(queryset=Referenz.objects.all(), required=False)
     class Meta:
         model = Vorgabe
         fields = '__all__'
