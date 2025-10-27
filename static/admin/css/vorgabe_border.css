@@ -22,6 +22,16 @@
     border-radius: 5px 5px 0 0;
 }
 
+/* Make Vorgabe identifier in tabular view prominent */
+.djn-dynamic-form-Standards-vorgabe td.original,
+.djn-dynamic-form-dokumente-vorgabe td.original,
+.djn-dynamic-form-Standards-vorgabe td.original p,
+.djn-dynamic-form-dokumente-vorgabe td.original p {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2c5aa0;
+}
+
 /* Optional: Slight padding for inner fieldsets (e.g., Langtext/Kurztext inlines) */
 .djn-dynamic-form-Standards-vorgabe .inline-related,
 .djn-dynamic-form-dokumente-vorgabe .inline-related {
