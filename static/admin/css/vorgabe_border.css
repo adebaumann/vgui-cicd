@@ -9,6 +9,19 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
+/* Make Vorgabe title prominent */
+.djn-dynamic-form-Standards-vorgabe > h3,
+.djn-dynamic-form-dokumente-vorgabe > h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2c5aa0;
+    margin: -15px -15px 15px -15px;
+    padding: 12px 15px;
+    background: linear-gradient(to bottom, #e8f0f8, #d4e4f3);
+    border-bottom: 2px solid #2c5aa0;
+    border-radius: 5px 5px 0 0;
+}
+
 /* Optional: Slight padding for inner fieldsets (e.g., Langtext/Kurztext inlines) */
 .djn-dynamic-form-Standards-vorgabe .inline-related,
 .djn-dynamic-form-dokumente-vorgabe .inline-related {
