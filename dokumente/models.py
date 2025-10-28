@@ -57,6 +57,7 @@ class Dokument(models.Model):
         verbose_name="Dokument"
 
 class Vorgabe(models.Model):
+    order = models.IntegerField()
     nummer = models.IntegerField()
     dokument = models.ForeignKey(Dokument, on_delete=models.CASCADE, related_name='vorgaben')
     thema = models.ForeignKey(Thema, on_delete=models.PROTECT)
@@ -87,7 +88,7 @@ class Vorgabe(models.Model):
 
     class Meta:
         verbose_name_plural="Vorgaben"
-
+        ordering = ['order']
 
 class VorgabeLangtext(Textabschnitt):
     abschnitt=models.ForeignKey(Vorgabe,on_delete=models.CASCADE)

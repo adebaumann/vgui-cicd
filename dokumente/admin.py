@@ -4,6 +4,7 @@ from nested_admin import NestedStackedInline, NestedModelAdmin, NestedTabularInl
 from django import forms
 from mptt.forms import TreeNodeMultipleChoiceField
 from mptt.admin import DraggableMPTTAdmin
+from adminsortable2.admin import SortableInlineAdminMixin, SortableAdminBase
 
 # Register your models here.
 from .models import *
@@ -66,10 +67,11 @@ class VorgabeForm(forms.ModelForm):
         model = Vorgabe
         fields = '__all__'
 
-class VorgabeInline(NestedTabularInline):  # or StackedInline for more vertical layout
+class VorgabeInline(SortableInlineAdminMixin, NestedTabularInline):  # or StackedInline for more vertical layout
     model = Vorgabe
     form = VorgabeForm
     extra = 0
+    sortable_field_name = "order"  # Add this - make sure your Vorgabe model has an 'order' field
     #show_change_link = True
     inlines = [VorgabeKurztextInline,VorgabeLangtextInline,ChecklistenfragenInline]
     autocomplete_fields = ['stichworte','referenzen','relevanz']
@@ -100,7 +102,7 @@ class PersonAdmin(admin.ModelAdmin):
 
 
 @admin.register(Dokument)
-class DokumentAdmin(NestedModelAdmin):
+class DokumentAdmin(SortableAdminBase, NestedModelAdmin):
     actions_on_top=True
     inlines = [EinleitungInline,GeltungsbereichInline,VorgabeInline]
     #filter_horizontal=['autoren','pruefende']
