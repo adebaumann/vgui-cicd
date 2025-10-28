@@ -6,7 +6,7 @@ import datetime
 import pprint
 
 def startseite(request):
-    standards=list(Dokument.objects.all())
+    standards=list(Dokument.objects.filter(aktiv=True))
     return render(request, 'startseite.html', {"dokumente":standards,})
 
 def search(request):

@@ -36,7 +36,7 @@ class VorgabeKurztextInline(NestedTabularInline):
     classes = ['collapse']
     #inline=inhalt
 
-class VorgabeLangtextInline(NestedStackedInline):
+class VorgabeLangtextInline(NestedTabularInline):
     model=VorgabeLangtext
     extra=0
     sortable_field_name = "order"
@@ -77,7 +77,7 @@ class VorgabeInline(NestedTabularInline):  # or StackedInline for more vertical 
     list_filter=['stichworte']
     #classes=["collapse"]
 
-class StichworterklaerungInline(NestedStackedInline):
+class StichworterklaerungInline(NestedTabularInline):
     model=Stichworterklaerung
     extra=0
     sortable_field_name = "order"
