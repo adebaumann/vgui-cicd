@@ -10,6 +10,8 @@ keys/
 .idea/
 
 *.kate-swp
-
+node_modules/
+package-lock.json
+package.json
 # Diagram cache directory
 media/diagram_cache/
