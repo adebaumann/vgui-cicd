@@ -166,6 +166,7 @@ class VorgabeModelTest(TestCase):
         )
         self.thema = Thema.objects.create(name="Security")
         self.vorgabe = Vorgabe.objects.create(
+            order=1,
             nummer=1,
             dokument=self.dokument,
             thema=self.thema,
@@ -175,6 +176,7 @@ class VorgabeModelTest(TestCase):
     
     def test_vorgabe_creation(self):
         """Test that Vorgabe is created correctly"""
+        self.assertEqual(self.vorgabe.order, 1)
         self.assertEqual(self.vorgabe.nummer, 1)
         self.assertEqual(self.vorgabe.dokument, self.dokument)
         self.assertEqual(self.vorgabe.thema, self.thema)
@@ -197,6 +199,7 @@ class VorgabeModelTest(TestCase):
     def test_get_status_future(self):
         """Test get_status returns 'future' for future vorgabe"""
         future_vorgabe = Vorgabe.objects.create(
+            order=2,
             nummer=2,
             dokument=self.dokument,
             thema=self.thema,
@@ -209,6 +212,7 @@ class VorgabeModelTest(TestCase):
     def test_get_status_expired(self):
         """Test get_status returns 'expired' for expired vorgabe"""
         expired_vorgabe = Vorgabe.objects.create(
+            order=3,
             nummer=3,
             dokument=self.dokument,
             thema=self.thema,
@@ -222,6 +226,7 @@ class VorgabeModelTest(TestCase):
     def test_get_status_verbose(self):
         """Test get_status with verbose=True"""
         future_vorgabe = Vorgabe.objects.create(
+            order=4,
             nummer=4,
             dokument=self.dokument,
             thema=self.thema,
@@ -235,6 +240,7 @@ class VorgabeModelTest(TestCase):
     def test_get_status_with_custom_check_date(self):
         """Test get_status with custom check_date"""
         vorgabe = Vorgabe.objects.create(
+            order=5,
             nummer=5,
             dokument=self.dokument,
             thema=self.thema,
@@ -263,6 +269,7 @@ class VorgabeTextAbschnitteTest(TestCase):
         )
         self.thema = Thema.objects.create(name="Testing")
         self.vorgabe = Vorgabe.objects.create(
+            order=1,
             nummer=1,
             dokument=self.dokument,
             thema=self.thema,
@@ -353,6 +360,7 @@ class ChecklistenfrageModelTest(TestCase):
         )
         self.thema = Thema.objects.create(name="Quality")
         self.vorgabe = Vorgabe.objects.create(
+            order=1,
             nummer=1,
             dokument=self.dokument,
             thema=self.thema,
@@ -432,6 +440,7 @@ class ViewsTestCase(TestCase):
         )
         self.thema = Thema.objects.create(name="Testing")
         self.vorgabe = Vorgabe.objects.create(
+            order=1,
             nummer=1,
             dokument=self.dokument,
             thema=self.thema,
