@@ -97,15 +97,15 @@ class VorgabeForm(forms.ModelForm):
         model = Vorgabe
         fields = '__all__'
 
-class VorgabeInline(SortableInlineAdminMixin, NestedStackedInline):  # Changed to StackedInline for better box separation
+class VorgabeInline(SortableInlineAdminMixin, NestedStackedInline):
     model = Vorgabe
     form = VorgabeForm
     extra = 0
-    sortable_field_name = "order"  # Add this - make sure your Vorgabe model has an 'order' field
+    sortable_field_name = "order"
     show_change_link = True
     inlines = [VorgabeKurztextInline, VorgabeLangtextInline, ChecklistenfragenInline]
     autocomplete_fields = ['stichworte','referenzen','relevanz']
-    classes = ["collapse"]  # Start collapsed for better overview
+    # Remove collapse class so Vorgaben show by default
     
     fieldsets = (
         ('Grunddaten', {
@@ -114,11 +114,11 @@ class VorgabeInline(SortableInlineAdminMixin, NestedStackedInline):  # Changed t
         }),
         ('Gültigkeit', {
             'fields': (('gueltigkeit_von', 'gueltigkeit_bis'),),
-            'classes': ('wide', 'collapse'),
+            'classes': ('wide',),
         }),
         ('Verknüpfungen', {
             'fields': (('referenzen', 'stichworte', 'relevanz'),),
-            'classes': ('wide', 'collapse'),
+            'classes': ('wide',),
         }),
     )
 
@@ -169,7 +169,7 @@ class DokumentAdmin(SortableAdminBase, NestedModelAdmin):
     )
     
     class Media:
-        js = ('admin/js/vorgabe_toggle.js',)
+        js = ('admin/js/vorgabe_collapse.js',)
         css = {
             'all': ('admin/css/vorgabe_border.css',)
         }
