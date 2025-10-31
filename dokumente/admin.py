@@ -109,15 +109,15 @@ class VorgabeInline(SortableInlineAdminMixin, NestedStackedInline):  # Changed t
     
     fieldsets = (
         ('Grunddaten', {
-            'fields': ('order', 'nummer', 'thema', 'titel'),
+            'fields': (('order', 'nummer'), ('thema', 'titel')),
             'classes': ('wide',),
         }),
         ('Gültigkeit', {
-            'fields': ('gueltigkeit_von', 'gueltigkeit_bis'),
+            'fields': (('gueltigkeit_von', 'gueltigkeit_bis'),),
             'classes': ('wide', 'collapse'),
         }),
         ('Verknüpfungen', {
-            'fields': ('referenzen', 'stichworte', 'relevanz'),
+            'fields': (('referenzen', 'stichworte', 'relevanz'),),
             'classes': ('wide', 'collapse'),
         }),
     )
@@ -155,15 +155,16 @@ class DokumentAdmin(SortableAdminBase, NestedModelAdmin):
     
     fieldsets = (
         ('Grunddaten', {
-            'fields': ('nummer', 'name', 'dokumententyp', 'aktiv')
+            'fields': ('nummer', 'name', 'dokumententyp', 'aktiv'),
+            'classes': ('wide',),
         }),
         ('Verantwortlichkeiten', {
             'fields': ('autoren', 'pruefende'),
-            'classes': ('collapse',),
+            'classes': ('wide', 'collapse'),
         }),
         ('Gültigkeit & Metadaten', {
             'fields': ('gueltigkeit_von', 'gueltigkeit_bis', 'signatur_cso', 'anhaenge'),
-            'classes': ('collapse',),
+            'classes': ('wide', 'collapse'),
         }),
     )
     
