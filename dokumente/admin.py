@@ -119,11 +119,39 @@ class DokumentAdmin(SortableAdminBase, NestedModelAdmin):
 
 #admin.site.register(Stichwort)
 
+@admin.register(VorgabenTable)
+class VorgabenTableAdmin(admin.ModelAdmin):
+    list_display = ['order', 'nummer', 'dokument', 'thema', 'titel', 'gueltigkeit_von', 'gueltigkeit_bis']
+    list_display_links = ['dokument']
+    list_editable = ['order', 'nummer', 'thema', 'titel', 'gueltigkeit_von', 'gueltigkeit_bis']
+    list_filter = ['dokument', 'thema', 'gueltigkeit_von', 'gueltigkeit_bis']
+    search_fields = ['nummer', 'titel', 'dokument__nummer', 'dokument__name']
+    autocomplete_fields = ['dokument', 'thema', 'stichworte', 'referenzen', 'relevanz']
+    ordering = ['order']
+    list_per_page = 100
+
+    fieldsets = (
+        ('Grunddaten', {
+            'fields': ('order', 'nummer', 'dokument', 'thema', 'titel')
+        }),
+        ('Gültigkeit', {
+            'fields': ('gueltigkeit_von', 'gueltigkeit_bis')
+        }),
+        ('Verknüpfungen', {
+            'fields': ('referenzen', 'stichworte', 'relevanz'),
+            'classes': ('collapse',)
+        }),
+    )
+
+@admin.register(Thema)
+class ThemaAdmin(admin.ModelAdmin):
+    search_fields = ['name']
+    ordering = ['name']
+
 admin.site.register(Checklistenfrage)
 admin.site.register(Dokumententyp)
 #admin.site.register(Person)
-admin.site.register(Thema)
 #admin.site.register(Referenz, DraggableM§PTTAdmin)
 admin.site.register(Vorgabe)
-    
+
 #admin.site.register(Changelog)

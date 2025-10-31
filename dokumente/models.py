@@ -125,6 +125,12 @@ class Checklistenfrage(models.Model):
         verbose_name_plural="Fragen für Checkliste"
         verbose_name="Frage für Checkliste"
 
+class VorgabenTable(Vorgabe):
+    class Meta:
+        proxy = True
+        verbose_name = "Vorgabe (Tabellenansicht)"
+        verbose_name_plural = "Vorgaben (Tabellenansicht)"
+
 class Changelog(models.Model):
     dokument = models.ForeignKey(Dokument, on_delete=models.CASCADE, related_name='changelog')
     autoren = models.ManyToManyField(Person)
