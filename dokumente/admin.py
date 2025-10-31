@@ -21,45 +21,75 @@ from referenzen.models import Referenz
 #            'frage': forms.Textarea(attrs={'rows': 1, 'cols': 100}),
 #        }
 
-class ChecklistenfragenInline(NestedTabularInline):
+class ChecklistenfragenInline(NestedStackedInline):
     model=Checklistenfrage
     extra=0
     fk_name="vorgabe"
-#    form=ChecklistenForm
     classes = ['collapse']
+    verbose_name_plural = "Checklistenfragen"
+    fieldsets = (
+        (None, {
+            'fields': ('frage',),
+            'classes': ('wide',),
+        }),
+    )
 
 
-class VorgabeKurztextInline(NestedTabularInline):
+class VorgabeKurztextInline(NestedStackedInline):
     model=VorgabeKurztext
     extra=0
     sortable_field_name = "order"
     show_change_link=True
     classes = ['collapse']
-    #inline=inhalt
+    verbose_name_plural = "Kurztext-Abschnitte"
+    fieldsets = (
+        (None, {
+            'fields': ('abschnitttyp', 'inhalt', 'order'),
+            'classes': ('wide',),
+        }),
+    )
 
-class VorgabeLangtextInline(NestedTabularInline):
+class VorgabeLangtextInline(NestedStackedInline):
     model=VorgabeLangtext
     extra=0
     sortable_field_name = "order"
     show_change_link=True
     classes = ['collapse']
-    #inline=inhalt
+    verbose_name_plural = "Langtext-Abschnitte"
+    fieldsets = (
+        (None, {
+            'fields': ('abschnitttyp', 'inhalt', 'order'),
+            'classes': ('wide',),
+        }),
+    )
 
-class GeltungsbereichInline(NestedTabularInline):
+class GeltungsbereichInline(NestedStackedInline):
     model=Geltungsbereich
     extra=0
     sortable_field_name = "order"
     show_change_link=True
     classes = ['collapse']
-    classes = ['collapse']
-    #inline=inhalt
+    verbose_name_plural = "Geltungsbereich-Abschnitte"
+    fieldsets = (
+        (None, {
+            'fields': ('abschnitttyp', 'inhalt', 'order'),
+            'classes': ('wide',),
+        }),
+    )
 
-class EinleitungInline(NestedTabularInline):
-        model = Einleitung
-        extra = 0
-        sortable_field_name = "order"
-        show_change_link = True
-        classes = ['collapse']
+class EinleitungInline(NestedStackedInline):
+    model = Einleitung
+    extra = 0
+    sortable_field_name = "order"
+    show_change_link = True
+    classes = ['collapse']
+    verbose_name_plural = "Einleitungs-Abschnitte"
+    fieldsets = (
+        (None, {
+            'fields': ('abschnitttyp', 'inhalt', 'order'),
+            'classes': ('wide',),
+        }),
+    )
 
 class VorgabeForm(forms.ModelForm):
     referenzen = TreeNodeMultipleChoiceField(queryset=Referenz.objects.all(), required=False)
@@ -67,17 +97,30 @@ class VorgabeForm(forms.ModelForm):
         model = Vorgabe
         fields = '__all__'
 
-class VorgabeInline(SortableInlineAdminMixin, NestedTabularInline):  # or StackedInline for more vertical layout
+class VorgabeInline(SortableInlineAdminMixin, NestedStackedInline):  # Changed to StackedInline for better box separation
     model = Vorgabe
     form = VorgabeForm
     extra = 0
     sortable_field_name = "order"  # Add this - make sure your Vorgabe model has an 'order' field
-    #show_change_link = True
-    inlines = [VorgabeKurztextInline,VorgabeLangtextInline,ChecklistenfragenInline]
+    show_change_link = True
+    inlines = [VorgabeKurztextInline, VorgabeLangtextInline, ChecklistenfragenInline]
     autocomplete_fields = ['stichworte','referenzen','relevanz']
-    #search_fields=['nummer','name']ModelAdmin.
-    list_filter=['stichworte']
-    #classes=["collapse"]
+    classes = ["collapse"]  # Start collapsed for better overview
+    
+    fieldsets = (
+        ('Grunddaten', {
+            'fields': ('order', 'nummer', 'thema', 'titel'),
+            'classes': ('wide',),
+        }),
+        ('Gültigkeit', {
+            'fields': ('gueltigkeit_von', 'gueltigkeit_bis'),
+            'classes': ('wide', 'collapse'),
+        }),
+        ('Verknüpfungen', {
+            'fields': ('referenzen', 'stichworte', 'relevanz'),
+            'classes': ('wide', 'collapse'),
+        }),
+    )
 
 class StichworterklaerungInline(NestedTabularInline):
     model=Stichworterklaerung
@@ -104,16 +147,30 @@ class PersonAdmin(admin.ModelAdmin):
 @admin.register(Dokument)
 class DokumentAdmin(SortableAdminBase, NestedModelAdmin):
     actions_on_top=True
-    inlines = [EinleitungInline,GeltungsbereichInline,VorgabeInline]
-    #filter_horizontal=['autoren','pruefende']
-    list_display=['nummer','name','dokumententyp']
+    inlines = [EinleitungInline, GeltungsbereichInline, VorgabeInline]
+    filter_horizontal=['autoren','pruefende']
+    list_display=['nummer','name','dokumententyp','gueltigkeit_von','gueltigkeit_bis','aktiv']
     search_fields=['nummer','name']
+    list_filter=['dokumententyp','aktiv','gueltigkeit_von']
+    
+    fieldsets = (
+        ('Grunddaten', {
+            'fields': ('nummer', 'name', 'dokumententyp', 'aktiv')
+        }),
+        ('Verantwortlichkeiten', {
+            'fields': ('autoren', 'pruefende'),
+            'classes': ('collapse',),
+        }),
+        ('Gültigkeit & Metadaten', {
+            'fields': ('gueltigkeit_von', 'gueltigkeit_bis', 'signatur_cso', 'anhaenge'),
+            'classes': ('collapse',),
+        }),
+    )
+    
     class Media:
-#        js = ('admin/js/vorgabe_collapse.js',)
+        js = ('admin/js/vorgabe_toggle.js',)
         css = {
-            'all': ('admin/css/vorgabe_border.css',
-#                    'admin/css/vorgabe_collapse.css',
-                    )
+            'all': ('admin/css/vorgabe_border.css',)
         }
 
 
