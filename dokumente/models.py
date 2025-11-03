@@ -78,7 +78,7 @@ class Vorgabe(models.Model):
         if not self.gueltigkeit_bis:
             return "active"
 
-        if self.gueltigkeit_bis > check_date:
+        if self.gueltigkeit_bis >= check_date:
             return "active"
 
         return "expired" if not verbose else "Ist seit dem "+self.gueltigkeit_bis.strftime('%d.%m.%Y')+" nicht mehr in Kraft."
