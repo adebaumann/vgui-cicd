@@ -102,7 +102,8 @@ class VorgabeInline(SortableInlineAdminMixin, NestedStackedInline):
     form = VorgabeForm
     extra = 0
     sortable_field_name = "order"
-    show_change_link = True
+    show_change_link = False
+    can_delete = False
     inlines = [VorgabeKurztextInline, VorgabeLangtextInline, ChecklistenfragenInline]
     autocomplete_fields = ['stichworte','referenzen','relevanz']
     # Remove collapse class so Vorgaben show by default
