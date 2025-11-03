@@ -1,11 +1,14 @@
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.core.management import call_command
 from datetime import date, timedelta
+from io import StringIO
 from .models import (
     Dokumententyp, Person, Thema, Dokument, Vorgabe,
     VorgabeLangtext, VorgabeKurztext, Geltungsbereich,
     Einleitung, Checklistenfrage, Changelog
 )
+from .utils import check_vorgabe_conflicts, date_ranges_intersect, format_conflict_report
 from abschnitte.models import AbschnittTyp
 from referenzen.models import Referenz
 from stichworte.models import Stichwort
@@ -513,3 +516,304 @@ class URLPatternsTest(TestCase):
         """Test that standard_history URL resolves correctly"""
         url = reverse('standard_history', kwargs={'nummer': 'TEST-001'})
         self.assertEqual(url, '/dokumente/TEST-001/history/')
+
+
+class VorgabeSanityCheckTest(TestCase):
+    """Test cases for Vorgabe sanity check functionality"""
+    
+    def setUp(self):
+        """Set up test data for sanity check tests"""
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
+        )
+        self.dokument = Dokument.objects.create(
+            nummer="R0066",
+            dokumententyp=self.dokumententyp,
+            name="IT Security Standard",
+            aktiv=True
+        )
+        self.thema = Thema.objects.create(name="Organisation")
+        self.base_date = date(2023, 1, 1)
+        
+        # Create non-conflicting Vorgaben
+        self.vorgabe1 = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="First Vorgabe",
+            gueltigkeit_von=self.base_date,
+            gueltigkeit_bis=date(2023, 12, 31)
+        )
+        
+        self.vorgabe2 = Vorgabe.objects.create(
+            order=2,
+            nummer=2,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Second Vorgabe",
+            gueltigkeit_von=self.base_date,
+            gueltigkeit_bis=date(2023, 12, 31)
+        )
+    
+    def test_date_ranges_intersect_no_overlap(self):
+        """Test date_ranges_intersect with non-overlapping ranges"""
+        # Range 1: 2023-01-01 to 2023-06-30
+        # Range 2: 2023-07-01 to 2023-12-31
+        result = date_ranges_intersect(
+            date(2023, 1, 1), date(2023, 6, 30),
+            date(2023, 7, 1), date(2023, 12, 31)
+        )
+        self.assertFalse(result)
+    
+    def test_date_ranges_intersect_with_overlap(self):
+        """Test date_ranges_intersect with overlapping ranges"""
+        # Range 1: 2023-01-01 to 2023-06-30
+        # Range 2: 2023-06-01 to 2023-12-31 (overlaps in June)
+        result = date_ranges_intersect(
+            date(2023, 1, 1), date(2023, 6, 30),
+            date(2023, 6, 1), date(2023, 12, 31)
+        )
+        self.assertTrue(result)
+    
+    def test_date_ranges_intersect_with_none_end_date(self):
+        """Test date_ranges_intersect with None end date (open-ended)"""
+        # Range 1: 2023-01-01 to None (open-ended)
+        # Range 2: 2023-06-01 to 2023-12-31
+        result = date_ranges_intersect(
+            date(2023, 1, 1), None,
+            date(2023, 6, 1), date(2023, 12, 31)
+        )
+        self.assertTrue(result)
+    
+    def test_date_ranges_intersect_both_none_end_dates(self):
+        """Test date_ranges_intersect with both None end dates"""
+        # Both ranges are open-ended
+        result = date_ranges_intersect(
+            date(2023, 1, 1), None,
+            date(2023, 6, 1), None
+        )
+        self.assertTrue(result)
+    
+    def test_date_ranges_intersect_identical_ranges(self):
+        """Test date_ranges_intersect with identical ranges"""
+        result = date_ranges_intersect(
+            date(2023, 1, 1), date(2023, 12, 31),
+            date(2023, 1, 1), date(2023, 12, 31)
+        )
+        self.assertTrue(result)
+    
+    def test_sanity_check_vorgaben_no_conflicts(self):
+        """Test sanity_check_vorgaben with no conflicts"""
+        conflicts = Vorgabe.sanity_check_vorgaben()
+        self.assertEqual(len(conflicts), 0)
+    
+    def test_sanity_check_vorgaben_with_conflicts(self):
+        """Test sanity_check_vorgaben with conflicting Vorgaben"""
+        # Create a conflicting Vorgabe (same nummer, thema, dokument with overlapping dates)
+        conflicting_vorgabe = Vorgabe.objects.create(
+            order=3,
+            nummer=1,  # Same as vorgabe1
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Conflicting Vorgabe",
+            gueltigkeit_von=date(2023, 6, 1),  # Overlaps with vorgabe1
+            gueltigkeit_bis=date(2023, 8, 31)
+        )
+        
+        conflicts = Vorgabe.sanity_check_vorgaben()
+        self.assertEqual(len(conflicts), 1)
+        
+        conflict = conflicts[0]
+        self.assertEqual(conflict['conflict_type'], 'date_range_intersection')
+        self.assertIn('R0066.O.1', conflict['message'])
+        self.assertIn('intersecting validity periods', conflict['message'])
+        self.assertEqual(conflict['vorgabe1'], self.vorgabe1)
+        self.assertEqual(conflict['vorgabe2'], conflicting_vorgabe)
+    
+    def test_sanity_check_vorgaben_multiple_conflicts(self):
+        """Test sanity_check_vorgaben with multiple conflict groups"""
+        # Create first conflict group
+        conflicting_vorgabe1 = Vorgabe.objects.create(
+            order=3,
+            nummer=1,  # Same as vorgabe1
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Conflicting Vorgabe 1",
+            gueltigkeit_von=date(2023, 6, 1),
+            gueltigkeit_bis=date(2023, 8, 31)
+        )
+        
+        # Create second conflict group with different nummer
+        conflicting_vorgabe2 = Vorgabe.objects.create(
+            order=4,
+            nummer=2,  # Same as vorgabe2
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Conflicting Vorgabe 2",
+            gueltigkeit_von=date(2023, 6, 1),
+            gueltigkeit_bis=date(2023, 8, 31)
+        )
+        
+        conflicts = Vorgabe.sanity_check_vorgaben()
+        self.assertEqual(len(conflicts), 2)
+        
+        # Check that we have conflicts for both nummer 1 and nummer 2
+        conflict_messages = [c['message'] for c in conflicts]
+        self.assertTrue(any('R0066.O.1' in msg for msg in conflict_messages))
+        self.assertTrue(any('R0066.O.2' in msg for msg in conflict_messages))
+    
+    def test_find_conflicts_no_conflicts(self):
+        """Test find_conflicts method on Vorgabe with no conflicts"""
+        conflicts = self.vorgabe1.find_conflicts()
+        self.assertEqual(len(conflicts), 0)
+    
+    def test_find_conflicts_with_conflicts(self):
+        """Test find_conflicts method on Vorgabe with conflicts"""
+        # Create a conflicting Vorgabe
+        conflicting_vorgabe = Vorgabe.objects.create(
+            order=3,
+            nummer=1,  # Same as vorgabe1
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Conflicting Vorgabe",
+            gueltigkeit_von=date(2023, 6, 1),  # Overlaps
+            gueltigkeit_bis=date(2023, 8, 31)
+        )
+        
+        conflicts = self.vorgabe1.find_conflicts()
+        self.assertEqual(len(conflicts), 1)
+        conflict = conflicts[0]
+        self.assertEqual(conflict['vorgabe1'], self.vorgabe1)
+        self.assertEqual(conflict['vorgabe2'], conflicting_vorgabe)
+    
+    def test_vorgabe_clean_no_conflicts(self):
+        """Test Vorgabe.clean() with no conflicts"""
+        try:
+            self.vorgabe1.clean()
+        except Exception as e:
+            self.fail(f"clean() raised {e} unexpectedly!")
+    
+    def test_vorgabe_clean_with_conflicts(self):
+        """Test Vorgabe.clean() with conflicts raises ValidationError"""
+        # Create a conflicting Vorgabe
+        conflicting_vorgabe = Vorgabe(
+            order=3,
+            nummer=1,  # Same as vorgabe1
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Conflicting Vorgabe",
+            gueltigkeit_von=date(2023, 6, 1),  # Overlaps
+            gueltigkeit_bis=date(2023, 8, 31)
+        )
+        
+        with self.assertRaises(Exception) as context:
+            conflicting_vorgabe.clean()
+        
+        self.assertIn('conflicts with existing', str(context.exception))
+        self.assertIn('overlapping validity periods', str(context.exception))
+    
+    def test_check_vorgabe_conflicts_utility(self):
+        """Test check_vorgabe_conflicts utility function"""
+        # Initially no conflicts
+        conflicts = check_vorgabe_conflicts()
+        self.assertEqual(len(conflicts), 0)
+        
+        # Create a conflicting Vorgabe
+        conflicting_vorgabe = Vorgabe.objects.create(
+            order=3,
+            nummer=1,  # Same as vorgabe1
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Conflicting Vorgabe",
+            gueltigkeit_von=date(2023, 6, 1),  # Overlaps
+            gueltigkeit_bis=date(2023, 8, 31)
+        )
+        
+        conflicts = check_vorgabe_conflicts()
+        self.assertEqual(len(conflicts), 1)
+    
+    def test_format_conflict_report_no_conflicts(self):
+        """Test format_conflict_report with no conflicts"""
+        report = format_conflict_report([])
+        self.assertEqual(report, "✓ No conflicts found in Vorgaben")
+    
+    def test_format_conflict_report_with_conflicts(self):
+        """Test format_conflict_report with conflicts"""
+        # Create a conflicting Vorgabe
+        conflicting_vorgabe = Vorgabe.objects.create(
+            order=3,
+            nummer=1,  # Same as vorgabe1
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Conflicting Vorgabe",
+            gueltigkeit_von=date(2023, 6, 1),  # Overlaps
+            gueltigkeit_bis=date(2023, 8, 31)
+        )
+        
+        conflicts = check_vorgabe_conflicts()
+        report = format_conflict_report(conflicts)
+        
+        self.assertIn("Found 1 conflicts:", report)
+        self.assertIn("R0066.O.1", report)
+        self.assertIn("intersecting validity periods", report)
+
+
+class SanityCheckManagementCommandTest(TestCase):
+    """Test cases for sanity_check_vorgaben management command"""
+    
+    def setUp(self):
+        """Set up test data for management command tests"""
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
+        )
+        self.dokument = Dokument.objects.create(
+            nummer="R0066",
+            dokumententyp=self.dokumententyp,
+            name="IT Security Standard",
+            aktiv=True
+        )
+        self.thema = Thema.objects.create(name="Organisation")
+    
+    def test_sanity_check_command_no_conflicts(self):
+        """Test management command with no conflicts"""
+        out = StringIO()
+        call_command('sanity_check_vorgaben', stdout=out)
+        
+        output = out.getvalue()
+        self.assertIn("Starting Vorgaben sanity check...", output)
+        self.assertIn("✓ No conflicts found in Vorgaben", output)
+    
+    def test_sanity_check_command_with_conflicts(self):
+        """Test management command with conflicts"""
+        # Create conflicting Vorgaben
+        Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="First Vorgabe",
+            gueltigkeit_von=date(2023, 1, 1),
+            gueltigkeit_bis=date(2023, 12, 31)
+        )
+        
+        Vorgabe.objects.create(
+            order=2,
+            nummer=1,  # Same nummer, thema, dokument
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Conflicting Vorgabe",
+            gueltigkeit_von=date(2023, 6, 1),  # Overlaps
+            gueltigkeit_bis=date(2023, 8, 31)
+        )
+        
+        out = StringIO()
+        call_command('sanity_check_vorgaben', stdout=out)
+        
+        output = out.getvalue()
+        self.assertIn("Starting Vorgaben sanity check...", output)
+        self.assertIn("Found 1 conflicts:", output)
+        self.assertIn("R0066.O.1", output)
+        self.assertIn("intersecting validity periods", output)

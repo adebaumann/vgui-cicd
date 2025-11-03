@@ -5,6 +5,7 @@ from stichworte.models import Stichwort
 from referenzen.models import Referenz
 from rollen.models import Rolle
 import datetime
+from django.db.models import Q
 
 class Dokumententyp(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
@@ -85,6 +86,123 @@ class Vorgabe(models.Model):
 
     def __str__(self):
         return f"{self.Vorgabennummer()}: {self.titel}"
+
+    @staticmethod
+    def sanity_check_vorgaben():
+        """
+        Sanity check for Vorgaben:
+        If there are two Vorgaben with the same number, Thema and Dokument,
+        their valid_from and valid_to date ranges shouldn't intersect.
+        
+        Returns:
+            list: List of dictionaries containing conflicts found
+        """
+        conflicts = []
+        
+        # Group Vorgaben by dokument, thema, and nummer
+        from django.db.models import Count
+        from itertools import combinations
+        
+        # Find Vorgaben with same dokument, thema, and nummer
+        duplicate_groups = (
+            Vorgabe.objects.values('dokument', 'thema', 'nummer')
+            .annotate(count=Count('id'))
+            .filter(count__gt=1)
+        )
+        
+        for group in duplicate_groups:
+            # Get all Vorgaben in this group
+            vorgaben = Vorgabe.objects.filter(
+                dokument=group['dokument'],
+                thema=group['thema'], 
+                nummer=group['nummer']
+            )
+            
+            # Check all pairs for date range intersections
+            for vorgabe1, vorgabe2 in combinations(vorgaben, 2):
+                if Vorgabe._date_ranges_intersect(
+                    vorgabe1.gueltigkeit_von, vorgabe1.gueltigkeit_bis,
+                    vorgabe2.gueltigkeit_von, vorgabe2.gueltigkeit_bis
+                ):
+                    conflicts.append({
+                        'vorgabe1': vorgabe1,
+                        'vorgabe2': vorgabe2,
+                        'conflict_type': 'date_range_intersection',
+                        'message': f"Vorgaben {vorgabe1.Vorgabennummer()} and {vorgabe2.Vorgabennummer()} "
+                                  f"have intersecting validity periods"
+                    })
+        
+        return conflicts
+    
+    def clean(self):
+        """
+        Validate the Vorgabe before saving.
+        """
+        from django.core.exceptions import ValidationError
+        
+        # Check for conflicts with existing Vorgaben
+        conflicts = self.find_conflicts()
+        if conflicts:
+            conflict_messages = [c['message'] for c in conflicts]
+            raise ValidationError({
+                '__all__': conflict_messages
+            })
+    
+    def find_conflicts(self):
+        """
+        Find conflicts with existing Vorgaben.
+        
+        Returns:
+            list: List of conflict dictionaries
+        """
+        conflicts = []
+        
+        # Find Vorgaben with same dokument, thema, and nummer (excluding self)
+        existing_vorgaben = Vorgabe.objects.filter(
+            dokument=self.dokument,
+            thema=self.thema,
+            nummer=self.nummer
+        ).exclude(pk=self.pk)
+        
+        for other_vorgabe in existing_vorgaben:
+            if self._date_ranges_intersect(
+                self.gueltigkeit_von, self.gueltigkeit_bis,
+                other_vorgabe.gueltigkeit_von, other_vorgabe.gueltigkeit_bis
+            ):
+                conflicts.append({
+                    'vorgabe1': self,
+                    'vorgabe2': other_vorgabe,
+                    'conflict_type': 'date_range_intersection',
+                    'message': f"Vorgabe {self.Vorgabennummer()} conflicts with "
+                              f"existing {other_vorgabe.Vorgabennummer()} "
+                              f"due to overlapping validity periods"
+                })
+        
+        return conflicts
+
+    @staticmethod
+    def _date_ranges_intersect(start1, end1, start2, end2):
+        """
+        Check if two date ranges intersect.
+        None end date means open-ended range.
+        
+        Args:
+            start1, start2: Start dates
+            end1, end2: End dates (can be None for open-ended)
+            
+        Returns:
+            bool: True if ranges intersect
+        """
+        # If either start date is None, treat it as invalid case
+        if not start1 or not start2:
+            return False
+            
+        # If end date is None, treat it as far future
+        end1 = end1 or datetime.date.max
+        end2 = end2 or datetime.date.max
+        
+        # Ranges intersect if start1 <= end2 and start2 <= end1
+        return start1 <= end2 and start2 <= end1
 
     class Meta:
         verbose_name_plural="Vorgaben"
