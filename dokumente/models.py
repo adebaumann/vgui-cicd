@@ -5,7 +5,6 @@ from stichworte.models import Stichwort
 from referenzen.models import Referenz
 from rollen.models import Rolle
 import datetime
-from django.db.models import Q
 
 class Dokumententyp(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
@@ -129,7 +128,7 @@ class Vorgabe(models.Model):
                         'vorgabe2': vorgabe2,
                         'conflict_type': 'date_range_intersection',
                         'message': f"Vorgaben {vorgabe1.Vorgabennummer()} and {vorgabe2.Vorgabennummer()} "
-                                  f"have intersecting validity periods"
+                                  f"überschneiden sich in der Geltungsdauer"
                     })
         
         return conflicts
