@@ -628,7 +628,7 @@ class VorgabeSanityCheckTest(TestCase):
         conflict = conflicts[0]
         self.assertEqual(conflict['conflict_type'], 'date_range_intersection')
         self.assertIn('R0066.O.1', conflict['message'])
-        self.assertIn('intersecting validity periods', conflict['message'])
+        self.assertIn('überschneiden sich in der Geltungsdauer', conflict['message'])
         self.assertEqual(conflict['vorgabe1'], self.vorgabe1)
         self.assertEqual(conflict['vorgabe2'], conflicting_vorgabe)
     
@@ -816,7 +816,7 @@ class SanityCheckManagementCommandTest(TestCase):
         self.assertIn("Starting Vorgaben sanity check...", output)
         self.assertIn("Found 1 conflicts:", output)
         self.assertIn("R0066.O.1", output)
-        self.assertIn("intersecting validity periods", output)
+        self.assertIn("überschneiden sich in der Geltungsdauer", output)
 
 
 class IncompleteVorgabenTest(TestCase):
