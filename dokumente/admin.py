@@ -207,10 +207,43 @@ class ThemaAdmin(admin.ModelAdmin):
     search_fields = ['name']
     ordering = ['name']
 
+@admin.register(Vorgabe)
+class VorgabeAdmin(NestedModelAdmin):
+    form = VorgabeForm
+    list_display = ['vorgabe_nummer', 'titel', 'dokument', 'thema', 'gueltigkeit_von', 'gueltigkeit_bis']
+    list_filter = ['dokument', 'thema', 'gueltigkeit_von', 'gueltigkeit_bis']
+    search_fields = ['nummer', 'titel', 'dokument__nummer', 'dokument__name']
+    autocomplete_fields = ['stichworte', 'referenzen', 'relevanz']
+    ordering = ['dokument', 'order']
+    
+    inlines = [
+        VorgabeKurztextInline, 
+        VorgabeLangtextInline, 
+        ChecklistenfragenInline
+    ]
+    
+    fieldsets = (
+        ('Grunddaten', {
+            'fields': (('order', 'nummer'), ('dokument', 'thema'), 'titel'),
+            'classes': ('wide',),
+        }),
+        ('Gültigkeit', {
+            'fields': (('gueltigkeit_von', 'gueltigkeit_bis'),),
+            'classes': ('wide',),
+        }),
+        ('Verknüpfungen', {
+            'fields': (('referenzen', 'stichworte', 'relevanz'),),
+            'classes': ('wide',),
+        }),
+    )
+    
+    def vorgabe_nummer(self, obj):
+        return obj.Vorgabennummer()
+    vorgabe_nummer.short_description = 'Vorgabennummer'
+
 admin.site.register(Checklistenfrage)
 admin.site.register(Dokumententyp)
 #admin.site.register(Person)
 #admin.site.register(Referenz, DraggableM§PTTAdmin)
-admin.site.register(Vorgabe)
 
 #admin.site.register(Changelog)

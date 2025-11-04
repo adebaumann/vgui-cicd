@@ -966,10 +966,13 @@ class IncompleteVorgabenTest(TestCase):
         """Test that the page contains expected content"""
         response = self.client.get(reverse('incomplete_vorgaben'))
         self.assertContains(response, 'Unvollständige Vorgaben')
-        self.assertContains(response, 'Vorgaben ohne Referenzen')
-        self.assertContains(response, 'Vorgaben ohne Stichworte')
-        self.assertContains(response, 'Vorgaben ohne Kurz- oder Langtext')
-        self.assertContains(response, 'Vorgaben ohne Checklistenfragen')
+        self.assertContains(response, 'Referenzen')
+        self.assertContains(response, 'Stichworte')
+        self.assertContains(response, 'Text')
+        self.assertContains(response, 'Checklistenfragen')
+        # Check for table structure
+        self.assertContains(response, '<table class="table table-striped table-hover">')
+        self.assertContains(response, '<th class="text-center">Referenzen</th>')
     
     def test_no_references_list(self):
         """Test that Vorgaben without references are listed"""
@@ -996,27 +999,34 @@ class IncompleteVorgabenTest(TestCase):
         self.assertNotContains(response, 'Vollständige Vorgabe')  # Should not appear
     
     def test_vorgabe_links(self):
-        """Test that Vorgaben link to their detail pages"""
+        """Test that Vorgaben link to their admin pages"""
         response = self.client.get(reverse('incomplete_vorgaben'))
-        # Should contain links to Vorgabe detail pages
-        self.assertContains(response, f'href="/dokumente/{self.dokument.nummer}/#TEST-001.T.2"')
-        self.assertContains(response, f'href="/dokumente/{self.dokument.nummer}/#TEST-001.T.3"')
-        self.assertContains(response, f'href="/dokumente/{self.dokument.nummer}/#TEST-001.T.4"')
-        self.assertContains(response, f'href="/dokumente/{self.dokument.nummer}/#TEST-001.T.5"')
+        # Should contain links to Vorgabe admin pages
+        self.assertContains(response, 'href="/autorenumgebung/dokumente/vorgabe/2/change/"')
+        self.assertContains(response, 'href="/autorenumgebung/dokumente/vorgabe/3/change/"')
+        self.assertContains(response, 'href="/autorenumgebung/dokumente/vorgabe/4/change/"')
+        self.assertContains(response, 'href="/autorenumgebung/dokumente/vorgabe/5/change/"')
     
     def test_badge_counts(self):
         """Test that badge counts are correct"""
         response = self.client.get(reverse('incomplete_vorgaben'))
-        # Each category should have exactly 1 Vorgabe
-        self.assertContains(response, '<span class="badge bg-secondary float-end">1</span>', count=4)
+        # Check that JavaScript updates the counts correctly
+        self.assertContains(response, 'id="no-references-count"')
+        self.assertContains(response, 'id="no-stichworte-count"')
+        self.assertContains(response, 'id="no-text-count"')
+        self.assertContains(response, 'id="no-checklistenfragen-count"')
+        # Check total count
+        self.assertContains(response, 'Gesamt: 4 unvollständige Vorgaben')
     
     def test_summary_section(self):
         """Test that summary section shows correct counts"""
         response = self.client.get(reverse('incomplete_vorgaben'))
         self.assertContains(response, 'Zusammenfassung')
-        self.assertContains(response, '<h4 class="text-warning">1</h4>', count=2)  # No refs, no stichworte
-        self.assertContains(response, '<h4 class="text-danger">1</h4>')  # No text
-        self.assertContains(response, '<h4 class="text-info">1</h4>')  # No checklistenfragen
+        self.assertContains(response, 'Ohne Referenzen')
+        self.assertContains(response, 'Ohne Stichworte')
+        self.assertContains(response, 'Ohne Text')
+        self.assertContains(response, 'Ohne Checklistenfragen')
+        self.assertContains(response, 'Gesamt: 4 unvollständige Vorgaben')
     
     def test_empty_lists_message(self):
         """Test that appropriate messages are shown when lists are empty"""
@@ -1024,10 +1034,8 @@ class IncompleteVorgabenTest(TestCase):
         Vorgabe.objects.exclude(pk=self.complete_vorgabe.pk).delete()
         
         response = self.client.get(reverse('incomplete_vorgaben'))
-        self.assertContains(response, 'Alle Vorgaben haben Referenzen.')
-        self.assertContains(response, 'Alle Vorgaben haben Stichworte.')
-        self.assertContains(response, 'Alle Vorgaben haben Kurz- oder Langtext.')
-        self.assertContains(response, 'Alle Vorgaben haben Checklistenfragen.')
+        self.assertContains(response, 'Alle Vorgaben sind vollständig!')
+        self.assertContains(response, 'Alle Vorgaben haben Referenzen, Stichworte, Text und Checklistenfragen.')
     
     def test_back_link(self):
         """Test that back link to standard list exists"""

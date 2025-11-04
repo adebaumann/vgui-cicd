@@ -64,36 +64,41 @@ def is_staff_user(user):
 @user_passes_test(is_staff_user)
 def incomplete_vorgaben(request):
     """
-    Show lists of incomplete Vorgaben:
-    1. Ones with no references
-    2. Ones with no Stichworte
-    3. Ones without Kurz- or Langtext
-    4. Ones without Checklistenfragen
+    Show table of all Vorgaben with completeness status:
+    - References (✓ or ✗)
+    - Stichworte (✓ or ✗)
+    - Text (✓ or ✗)
+    - Checklistenfragen (✓ or ✗)
     """
     # Get all active Vorgaben
-    all_vorgaben = Vorgabe.objects.all().select_related('dokument', 'thema')
+    all_vorgaben = Vorgabe.objects.all().select_related('dokument', 'thema').prefetch_related(
+        'referenzen', 'stichworte', 'checklistenfragen', 'vorgabekurztext_set', 'vorgabelangtext_set'
+    )
     
-    # 1. Vorgaben with no references
-    no_references = [v for v in all_vorgaben if not v.referenzen.exists()]
-    
-    # 2. Vorgaben with no Stichworte
-    no_stichworte = [v for v in all_vorgaben if not v.stichworte.exists()]
-    
-    # 3. Vorgaben without Kurz- or Langtext
-    no_text = []
+    # Build table data
+    vorgaben_data = []
     for vorgabe in all_vorgaben:
-        has_kurztext = VorgabeKurztext.objects.filter(abschnitt=vorgabe).exists()
-        has_langtext = VorgabeLangtext.objects.filter(abschnitt=vorgabe).exists()
-
-        if not has_kurztext and not has_langtext:
-            no_text.append(vorgabe)
+        has_references = vorgabe.referenzen.exists()
+        has_stichworte = vorgabe.stichworte.exists()
+        has_kurztext = vorgabe.vorgabekurztext_set.exists()
+        has_langtext = vorgabe.vorgabelangtext_set.exists()
+        has_text = has_kurztext or has_langtext
+        has_checklistenfragen = vorgabe.checklistenfragen.exists()
+        
+        # Only include Vorgaben that are incomplete in at least one way
+        if not (has_references and has_stichworte and has_text and has_checklistenfragen):
+            vorgaben_data.append({
+                'vorgabe': vorgabe,
+                'has_references': has_references,
+                'has_stichworte': has_stichworte,
+                'has_text': has_text,
+                'has_checklistenfragen': has_checklistenfragen,
+                'is_complete': has_references and has_stichworte and has_text and has_checklistenfragen
+            })
     
-    # 4. Vorgaben without Checklistenfragen
-    no_checklistenfragen = [v for v in all_vorgaben if not v.checklistenfragen.exists()]
+    # Sort by document number and Vorgabe number
+    vorgaben_data.sort(key=lambda x: (x['vorgabe'].dokument.nummer, x['vorgabe'].Vorgabennummer()))
     
     return render(request, 'standards/incomplete_vorgaben.html', {
-        'no_references': no_references,
-        'no_stichworte': no_stichworte,
-        'no_text': no_text,
-        'no_checklistenfragen': no_checklistenfragen,
+        'vorgaben_data': vorgaben_data,
     })
