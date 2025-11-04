@@ -1,0 +1,102 @@
+/* Better visual separation for Vorgaben inlines */
+.inline-group[data-inline-model="vorgabe"] {
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.inline-group[data-inline-model="vorgabe"] .inline-related {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background-color: white;
+    padding: 10px;
+}
+
+.inline-group[data-inline-model="vorgabe"] h3 {
+    background-color: #007cba;
+    color: white;
+    padding: 8px 12px;
+    margin: -15px -15px 10px -15px;
+    border-radius: 6px 6px 0 0;
+    font-weight: bold;
+}
+
+.inline-group[data-inline-model="vorgabe"] .collapse .inline-related {
+    border-left: 3px solid #007cba;
+}
+
+/* Better spacing for nested inlines */
+.inline-group[data-inline-model="vorgabe"] .inline-group {
+    margin-top: 10px;
+}
+
+.inline-group[data-inline-model="vorgabe"] .inline-group h3 {
+    background-color: #f0f8ff;
+    color: #333;
+    padding: 6px 10px;
+    margin: 0 0 8px 0;
+    border-left: 3px solid #007cba;
+}
+
+/* Highlight active/expanded vorgabe */
+.inline-group[data-inline-model="vorgabe"] .inline-related:not(.collapsed) {
+    border-color: #007cba;
+    box-shadow: 0 0 8px rgba(0,124,186,0.2);
+}
+
+/* Highlight actively edited vorgabe */
+.inline-group[data-inline-model="vorgabe"] .inline-related.active-edit {
+    border-color: #28a745;
+    box-shadow: 0 0 12px rgba(40,167,69,0.3);
+    background-color: #f8fff9;
+}
+
+/* Toggle hint styling */
+.toggle-hint {
+    font-size: 0.8em;
+    color: #666;
+    font-weight: normal;
+}
+
+/* Better fieldset styling for vorgabe inlines */
+.inline-group[data-inline-model="vorgabe"] .fieldset {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #fafafa;
+}
+
+.inline-group[data-inline-model="vorgabe"] .fieldset h2 {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    padding: 5px 10px;
+    margin: -10px -10px 10px -10px;
+    border-radius: 4px 4px 0 0;
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+/* Better form layout */
+.inline-group[data-inline-model="vorgabe"] .form-row {
+    border-bottom: 1px solid #eee;
+    padding: 8px 0;
+}
+
+.inline-group[data-inline-model="vorgabe"] .form-row:last-child {
+    border-bottom: none;
+}
+
+/* Wide fields styling */
+.inline-group[data-inline-model="vorgabe"] .wide .form-row > div {
+    width: 100%;
+}
+
+.inline-group[data-inline-model="vorgabe"] .wide textarea {
+    width: 100%;
+    min-height: 80px;
+}
