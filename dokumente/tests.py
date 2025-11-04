@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.core.management import call_command
+from django.contrib.auth.models import User
 from datetime import date, timedelta
 from io import StringIO
 from .models import (
@@ -825,6 +826,15 @@ class IncompleteVorgabenTest(TestCase):
     def setUp(self):
         self.client = Client()
         
+        # Create and login a staff user
+        self.staff_user = User.objects.create_user(
+            username='teststaff',
+            password='testpass123'
+        )
+        self.staff_user.is_staff = True
+        self.staff_user.save()
+        self.client.login(username='teststaff', password='testpass123')
+        
         # Create test data
         self.dokumententyp = Dokumententyp.objects.create(
             name="Test Typ",
@@ -1092,3 +1102,28 @@ class IncompleteVorgabenTest(TestCase):
         response = self.client.get(reverse('incomplete_vorgaben'))
         # Should NOT appear in "no text" list because it has both text types
         self.assertNotContains(response, 'Vorgabe mit beiden Texten')
+    
+    def test_incomplete_vorgaben_staff_only(self):
+        """Test that non-staff users are redirected to login"""
+        # Logout the staff user
+        self.client.logout()
+        
+        # Try to access the page as anonymous user
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        self.assertEqual(response.status_code, 302)  # Redirect to login
+        
+        # Create a regular (non-staff) user
+        regular_user = User.objects.create_user(
+            username='regularuser',
+            password='testpass123'
+        )
+        self.client.login(username='regularuser', password='testpass123')
+        
+        # Try to access the page as regular user
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        self.assertEqual(response.status_code, 302)  # Redirect to login
+        
+        # Login as staff user again - should work
+        self.client.login(username='teststaff', password='testpass123')
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        self.assertEqual(response.status_code, 200)  # Success

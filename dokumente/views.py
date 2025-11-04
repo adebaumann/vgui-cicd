@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Dokument, Vorgabe, VorgabeKurztext, VorgabeLangtext, Checklistenfrage
 from abschnitte.utils import render_textabschnitte
 
@@ -56,6 +57,11 @@ def standard_checkliste(request, nummer):
     })
 
 
+def is_staff_user(user):
+    return user.is_staff
+
+@login_required
+@user_passes_test(is_staff_user)
 def incomplete_vorgaben(request):
     """
     Show lists of incomplete Vorgaben:
