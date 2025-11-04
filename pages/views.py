@@ -23,7 +23,7 @@ def validate_search_input(search_term):
     search_term = re.sub(r'<[^>]*>', '', search_term)
     
     # Allow only alphanumeric characters, spaces, and basic punctuation
-    # This prevents SQL injection and other malicious input
+    # This prevents SQL injection and other malicious input while allowing useful characters
     if not re.match(r'^[a-zA-Z0-9äöüÄÖÜß\s\-\.\,\:\;\!\?\(\)\[\]\{\}\"\']+$', search_term):
         raise ValidationError("Ungültige Zeichen im Suchbegriff")
     
