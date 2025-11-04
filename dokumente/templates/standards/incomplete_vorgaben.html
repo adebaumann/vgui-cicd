@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="mb-4">Unvollständige Vorgaben</h1>
+
+<div class="row">
+    <!-- Vorgaben ohne Referenzen -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Vorgaben ohne Referenzen
+                    <span class="badge bg-secondary float-end">{{ no_references|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if no_references %}
+                    <div class="list-group list-group-flush">
+                        {% for vorgabe in no_references %}
+                            <a href="{% url 'standard_detail' nummer=vorgabe.dokument.nummer %}#{{ vorgabe.Vorgabennummer }}" 
+                               class="list-group-item list-group-item-action">
+                                <strong>{{ vorgabe.Vorgabennummer }}</strong>: {{ vorgabe.titel }}
+                                <br>
+                                <small class="text-muted">{{ vorgabe.dokument.nummer }} – {{ vorgabe.dokument.name }}</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">Alle Vorgaben haben Referenzen.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Vorgaben ohne Stichworte -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-tags"></i>
+                    Vorgaben ohne Stichworte
+                    <span class="badge bg-secondary float-end">{{ no_stichworte|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if no_stichworte %}
+                    <div class="list-group list-group-flush">
+                        {% for vorgabe in no_stichworte %}
+                            <a href="{% url 'standard_detail' nummer=vorgabe.dokument.nummer %}#{{ vorgabe.Vorgabennummer }}" 
+                               class="list-group-item list-group-item-action">
+                                <strong>{{ vorgabe.Vorgabennummer }}</strong>: {{ vorgabe.titel }}
+                                <br>
+                                <small class="text-muted">{{ vorgabe.dokument.nummer }} – {{ vorgabe.dokument.name }}</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">Alle Vorgaben haben Stichworte.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Vorgaben ohne Kurz- oder Langtext -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-file-alt"></i>
+                    Vorgaben ohne Kurz- oder Langtext
+                    <span class="badge bg-secondary float-end">{{ no_text|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if no_text %}
+                    <div class="list-group list-group-flush">
+                        {% for vorgabe in no_text %}
+                            <a href="{% url 'standard_detail' nummer=vorgabe.dokument.nummer %}#{{ vorgabe.Vorgabennummer }}" 
+                               class="list-group-item list-group-item-action">
+                                <strong>{{ vorgabe.Vorgabennummer }}</strong>: {{ vorgabe.titel }}
+                                <br>
+                                <small class="text-muted">{{ vorgabe.dokument.nummer }} – {{ vorgabe.dokument.name }}</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">Alle Vorgaben haben Kurz- oder Langtext.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Vorgaben ohne Checklistenfragen -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-question-circle"></i>
+                    Vorgaben ohne Checklistenfragen
+                    <span class="badge bg-secondary float-end">{{ no_checklistenfragen|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if no_checklistenfragen %}
+                    <div class="list-group list-group-flush">
+                        {% for vorgabe in no_checklistenfragen %}
+                            <a href="{% url 'standard_detail' nummer=vorgabe.dokument.nummer %}#{{ vorgabe.Vorgabennummer }}" 
+                               class="list-group-item list-group-item-action">
+                                <strong>{{ vorgabe.Vorgabennummer }}</strong>: {{ vorgabe.titel }}
+                                <br>
+                                <small class="text-muted">{{ vorgabe.dokument.nummer }} – {{ vorgabe.dokument.name }}</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">Alle Vorgaben haben Checklistenfragen.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summary -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Zusammenfassung</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="p-3">
+                            <h4 class="text-warning">{{ no_references|length }}</h4>
+                            <p class="mb-0">Ohne Referenzen</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3">
+                            <h4 class="text-warning">{{ no_stichworte|length }}</h4>
+                            <p class="mb-0">Ohne Stichworte</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3">
+                            <h4 class="text-danger">{{ no_text|length }}</h4>
+                            <p class="mb-0">Ohne Text</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3">
+                            <h4 class="text-info">{{ no_checklistenfragen|length }}</h4>
+                            <p class="mb-0">Ohne Checklistenfragen</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'standard_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Zurück zur Übersicht
+    </a>
+</div>
+{% endblock %}

@@ -817,3 +817,278 @@ class SanityCheckManagementCommandTest(TestCase):
         self.assertIn("Found 1 conflicts:", output)
         self.assertIn("R0066.O.1", output)
         self.assertIn("intersecting validity periods", output)
+
+
+class IncompleteVorgabenTest(TestCase):
+    """Test cases for incomplete Vorgaben functionality"""
+    
+    def setUp(self):
+        self.client = Client()
+        
+        # Create test data
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Test Typ",
+            verantwortliche_ve="Test VE"
+        )
+        
+        self.thema = Thema.objects.create(
+            name="Test Thema",
+            erklaerung="Test Erklärung"
+        )
+        
+        self.dokument = Dokument.objects.create(
+            nummer="TEST-001",
+            dokumententyp=self.dokumententyp,
+            name="Test Dokument",
+            gueltigkeit_von=date.today(),
+            aktiv=True
+        )
+        
+        # Create complete Vorgabe (should not appear in any list)
+        self.complete_vorgabe = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vollständige Vorgabe",
+            gueltigkeit_von=date.today()
+        )
+        
+        # Add all required components to make it complete
+        self.stichwort = Stichwort.objects.create(
+            stichwort="Test Stichwort"
+        )
+        self.complete_vorgabe.stichworte.add(self.stichwort)
+        
+        self.referenz = Referenz.objects.create(
+            name_nummer="Test Referenz",
+            url="/test/path"
+        )
+        self.complete_vorgabe.referenzen.add(self.referenz)
+        
+        VorgabeKurztext.objects.create(
+            abschnitt=self.complete_vorgabe,
+            inhalt="Test Kurztext"
+        )
+        
+        Checklistenfrage.objects.create(
+            vorgabe=self.complete_vorgabe,
+            frage="Test Frage"
+        )
+        
+        # Create incomplete Vorgaben
+        # 1. Vorgabe without references
+        self.no_refs_vorgabe = Vorgabe.objects.create(
+            order=2,
+            nummer=2,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe ohne Referenzen",
+            gueltigkeit_von=date.today()
+        )
+        self.no_refs_vorgabe.stichworte.add(self.stichwort)
+        VorgabeKurztext.objects.create(
+            abschnitt=self.no_refs_vorgabe,
+            inhalt="Test Kurztext"
+        )
+        Checklistenfrage.objects.create(
+            vorgabe=self.no_refs_vorgabe,
+            frage="Test Frage"
+        )
+        
+        # 2. Vorgabe without Stichworte
+        self.no_stichworte_vorgabe = Vorgabe.objects.create(
+            order=3,
+            nummer=3,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe ohne Stichworte",
+            gueltigkeit_von=date.today()
+        )
+        self.no_stichworte_vorgabe.referenzen.add(self.referenz)
+        VorgabeKurztext.objects.create(
+            abschnitt=self.no_stichworte_vorgabe,
+            inhalt="Test Kurztext"
+        )
+        Checklistenfrage.objects.create(
+            vorgabe=self.no_stichworte_vorgabe,
+            frage="Test Frage"
+        )
+        
+        # 3. Vorgabe without text
+        self.no_text_vorgabe = Vorgabe.objects.create(
+            order=4,
+            nummer=4,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe ohne Text",
+            gueltigkeit_von=date.today()
+        )
+        self.no_text_vorgabe.stichworte.add(self.stichwort)
+        self.no_text_vorgabe.referenzen.add(self.referenz)
+        Checklistenfrage.objects.create(
+            vorgabe=self.no_text_vorgabe,
+            frage="Test Frage"
+        )
+        
+        # 4. Vorgabe without Checklistenfragen
+        self.no_checklisten_vorgabe = Vorgabe.objects.create(
+            order=5,
+            nummer=5,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe ohne Checklistenfragen",
+            gueltigkeit_von=date.today()
+        )
+        self.no_checklisten_vorgabe.stichworte.add(self.stichwort)
+        self.no_checklisten_vorgabe.referenzen.add(self.referenz)
+        VorgabeKurztext.objects.create(
+            abschnitt=self.no_checklisten_vorgabe,
+            inhalt="Test Kurztext"
+        )
+    
+    def test_incomplete_vorgaben_page_status(self):
+        """Test that the incomplete Vorgaben page loads successfully"""
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        self.assertEqual(response.status_code, 200)
+    
+    def test_incomplete_vorgaben_page_content(self):
+        """Test that the page contains expected content"""
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        self.assertContains(response, 'Unvollständige Vorgaben')
+        self.assertContains(response, 'Vorgaben ohne Referenzen')
+        self.assertContains(response, 'Vorgaben ohne Stichworte')
+        self.assertContains(response, 'Vorgaben ohne Kurz- oder Langtext')
+        self.assertContains(response, 'Vorgaben ohne Checklistenfragen')
+    
+    def test_no_references_list(self):
+        """Test that Vorgaben without references are listed"""
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        self.assertContains(response, 'Vorgabe ohne Referenzen')
+        self.assertNotContains(response, 'Vollständige Vorgabe')  # Should not appear
+    
+    def test_no_stichworte_list(self):
+        """Test that Vorgaben without Stichworte are listed"""
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        self.assertContains(response, 'Vorgabe ohne Stichworte')
+        self.assertNotContains(response, 'Vollständige Vorgabe')  # Should not appear
+    
+    def test_no_text_list(self):
+        """Test that Vorgaben without Kurz- or Langtext are listed"""
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        self.assertContains(response, 'Vorgabe ohne Text')
+        self.assertNotContains(response, 'Vollständige Vorgabe')  # Should not appear
+    
+    def test_no_checklistenfragen_list(self):
+        """Test that Vorgaben without Checklistenfragen are listed"""
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        self.assertContains(response, 'Vorgabe ohne Checklistenfragen')
+        self.assertNotContains(response, 'Vollständige Vorgabe')  # Should not appear
+    
+    def test_vorgabe_links(self):
+        """Test that Vorgaben link to their detail pages"""
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        # Should contain links to Vorgabe detail pages
+        self.assertContains(response, f'href="/dokumente/{self.dokument.nummer}/#TEST-001.T.2"')
+        self.assertContains(response, f'href="/dokumente/{self.dokument.nummer}/#TEST-001.T.3"')
+        self.assertContains(response, f'href="/dokumente/{self.dokument.nummer}/#TEST-001.T.4"')
+        self.assertContains(response, f'href="/dokumente/{self.dokument.nummer}/#TEST-001.T.5"')
+    
+    def test_badge_counts(self):
+        """Test that badge counts are correct"""
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        # Each category should have exactly 1 Vorgabe
+        self.assertContains(response, '<span class="badge bg-secondary float-end">1</span>', count=4)
+    
+    def test_summary_section(self):
+        """Test that summary section shows correct counts"""
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        self.assertContains(response, 'Zusammenfassung')
+        self.assertContains(response, '<h4 class="text-warning">1</h4>', count=2)  # No refs, no stichworte
+        self.assertContains(response, '<h4 class="text-danger">1</h4>')  # No text
+        self.assertContains(response, '<h4 class="text-info">1</h4>')  # No checklistenfragen
+    
+    def test_empty_lists_message(self):
+        """Test that appropriate messages are shown when lists are empty"""
+        # Delete all incomplete Vorgaben
+        Vorgabe.objects.exclude(pk=self.complete_vorgabe.pk).delete()
+        
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        self.assertContains(response, 'Alle Vorgaben haben Referenzen.')
+        self.assertContains(response, 'Alle Vorgaben haben Stichworte.')
+        self.assertContains(response, 'Alle Vorgaben haben Kurz- oder Langtext.')
+        self.assertContains(response, 'Alle Vorgaben haben Checklistenfragen.')
+    
+    def test_back_link(self):
+        """Test that back link to standard list exists"""
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        self.assertContains(response, 'href="/dokumente/"')
+        self.assertContains(response, 'Zurück zur Übersicht')
+    
+    def test_navigation_link(self):
+        """Test that navigation includes link to incomplete Vorgaben"""
+        response = self.client.get('/dokumente/')
+        self.assertContains(response, 'href="/dokumente/unvollstaendig/"')
+        self.assertContains(response, 'Unvollständig')
+    
+    def test_vorgabe_with_langtext_only(self):
+        """Test that Vorgabe with only Langtext is still considered incomplete for text"""
+        vorgabe_langtext_only = Vorgabe.objects.create(
+            order=6,
+            nummer=6,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe nur mit Langtext",
+            gueltigkeit_von=date.today()
+        )
+        vorgabe_langtext_only.stichworte.add(self.stichwort)
+        vorgabe_langtext_only.referenzen.add(self.referenz)
+        
+        # Add only Langtext, no Kurztext
+        VorgabeLangtext.objects.create(
+            abschnitt=vorgabe_langtext_only,
+            inhalt="Test Langtext"
+        )
+        # Add Checklistenfragen to make it complete in that aspect
+        Checklistenfrage.objects.create(
+            vorgabe=vorgabe_langtext_only,
+            frage="Test Frage"
+        )
+        
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        # Debug: print response content to see where it appears
+        print("Response content:", response.content.decode())
+        # Should NOT appear in "no text" list because it has Langtext
+        self.assertNotContains(response, 'Vorgabe nur mit Langtext')
+    
+    def test_vorgabe_with_both_text_types(self):
+        """Test that Vorgabe with both Kurztext and Langtext is complete"""
+        vorgabe_both_text = Vorgabe.objects.create(
+            order=7,
+            nummer=7,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe mit beiden Texten",
+            gueltigkeit_von=date.today()
+        )
+        vorgabe_both_text.stichworte.add(self.stichwort)
+        vorgabe_both_text.referenzen.add(self.referenz)
+        
+        # Add both Kurztext and Langtext
+        VorgabeKurztext.objects.create(
+            abschnitt=vorgabe_both_text,
+            inhalt="Test Kurztext"
+        )
+        VorgabeLangtext.objects.create(
+            abschnitt=vorgabe_both_text,
+            inhalt="Test Langtext"
+        )
+        # Add Checklistenfragen to make it complete in that aspect
+        Checklistenfrage.objects.create(
+            vorgabe=vorgabe_both_text,
+            frage="Test Frage"
+        )
+        
+        response = self.client.get(reverse('incomplete_vorgaben'))
+        # Should NOT appear in "no text" list because it has both text types
+        self.assertNotContains(response, 'Vorgabe mit beiden Texten')

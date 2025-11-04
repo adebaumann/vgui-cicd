@@ -6,7 +6,7 @@ from abschnitte.utils import render_textabschnitte
 from dokumente.models import Dokument, VorgabeLangtext, VorgabeKurztext, Geltungsbereich, Vorgabe
 from itertools import groupby
 import datetime
-import pprint
+
 
 def startseite(request):
     standards=list(Dokument.objects.filter(aktiv=True))
@@ -66,6 +66,6 @@ def search(request):
         geltungsbereich=set(list([x.geltungsbereich for x in Geltungsbereich.objects.filter(inhalt__icontains=suchbegriff)]))
         for s in geltungsbereich:
             result["geltungsbereich"][s]=render_textabschnitte(s.geltungsbereich_set.order_by("order"))
-        pprint.pp (result)
+
         return render(request,"results.html",{"suchbegriff":safe_search_term,"resultat":result})
 
