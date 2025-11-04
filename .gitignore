@@ -15,3 +15,4 @@ package-lock.json
 package.json
 # Diagram cache directory
 media/diagram_cache/
+.env
