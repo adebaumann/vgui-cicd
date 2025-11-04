@@ -60,7 +60,7 @@ class Vorgabe(models.Model):
     order = models.IntegerField()
     nummer = models.IntegerField()
     dokument = models.ForeignKey(Dokument, on_delete=models.CASCADE, related_name='vorgaben')
-    thema = models.ForeignKey(Thema, on_delete=models.PROTECT)
+    thema = models.ForeignKey(Thema, on_delete=models.PROTECT, blank=False)
     titel = models.CharField(max_length=255)
     referenzen = models.ManyToManyField(Referenz, blank=True)
     gueltigkeit_von = models.DateField()
@@ -132,13 +132,13 @@ class Vorgabe(models.Model):
                     })
         
         return conflicts
-    
+
     def clean(self):
         """
         Validate the Vorgabe before saving.
         """
         from django.core.exceptions import ValidationError
-        
+
         # Check for conflicts with existing Vorgaben
         conflicts = self.find_conflicts()
         if conflicts:
@@ -172,9 +172,9 @@ class Vorgabe(models.Model):
                     'vorgabe1': self,
                     'vorgabe2': other_vorgabe,
                     'conflict_type': 'date_range_intersection',
-                    'message': f"Vorgabe {self.Vorgabennummer()} conflicts with "
-                              f"existing {other_vorgabe.Vorgabennummer()} "
-                              f"due to overlapping validity periods"
+                    'message': f"Vorgabe {self.Vorgabennummer()} in Konflikt mit "
+                              f"bestehender {other_vorgabe.Vorgabennummer()} "
+                              f" - Geltungsdauer übeschneidet sich"
                 })
         
         return conflicts

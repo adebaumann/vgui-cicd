@@ -712,8 +712,8 @@ class VorgabeSanityCheckTest(TestCase):
         with self.assertRaises(Exception) as context:
             conflicting_vorgabe.clean()
         
-        self.assertIn('conflicts with existing', str(context.exception))
-        self.assertIn('overlapping validity periods', str(context.exception))
+        self.assertIn('Konflikt mit bestehender', str(context.exception))
+        self.assertIn('Geltungsdauer übeschneidet sich', str(context.exception))
     
     def test_check_vorgabe_conflicts_utility(self):
         """Test check_vorgabe_conflicts utility function"""
