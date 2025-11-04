@@ -2,6 +2,12 @@
 {% block content %}
  <h1 class="mb-4">Suche</h1>
 
+ {% if error_message %}
+    <div class="alert alert-danger">
+        <strong>Fehler:</strong> {{ error_message }}
+    </div>
+ {% endif %}
+
     <!--  Search form  -->
     <form action="." method="post">
       {% csrf_token %}
@@ -13,7 +19,9 @@
                id="query"
                name="q"
                placeholder="Suchbegriff eingeben …"
-               required>
+               value="{{ search_term|default:'' }}"
+               required
+               maxlength="200">
       </div>
       <button type="submit" class="btn btn-primary">Suchen</button>
     </form>
