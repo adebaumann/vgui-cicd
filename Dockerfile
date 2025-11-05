@@ -28,7 +28,10 @@ RUN rm -rf /app/Dockerfile* \
            /app/k8s \
            /app/data-loader \
            /app/keys \
-           /app/requirements.txt
+           /app/requirements.txt \
+           /app/node_modules \
+           /app/*.json \
+           /app/test_*.py
 RUN python3 manage.py collectstatic
 CMD ["gunicorn","--bind","0.0.0.0:8000","--workers","3","VorgabenUI.wsgi:application"]
 
