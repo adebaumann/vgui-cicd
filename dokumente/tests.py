@@ -1075,7 +1075,7 @@ class IncompleteVorgabenTest(TestCase):
         
         response = self.client.get(reverse('incomplete_vorgaben'))
         # Debug: print response content to see where it appears
-        print("Response content:", response.content.decode())
+        #print("Response content:", response.content.decode())
         # Should NOT appear in "no text" list because it has Langtext
         self.assertNotContains(response, 'Vorgabe nur mit Langtext')
     
