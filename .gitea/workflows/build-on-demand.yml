@@ -53,6 +53,9 @@ jobs:
           cname="${CONTAINER_NAME:-web}"
           expected_repo="${EXPECTED_REPO:-git.baumann.gr/adebaumann/vui}"
 
+          export cname
+          export expected_repo
+          
           # --- functions ------------------------------------------------------
           have_yq() { command -v yq >/dev/null 2>&1; }
 
