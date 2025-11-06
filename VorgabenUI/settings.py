@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     'mptt',
     'pages',
     'nested_admin',
-    'revproxy.apps.RevProxyConfig',
 ]
 
 MIDDLEWARE = [
