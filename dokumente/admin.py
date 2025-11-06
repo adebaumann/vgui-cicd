@@ -2,6 +2,7 @@ from django.contrib import admin
 #from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 from nested_admin import NestedStackedInline, NestedModelAdmin, NestedTabularInline
 from django import forms
+from django.utils.html import format_html
 from mptt.forms import TreeNodeMultipleChoiceField
 from mptt.admin import DraggableMPTTAdmin
 from adminsortable2.admin import SortableInlineAdminMixin, SortableAdminBase
@@ -132,9 +133,57 @@ class StichworterklaerungInline(NestedTabularInline):
 
 @admin.register(Stichwort)
 class StichwortAdmin(NestedModelAdmin):
+    list_display = ('stichwort', 'vorgaben_count')
     search_fields = ('stichwort',)
     ordering=('stichwort',)
     inlines=[StichworterklaerungInline]
+    readonly_fields = ('vorgaben_list',)
+    fieldsets = (
+        (None, {
+            'fields': ('stichwort', 'vorgaben_list')
+        }),
+    )
+    
+    def vorgaben_count(self, obj):
+        """Count the number of Vorgaben that have this Stichwort"""
+        count = obj.vorgabe_set.count()
+        return f"{count} Vorgabe{'n' if count != 1 else ''}"
+    vorgaben_count.short_description = "Anzahl Vorgaben"
+    
+    def vorgaben_list(self, obj):
+        """Display list of Vorgaben that use this Stichwort"""
+        vorgaben = obj.vorgabe_set.select_related('dokument', 'thema').order_by('dokument__nummer', 'nummer')
+        vorgaben_list = list(vorgaben)  # Evaluate queryset once
+        count = len(vorgaben_list)
+        
+        if count == 0:
+            return format_html("<em>Keine Vorgaben gefunden</em><p><strong>Gesamt: 0 Vorgaben</strong></p>")
+        
+        html = "<div style='max-height: 300px; overflow-y: auto;'>"
+        html += "<table style='width: 100%; border-collapse: collapse;'>"
+        html += "<thead><tr style='background-color: #f5f5f5;'>"
+        html += "<th style='padding: 8px; border: 1px solid #ddd; text-align: left;'>Vorgabe</th>"
+        html += "<th style='padding: 8px; border: 1px solid #ddd; text-align: left;'>Titel</th>"
+        html += "<th style='padding: 8px; border: 1px solid #ddd; text-align: left;'>Dokument</th>"
+        html += "</tr></thead>"
+        html += "<tbody>"
+        
+        for vorgabe in vorgaben_list:
+            html += "<tr>"
+            html += f"<td style='padding: 6px; border: 1px solid #ddd;'>{vorgabe.Vorgabennummer()}</td>"
+            html += f"<td style='padding: 6px; border: 1px solid #ddd;'>{vorgabe.titel}</td>"
+            html += f"<td style='padding: 6px; border: 1px solid #ddd;'>{vorgabe.dokument.nummer} – {vorgabe.dokument.name}</td>"
+            html += "</tr>"
+        
+        html += "</tbody></table>"
+        html += f"</div><p><strong>Gesamt: {count} Vorgabe{'n' if count != 1 else ''}</strong></p>"
+        
+        return format_html(html)
+    vorgaben_list.short_description = "Zugeordnete Vorgaben"
+    
+    def get_queryset(self, request):
+        """Optimize queryset with related data"""
+        return super().get_queryset(request).prefetch_related('vorgabe_set')
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):    
