@@ -182,6 +182,21 @@ The dokumente app contains 98 tests, making it the most comprehensive test suite
 - **test_standard_history_view**: Tests standard detail view with historical check_date parameter
 - **test_standard_checkliste_view**: Tests checklist view functionality
 
+### JSON Export Tests
+
+#### JSONExportManagementCommandTest
+- **test_export_json_command_to_file**: Tests export_json command outputs JSON to specified file
+- **test_export_json_command_stdout**: Tests export_json command outputs JSON to stdout when no file specified
+- **test_export_json_command_inactive_documents**: Tests export_json command filters out inactive documents
+- **test_export_json_command_empty_database**: Tests export_json command handles empty database gracefully
+
+#### StandardJSONViewTest
+- **test_standard_json_view_success**: Tests standard_json view returns correct JSON for existing document
+- **test_standard_json_view_not_found**: Tests standard_json view returns 404 for non-existent document
+- **test_standard_json_view_json_formatting**: Tests standard_json view returns properly formatted JSON
+- **test_standard_json_view_null_dates**: Tests standard_json view handles null date fields correctly
+- **test_standard_json_view_empty_sections**: Tests standard_json view handles empty document sections
+
 ### Incomplete Vorgaben Tests
 
 #### IncompleteVorgabenTest
@@ -317,9 +332,9 @@ The stichworte app contains 18 tests covering keyword models and their ordering.
 
 ## Test Statistics
 
-- **Total Tests**: 188
+- **Total Tests**: 206
 - **abschnitte**: 32 tests
-- **dokumente**: 98 tests
+- **dokumente**: 116 tests (98 in tests.py + 9 in test_json.py + 9 JSON tests in main tests.py)
 - **pages**: 4 tests
 - **referenzen**: 18 tests
 - **rollen**: 18 tests

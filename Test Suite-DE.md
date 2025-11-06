@@ -182,6 +182,21 @@ Die dokumente App enthält 98 Tests und ist damit die umfassendste Test-Suite, d
 - **test_standard_history_view**: Testet die Standard-Detail-View mit historischem check_date-Parameter
 - **test_standard_checkliste_view**: Testet die Funktionalität der Checklisten-View
 
+### JSON-Export-Tests
+
+#### JSONExportManagementCommandTest
+- **test_export_json_command_to_file**: Testet, dass der export_json-Befehl JSON in die angegebene Datei ausgibt
+- **test_export_json_command_stdout**: Testet, dass der export_json-Befehl JSON an stdout ausgibt, wenn keine Datei angegeben ist
+- **test_export_json_command_inactive_documents**: Testet, dass der export_json-Befehl inaktive Dokumente herausfiltert
+- **test_export_json_command_empty_database**: Testet, dass der export_json-Befehl leere Datenbank angemessen behandelt
+
+#### StandardJSONViewTest
+- **test_standard_json_view_success**: Testet, dass die standard_json-View korrektes JSON für existierendes Dokument zurückgibt
+- **test_standard_json_view_not_found**: Testet, dass die standard_json-View 404 für nicht existierendes Dokument zurückgibt
+- **test_standard_json_view_json_formatting**: Testet, dass die standard_json-View korrekt formatiertes JSON zurückgibt
+- **test_standard_json_view_null_dates**: Testet, dass die standard_json-View null-Datumfelder korrekt behandelt
+- **test_standard_json_view_empty_sections**: Testet, dass die standard_json-View leere Dokumentabschnitte behandelt
+
 ### Unvollständige Vorgaben Tests
 
 #### IncompleteVorgabenTest
@@ -317,9 +332,9 @@ Die stichworte App enthält 18 Tests, die Schlüsselwortmodelle und ihre Sortier
 
 ## Test-Statistiken
 
-- **Gesamt-Tests**: 188
+- **Gesamt-Tests**: 206
 - **abschnitte**: 32 Tests
-- **dokumente**: 98 Tests
+- **dokumente**: 116 Tests (98 in tests.py + 9 in test_json.py + 9 JSON-Tests in Haupt-tests.py)
 - **pages**: 4 Tests
 - **referenzen**: 18 Tests
 - **rollen**: 18 Tests
