@@ -2,7 +2,7 @@ name: Build image when workload image tag changes
 
 on:
   push:
-    branches: [ deployment ]                 # adjust if needed
+    branches: [ development ]                 # adjust if needed
     paths:
       - "arcocd/deployment.yaml"
       - "Dockerfile"                   # keep if you also want to rebuild when Dockerfile changes
