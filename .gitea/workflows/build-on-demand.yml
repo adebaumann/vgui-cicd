@@ -2,17 +2,20 @@ name: Build image when workload image tag changes
 
 on:
   push:
+    # Uncomment/adjust once it's working:
+    # branches: [ main ]
     paths:
       - "argocd/deployment.yaml"
-      - "Dockerfile"                   # keep if you also want to rebuild when Dockerfile changes
+      - "Dockerfile"
 
 jobs:
   build-if-image-changed:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted   # or whatever label your runner uses
 
     env:
       DEPLOY_FILE: "argocd/deployment.yaml"
-      TARGET_REPO: "git.baumann.gr/adebaumann/vui"   # repo (no tag)
+      CONTAINER_NAME: "web"                       # we only consider this container
+      EXPECTED_REPO: "git.baumann.gr/adebaumann/vui"  # sanity-check the repo
 
     steps:
       - name: Checkout
@@ -31,7 +34,6 @@ jobs:
             echo "base=$(git hash-object -t tree /dev/null)" >> "$GITHUB_OUTPUT"
           fi
 
-      # Install yq for robust YAML parsing
       - name: Install yq
         shell: bash
         run: |
@@ -47,28 +49,41 @@ jobs:
         run: |
           set -euo pipefail
           file="$DEPLOY_FILE"
-          repo="$TARGET_REPO"
+          cname="$CONTAINER_NAME"
+          expected_repo="$EXPECTED_REPO"
 
-          # Function: from a deployment yaml, read .spec.template.spec.containers[].image
-          # and select the one whose image starts with "$repo:"
+          # Extract ONLY from .spec.template.spec.containers[], selecting by .name == cname
+          # Works across multi-doc YAML (the Service doc will be ignored)
           extract() {
             yq -r '
-              .spec.template.spec.containers // []                       # only real containers, not initContainers
-              | map(.image) | .[]?                                        # images as strings
-              | select(startswith(env(repo) + ":"))                       # match exact repo + ":"
+              select(.kind == "Deployment") |
+              .spec.template.spec.containers // [] |
+              map(select(.name == env(cname))) |
+              .[]?.image
             ' "$1" 2>/dev/null | tail -n 1
           }
 
-          # Old image from previous commit (if file existed)
+          debug_list() {
+            echo "== workload images in $1 ==" >&2
+            yq -r '
+              select(.kind == "Deployment") |
+              .spec.template.spec.containers // [] |
+              .[] | "\(.name): \(.image)"
+            ' "$1" 2>/dev/null | nl -ba >&2 || true
+          }
+
+          # Old image (from previous commit)
           if git cat-file -e "${{ steps.base.outputs.base }}":"$file" 2>/dev/null; then
             git show "${{ steps.base.outputs.base }}:$file" > /tmp/old.yaml
+            debug_list /tmp/old.yaml
             old_image="$(extract /tmp/old.yaml || true)"
           else
             old_image=""
           fi
 
-          # New image from workspace
+          # New image (from workspace)
           if [ -f "$file" ]; then
+            debug_list "$file"
             new_image="$(extract "$file" || true)"
           else
             new_image=""
@@ -77,25 +92,24 @@ jobs:
           echo "Old workload image: $old_image"
           echo "New workload image: $new_image"
 
-          # Helpers to split repo and tag (handles registry with port)
-          parse_tag() {
-            local ref="$1"
-            local after_slash="${ref##*/}"
-            if [[ "$after_slash" == *:* ]]; then echo "${after_slash##*:}"; else echo ""; fi
-          }
-          parse_repo() {
-            local ref="$1"
-            local tag="$(parse_tag "$ref")"
-            if [ -n "$tag" ]; then echo "${ref%:$tag}"; else echo "$ref"; fi
-          }
-
-          old_tag="$(parse_tag "$old_image")"
-          new_tag="$(parse_tag "$new_image")"
-          new_repo="$(parse_repo "$new_image")"
-
           if [ -z "$new_image" ]; then
-            echo "ERROR: Could not find a containers[].image starting with ${repo}: in $file"
+            echo "ERROR: Could not find containers[].name == \"$cname\" in $file"
             exit 1
+          fi
+
+          # Sanity-check repo prefix (avoid accidentally building the init image)
+          new_repo="${new_image%:*}"
+          new_tag="${new_image##*:}"
+          if [[ "$new_repo" != "$expected_repo" ]]; then
+            echo "ERROR: Found container \"$cname\" image repo is \"$new_repo\" but expected \"$expected_repo\""
+            exit 1
+          fi
+
+          # Old tag (if any)
+          if [ -n "$old_image" ]; then
+            old_tag="${old_image##*:}"
+          else
+            old_tag=""
           fi
 
           registry="$(echo "$new_repo" | awk -F/ '{print $1}')"
@@ -110,7 +124,7 @@ jobs:
 
       - name: Skip if tag unchanged
         if: steps.img.outputs.changed != 'true'
-        run: echo "Workload image tag unchanged in ${{ env.DEPLOY_FILE }}; skipping build."
+        run: echo "Workload image tag unchanged; skipping build."
 
       - name: Set up Buildx
         if: steps.img.outputs.changed == 'true'
