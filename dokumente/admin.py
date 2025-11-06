@@ -191,6 +191,7 @@ class PersonAdmin(admin.ModelAdmin):
         js = ['admin/js/jquery.init.js', 'custom/js/inline_toggle.js']
         css = {'all': ['custom/css/admin_extras.css']}
     list_display=['name']
+    ordering = ['name']
     
 
 

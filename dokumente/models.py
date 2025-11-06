@@ -26,6 +26,7 @@ class Person(models.Model):
         return self.name
     class Meta:
         verbose_name_plural="Personen"
+        ordering = ['name']
 
 class Thema(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
