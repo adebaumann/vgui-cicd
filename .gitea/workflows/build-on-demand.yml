@@ -7,10 +7,11 @@ on:
     paths:
       - "argocd/deployment.yaml"
       - "Dockerfile"
+      - ".gitea/workflows/build-on-demand.yml"
 
 jobs:
   build-if-image-changed:
-    runs-on: self-hosted   # or whatever label your runner uses
+    runs-on: ubuntu-latest
 
     env:
       DEPLOY_FILE: "argocd/deployment.yaml"
