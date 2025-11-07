@@ -2,7 +2,7 @@ name: Build containers when image tags change
 
 on:
   push:
-    # Uncomment/adjust once it's working:
+    # Uncomment/adjust once working:
     # branches: [ main ]
     paths:
       - "argocd/deployment.yaml"
