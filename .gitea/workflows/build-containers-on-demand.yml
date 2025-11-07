@@ -14,6 +14,7 @@ jobs:
   build-if-image-changed:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - container_name: web
@@ -72,6 +73,11 @@ jobs:
           export cname
           export expected_repo
           export ctype
+
+          echo "========================================"
+          echo "Checking: $ctype / $cname"
+          echo "Expected repo: $expected_repo"
+          echo "========================================"
 
           # --- functions ------------------------------------------------------
           have_yq() { command -v yq >/dev/null 2>&1; }
