@@ -11,15 +11,17 @@
   <div class="row mb-4">
     <div class="col-md-12">
       <h2 class="h3" id="{{ Anfang }}">{{ Anfang }}</h2>
-      <div class="list-group">
-        {% for Wort in Worte %}
-        <a href="{% url 'stichwort_detail' stichwort=Wort %}"
-           class="list-group-item list-group-item-action">
-          {{ Wort }}
-        </a>
-        {% endfor %}
-      </div>
     </div>
+  </div>
+  <div class="row mb-4">
+    {% for Wort in Worte %}
+    <div class="col-md-4 mb-2">
+      <a href="{% url 'stichwort_detail' stichwort=Wort %}"
+         class="list-group-item list-group-item-action">
+        {{ Wort }}
+      </a>
+    </div>
+    {% endfor %}
   </div>
   {% endfor %}
 </div>
