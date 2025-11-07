@@ -1,4 +1,4 @@
-name: Build data-loader when init-container image tag changes
+name: Build containers when image tags change
 
 on:
   push:
@@ -6,17 +6,32 @@ on:
     # branches: [ main ]
     paths:
       - "argocd/deployment.yaml"
+      - "Dockerfile"
       - "data-loader/**"
-      - ".gitea/workflows/build-data-loader-on-demand.yml"
+      - ".gitea/workflows/build-containers-on-demand.yml"
 
 jobs:
   build-if-image-changed:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - container_name: web
+            expected_repo: git.baumann.gr/adebaumann/vui
+            build_context: .
+            container_type: containers
+            description: main container
+          - container_name: loader
+            expected_repo: git.baumann.gr/adebaumann/vui-data-loader
+            build_context: data-loader
+            container_type: initContainers
+            description: init-container
 
     env:
       DEPLOY_FILE: "argocd/deployment.yaml"
-      CONTAINER_NAME: "loader"                    # we only consider this init-container
-      EXPECTED_REPO: "git.baumann.gr/adebaumann/vui-data-loader"  # sanity-check the repo
+      CONTAINER_NAME: ${{ matrix.container_name }}
+      EXPECTED_REPO: ${{ matrix.expected_repo }}
+      CONTAINER_TYPE: ${{ matrix.container_type }}
 
     steps:
       - name: Checkout
@@ -43,41 +58,53 @@ jobs:
           curl -sL "https://github.com/mikefarah/yq/releases/download/${YQ_VER}/yq_linux_amd64" -o /usr/local/bin/yq
           chmod +x /usr/local/bin/yq
           yq --version
-      
-      - name: Read init-container image from deployment (old vs new)
+
+      - name: Read ${{ matrix.description }} image from deployment (old vs new)
         id: img
         shell: bash
         run: |
           set -euo pipefail
           file="${DEPLOY_FILE:-argocd/deployment.yaml}"
-          cname="${CONTAINER_NAME:-web}"
-          expected_repo="${EXPECTED_REPO:-git.baumann.gr/adebaumann/vui}"
+          cname="${CONTAINER_NAME}"
+          expected_repo="${EXPECTED_REPO}"
+          ctype="${CONTAINER_TYPE}"
 
           export cname
           export expected_repo
-          
+          export ctype
+
           # --- functions ------------------------------------------------------
           have_yq() { command -v yq >/dev/null 2>&1; }
 
-          # yq-based extractor (multi-doc aware; Deployment only; init-container name match)
+          # yq-based extractor (multi-doc aware; Deployment only; container name match)
           yq_extract() {
             yq -r '
               select(.kind == "Deployment") |
-              .spec.template.spec.initContainers // [] |
+              .spec.template.spec.[env(ctype)] // [] |
               map(select(.name == env(cname))) |
               .[]?.image
             ' "$1" 2>/dev/null | tail -n 1
           }
 
-          # ultra-tolerant fallback: grep around initContainers: block and pick name==loader image
+          # ultra-tolerant fallback: grep around the appropriate block
           fallback_extract() {
-            # print the initContainers block, then associate names with images
-            awk -v cname="$cname" '
+            local block_pattern
+            local end_pattern
+
+            if [[ "$ctype" == "initContainers" ]]; then
+              block_pattern="^[[:space:]]*initContainers:"
+              end_pattern="^[[:space:]]*containers:|^[[:alpha:]][[:alnum:]_:-]*:"
+            else
+              block_pattern="^[[:space:]]*containers:"
+              end_pattern="^[[:alpha:]][[:alnum:]_:-]*:|^[[:space:]]*initContainers:"
+            fi
+
+            awk -v cname="$cname" -v block="$block_pattern" -v endp="$end_pattern" '
               BEGIN{ in_cont=0; name=""; image="" }
-              /^[[:space:]]*initContainers:/ {in_cont=1; next}
+              $0 ~ block {in_cont=1; next}
               in_cont {
-                # end of initContainers block when dedented to less than two spaces or new top-level key
-                if ($0 ~ /^[[:space:]]*containers:/ || $0 ~ /^[[:alpha:]][[:alnum:]_:-]*:/) { in_cont=0 }
+                # end of block when we hit the end pattern
+                if ($0 ~ endp) { in_cont=0 }
                 # capture name and image lines
                 if ($0 ~ /^[[:space:]]*-?[[:space:]]*name:[[:space:]]*/) {
                   name=$0; sub(/^.*name:[[:space:]]*/,"",name); gsub(/^[ "\047]+|[ "\047]+$/,"",name)
@@ -91,18 +118,24 @@ jobs:
           }
 
           list_workload_images() {
-            echo "== workload initContainers in $1 ==" >&2
+            echo "== workload $ctype in $1 ==" >&2
             if have_yq; then
               yq -r '
                 select(.kind == "Deployment") |
-                .spec.template.spec.initContainers // [] |
+                .spec.template.spec.[env(ctype)] // [] |
                 .[] | "\(.name): \(.image)"
               ' "$1" 2>/dev/null | nl -ba >&2 || true
             else
               # coarse list for visibility
-              awk '
-                /^ *initContainers:/, /^ *containers:/ { if ($0 ~ /name:|image:/) print }
-              ' "$1" | nl -ba >&2 || true
+              if [[ "$ctype" == "initContainers" ]]; then
+                awk '
+                  /^ *initContainers:/, /^ *containers:/ { if ($0 ~ /name:|image:/) print }
+                ' "$1" | nl -ba >&2 || true
+              else
+                awk '
+                  /^ *containers:/, /^[^ ]/ { if ($0 ~ /name:|image:/) print }
+                ' "$1" | nl -ba >&2 || true
+              fi
             fi
           }
           # --------------------------------------------------------------------
@@ -140,11 +173,11 @@ jobs:
             old_image="$(fallback_extract /tmp/old.yaml || true)"
           fi
 
-          echo "Old workload image: ${old_image:-<none>}"
-          echo "New workload image: ${new_image:-<none>}"
+          echo "Old $ctype image: ${old_image:-<none>}"
+          echo "New $ctype image: ${new_image:-<none>}"
 
           if [ -z "${new_image:-}" ]; then
-            echo "ERROR: Could not find initContainers[].name == \"$cname\" image in $file"
+            echo "ERROR: Could not find $ctype[].name == \"$cname\" image in $file"
             exit 1
           fi
 
@@ -152,7 +185,7 @@ jobs:
           new_repo="${new_image%:*}"
           new_tag="${new_image##*:}"
           if [[ "$new_repo" != "$expected_repo" ]]; then
-            echo "ERROR: Found init-container \"$cname\" image repo is \"$new_repo\" but expected \"$expected_repo\""
+            echo "ERROR: Found $ctype \"$cname\" image repo is \"$new_repo\" but expected \"$expected_repo\""
             exit 1
           fi
           if [ -n "${old_image:-}" ]; then
@@ -170,10 +203,10 @@ jobs:
             echo "new_tag=$new_tag"
             echo "registry=$registry"
           } >> "$GITHUB_OUTPUT"
-      
+
       - name: Skip if tag unchanged
         if: steps.img.outputs.changed != 'true'
-        run: echo "Init-container image tag unchanged; skipping build."
+        run: echo "${{ matrix.description }} image tag unchanged; skipping build."
 
       - name: Set up Buildx
         if: steps.img.outputs.changed == 'true'
@@ -187,11 +220,11 @@ jobs:
           username: ${{ secrets.REGISTRY_USER }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Build and push (exact tag from deployment)
+      - name: Build and push ${{ matrix.description }} (exact tag from deployment)
         if: steps.img.outputs.changed == 'true'
         uses: docker/build-push-action@v6
         with:
-          context: data-loader
+          context: ${{ matrix.build_context }}
           push: true
           tags: |
             ${{ steps.img.outputs.new_image }}
@@ -201,4 +234,3 @@ jobs:
             org.opencontainers.image.revision=${{ gitea.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
