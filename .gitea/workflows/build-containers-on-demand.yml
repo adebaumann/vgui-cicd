@@ -78,12 +78,21 @@ jobs:
 
           # yq-based extractor (multi-doc aware; Deployment only; container name match)
           yq_extract() {
-            yq -r '
-              select(.kind == "Deployment") |
-              .spec.template.spec.[env(ctype)] // [] |
-              map(select(.name == env(cname))) |
-              .[]?.image
-            ' "$1" 2>/dev/null | tail -n 1
+            if [[ "$ctype" == "initContainers" ]]; then
+              yq -r '
+                select(.kind == "Deployment") |
+                .spec.template.spec.initContainers // [] |
+                map(select(.name == env(cname))) |
+                .[]?.image
+              ' "$1" 2>/dev/null | tail -n 1
+            else
+              yq -r '
+                select(.kind == "Deployment") |
+                .spec.template.spec.containers // [] |
+                map(select(.name == env(cname))) |
+                .[]?.image
+              ' "$1" 2>/dev/null | tail -n 1
+            fi
           }
 
           # ultra-tolerant fallback: grep around the appropriate block
@@ -120,11 +129,19 @@ jobs:
           list_workload_images() {
             echo "== workload $ctype in $1 ==" >&2
             if have_yq; then
-              yq -r '
-                select(.kind == "Deployment") |
-                .spec.template.spec.[env(ctype)] // [] |
-                .[] | "\(.name): \(.image)"
-              ' "$1" 2>/dev/null | nl -ba >&2 || true
+              if [[ "$ctype" == "initContainers" ]]; then
+                yq -r '
+                  select(.kind == "Deployment") |
+                  .spec.template.spec.initContainers // [] |
+                  .[] | "\(.name): \(.image)"
+                ' "$1" 2>/dev/null | nl -ba >&2 || true
+              else
+                yq -r '
+                  select(.kind == "Deployment") |
+                  .spec.template.spec.containers // [] |
+                  .[] | "\(.name): \(.image)"
+                ' "$1" 2>/dev/null | nl -ba >&2 || true
+              fi
             else
               # coarse list for visibility
               if [[ "$ctype" == "initContainers" ]]; then
