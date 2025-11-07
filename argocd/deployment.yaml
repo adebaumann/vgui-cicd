@@ -18,7 +18,7 @@ spec:
         fsGroupChangePolicy: "OnRootMismatch"
       initContainers:
         - name: loader
-          image: git.baumann.gr/adebaumann/vui-data-loader:0.9-test
+          image: git.baumann.gr/adebaumann/vui-data-loader:0.9-debug
           command: [ "sh","-c","cp -n preload/preload.sqlite3 /data/db.sqlite3; chown -R 999:999 /data; ls -la /data; sleep 10; exit 0" ]
           volumeMounts:
             - name: data
