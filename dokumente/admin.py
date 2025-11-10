@@ -294,6 +294,5 @@ class VorgabeAdmin(NestedModelAdmin):
 admin.site.register(Checklistenfrage)
 admin.site.register(Dokumententyp)
 #admin.site.register(Person)
-#admin.site.register(Referenz, DraggableM§PTTAdmin)
 
 #admin.site.register(Changelog)
