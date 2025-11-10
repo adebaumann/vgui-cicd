@@ -24,7 +24,7 @@
         <a href="{% url 'standard_detail' nummer=standard.nummer %}"
            class="list-group-item list-group-item-action">
           <div class="d-flex w-100 justify-content-between">
-            <h3 class="h5 mb-1">{{ standard.nummer }} - {{ standard.titel }}</h3>
+            <h3 class="h5 mb-1">{{ standard.nummer }} - {{ standard.name }}</h3>
             {% if standard.status %}
             <small class="text-muted">{{ standard.status }}</small>
             {% endif %}
