@@ -96,22 +96,20 @@
 
       <a id="{{ vorgabe.Vorgabennummer }}"></a>
       <div class="card mb-4">
-        <div class="card-header">
-          <div class="d-flex justify-content-between align-items-center flex-wrap">
-            <h3 class="h5 mb-0 flex-grow-1">
-              {{ vorgabe.Vorgabennummer }} – {{ vorgabe.titel }}
-              {% if vorgabe.long_status != "active" and standard.history == True %}
-              <span class="badge badge-danger">{{ vorgabe.long_status }}</span>
-              {% endif %}
-            </h3>
-            <div class="d-flex align-items-center gap-2">
-              <span class="badge badge-info">{{ vorgabe.thema }}</span>
-              {% if vorgabe.relevanzset %}
-              <span class="badge badge-secondary">
-                Relevanz: {{ vorgabe.relevanzset|join:", " }}
-              </span>
-              {% endif %}
-            </div>
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 class="h5 mb-0">
+            {{ vorgabe.Vorgabennummer }} – {{ vorgabe.titel }}
+            {% if vorgabe.long_status != "active" and standard.history == True %}
+            <span class="badge badge-danger">{{ vorgabe.long_status }}</span>
+            {% endif %}
+          </h3>
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; white-space: nowrap;">
+            <span class="badge badge-info">{{ vorgabe.thema }}</span>
+            {% if vorgabe.relevanzset %}
+            <span class="badge badge-secondary">
+              Relevanz: {{ vorgabe.relevanzset|join:", " }}
+            </span>
+            {% endif %}
           </div>
         </div>
 
