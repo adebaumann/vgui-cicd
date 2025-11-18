@@ -1,28 +1,60 @@
 {% extends "base.html" %}
+
+{% block title %}Suche - Vorgaben Informatiksicherheit{% endblock %}
+
 {% block content %}
- <h1 class="mb-4">Suche</h1>
+<div class="container-fluid">
+  <h1>Suche in den Vorgaben</h1>
 
- {% if error_message %}
-    <div class="alert alert-danger">
-        <strong>Fehler:</strong> {{ error_message }}
+  {% if error_message %}
+  <div class="alert alert-danger" role="alert">
+    <span class="icon icon--error" aria-hidden="true"></span>
+    <strong>Fehler:</strong> {{ error_message }}
+  </div>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-md-8">
+      <!-- Search form -->
+      <form action="." method="post" class="form-horizontal">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="query" class="control-label">Suchbegriff</label>
+          <div class="input-group">
+            <input type="text"
+                   class="form-control"
+                   id="query"
+                   name="q"
+                   placeholder="Suchbegriff eingeben …"
+                   value="{{ search_term|default:'' }}"
+                   required
+                   maxlength="200"
+                   aria-describedby="search-help">
+            <span class="input-group-btn">
+              <button type="submit" class="btn btn-primary">
+                <span class="icon icon--search" aria-hidden="true"></span>
+                Suchen
+              </button>
+            </span>
+          </div>
+          <small id="search-help" class="form-text text-muted">
+            Durchsuchen Sie Standards, Vorgaben und Referenzen nach Stichworten.
+          </small>
+        </div>
+      </form>
     </div>
- {% endif %}
 
-    <!--  Search form  -->
-    <form action="." method="post">
-      {% csrf_token %}
-      <!-- Search field -->
-      <div class="mb-3">
-        <label for="query" class="form-label">Suchbegriff</label>
-        <input type="text"
-               class="form-control"
-               id="query"
-               name="q"
-               placeholder="Suchbegriff eingeben …"
-               value="{{ search_term|default:'' }}"
-               required
-               maxlength="200">
+    <div class="col-md-4">
+      <div class="alert alert-info" role="alert">
+        <h3 class="h4">Suchtipps</h3>
+        <ul>
+          <li>Verwenden Sie spezifische Begriffe für bessere Ergebnisse</li>
+          <li>Die Suche erfasst Titel, Beschreibungen und Inhalte</li>
+          <li>Groß-/Kleinschreibung wird nicht berücksichtigt</li>
+        </ul>
       </div>
-      <button type="submit" class="btn btn-primary">Suchen</button>
-    </form>
-   {% endblock %}
+    </div>
+  </div>
+</div>
+{% endblock %}

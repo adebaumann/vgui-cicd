@@ -15,3 +15,4 @@ class Stichworterklaerung (Textabschnitt):
 
     class Meta:
         verbose_name="Erklärung"
+        verbose_name_plural="Erklärungen"

@@ -1,21 +1,39 @@
 {% extends "base.html" %}
+{% load mptt_tags %}
+
+{% block title %}Referenzen - Vorgaben Informatiksicherheit{% endblock %}
 
 {% block content %}
-<h1>Referenzen</h1>
+<div class="container-fluid">
+  <h1>Referenzen</h1>
+  <p class="lead">Hierarchische Übersicht externer Referenzen und Normen</p>
 
-<div>
-{% load mptt_tags %}
-<ul class="tree">
-    {% recursetree referenzen %}
-        <li>
-            <a href="{{node.id}}">{{ node.name_nummer }}{% if node.name_text %} ({{node.name_text}}){% endif %}</a>
-            {% if not node.is_leaf_node %}
-                <ul class="children">
-                    {{ children }}
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <nav aria-label="Referenzen-Hierarchie">
+            <ul class="nav nav-page-list">
+              {% recursetree referenzen %}
+              <li>
+                <a href="{{ node.id }}">
+                  <strong>{{ node.name_nummer }}</strong>
+                  {% if node.name_text %}
+                  <span class="text-muted"> - {{ node.name_text }}</span>
+                  {% endif %}
+                </a>
+                {% if not node.is_leaf_node %}
+                <ul class="nav nav-page-list">
+                  {{ children }}
                 </ul>
-            {% endif %}
-        </li>
-    {% endrecursetree %}
-</ul>
+                {% endif %}
+              </li>
+              {% endrecursetree %}
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

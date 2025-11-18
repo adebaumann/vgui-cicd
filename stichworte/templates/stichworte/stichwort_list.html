@@ -1,14 +1,28 @@
 {% extends "base.html" %}
-{% block title %}Stichworte{% endblock %}
+
+{% block title %}Stichworte - Vorgaben Informatiksicherheit{% endblock %}
+
 {% block content %}
-<h1>Stichworte</h1>
+<div class="container-fluid">
+  <h1>Stichworte</h1>
+  <p class="lead">Alphabetisches Verzeichnis aller Schlagworte und Kategorien</p>
 
   {% for Anfang, Worte in stichworte.items %}
-    <h2>{{ Anfang }}</h2>
-    <ul>
-      {% for Wort in Worte %}
-      <li><a href="{% url 'stichwort_detail' stichwort=Wort %}">{{ Wort }}</a></li>
-      {% endfor %}
-      </ul>
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <h2 class="h3" id="{{ Anfang }}">{{ Anfang }}</h2>
+    </div>
+  </div>
+  <div class="row mb-4">
+    {% for Wort in Worte %}
+    <div class="col-md-4 mb-2">
+      <a href="{% url 'stichwort_detail' stichwort=Wort %}"
+         class="list-group-item list-group-item-action">
+        {{ Wort }}
+      </a>
+    </div>
     {% endfor %}
- {% endblock %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -4,7 +4,7 @@ metadata:
   name: django
   namespace: vorgabenui
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    traefik.ingress.kubernetes.io/router.middlewares: "vorgabenui-vorgabenui-rewrite@kubernetescrd"
 spec:
   rules:
     - host: vorgabenui.adebaumann.com

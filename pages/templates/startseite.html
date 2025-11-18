@@ -1,10 +1,77 @@
 {% extends "base.html" %}
+
+{% block title %}Startseite - Vorgaben Informatiksicherheit{% endblock %}
+
 {% block content %}
-<h1>Vorgaben Informatiksicherheit BIT</h1>
-<h2>Aktuell erfasste Standards</h2>
-<ul>
-    {% for standard in dokumente %}
-    <li><a href="{% url 'standard_detail' nummer=standard.nummer %}">{{ standard }}</a></li>
-    {% endfor %}
-</ul>
+<div class="container-fluid">
+  <h1>Vorgaben Informatiksicherheit BIT</h1>
+
+  <div class="row">
+    <div class="col-md-12">
+      <p class="lead">
+        Willkommen bei den Vorgaben zur Informatiksicherheit des Bundesamts für Informatik und Telekommunikation (BIT).
+        Diese Plattform bietet Ihnen Zugang zu allen aktuellen IT-Sicherheitsstandards der Bundesverwaltung.
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Aktuell erfasste Standards</h2>
+
+      <div class="list-group">
+        {% for standard in dokumente %}
+        <a href="{% url 'standard_detail' nummer=standard.nummer %}"
+           class="list-group-item list-group-item-action">
+          <div class="d-flex w-100 justify-content-between">
+            <h3 class="h5 mb-1">{{ standard.nummer }} - {{ standard.name }}</h3>
+            {% if standard.status %}
+            <small class="text-muted">{{ standard.status }}</small>
+            {% endif %}
+          </div>
+          {% if standard.kurzbeschreibung %}
+          <p class="mb-1">{{ standard.kurzbeschreibung|truncatewords:30 }}</p>
+          {% endif %}
+        </a>
+        {% empty %}
+        <div class="alert alert-info" role="alert">
+          <p class="icon icon--info">Aktuell sind keine Standards erfasst.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title h4">Standards durchsuchen</h3>
+          <p class="card-text">Durchsuchen Sie alle Vorgaben nach Stichworten und Inhalten.</p>
+          <a href="/search" class="btn btn-primary">Zur Suche</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title h4">Referenzen</h3>
+          <p class="card-text">Übersicht über externe Referenzen und Normen.</p>
+          <a href="/referenzen" class="btn btn-secondary">Referenzen anzeigen</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title h4">Stichworte</h3>
+          <p class="card-text">Alphabetische Übersicht aller Schlagworte und Kategorien.</p>
+          <a href="/stichworte" class="btn btn-secondary">Stichworte durchsuchen</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

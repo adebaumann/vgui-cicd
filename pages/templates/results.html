@@ -1,30 +1,80 @@
 {% extends "base.html" %}
 {% load page_extras %}
+
+{% block title %}Suchergebnisse für "{{ suchbegriff }}" - Vorgaben Informatiksicherheit{% endblock %}
+
 {% block content %}
-<h1 class="mb-4">Suchresultate für {{ suchbegriff }}</h1>
-{% if resultat.geltungsbereich %}
-<h2>Standards mit "{{suchbegriff}}" im Geltungsbereich</h2>
-{% for standard,geltungsbereich in resultat.geltungsbereich.items %}
-<h4>{{ standard }}</h4>
-{% for typ, html in geltungsbereich %}
-<div>{{ html|highlighttext:suchbegriff|safe }}</div>
-{% endfor %}
-{% endfor %}
-{% endif %}
+<div class="container-fluid">
+  <h1>Suchergebnisse für "{{ suchbegriff }}"</h1>
 
-{% if resultat.all %}
-    <h2>Vorgaben mit "{{ suchbegriff }}"</h2>
-    {% for standard, vorgaben in resultat.all.items %}
-        <h4>{{ standard }}</h4>
-        <ul>
+  <div class="row">
+    <div class="col-md-12">
+      <p class="text-muted">
+        <a href="/search" class="icon icon--before icon--less">Neue Suche starten</a>
+      </p>
+    </div>
+  </div>
+
+  {% if resultat.geltungsbereich %}
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Standards mit "{{ suchbegriff }}" im Geltungsbereich</h2>
+
+      {% for standard, geltungsbereich in resultat.geltungsbereich.items %}
+      <div class="card mb-3">
+        <div class="card-header">
+          <h3 class="h4 mb-0">{{ standard }}</h3>
+        </div>
+        <div class="card-body">
+          {% for typ, html in geltungsbereich %}
+          <div class="mb-2">{{ html|highlighttext:suchbegriff|safe }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if resultat.all %}
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Vorgaben mit "{{ suchbegriff }}"</h2>
+
+      {% for standard, vorgaben in resultat.all.items %}
+      <div class="card mb-3">
+        <div class="card-header">
+          <h3 class="h4 mb-0">{{ standard }}</h3>
+        </div>
+        <div class="card-body">
+          <ul class="list-unstyled">
             {% for vorgabe in vorgaben %}
-            <li><a href="{% url 'standard_detail' nummer=vorgabe.dokument.nummer %}#{{vorgabe.Vorgabennummer}}">{{vorgabe}}</a></li>
-        {% endfor %}
-        </ul>
-    {% endfor %}
-{% endif %}
+            <li class="mb-2">
+              <a href="{% url 'standard_detail' nummer=vorgabe.dokument.nummer %}#{{ vorgabe.Vorgabennummer }}"
+                 class="icon icon--before icon--external">
+                {{ vorgabe }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
 
-{% if not resultat.all %}
-    <h2>Keine Resultate für "{{suchbegriff}}"</h2>
-{% endif %}
+  {% if not resultat.all and not resultat.geltungsbereich %}
+  <div class="row">
+    <div class="col-md-12">
+      <div class="alert alert-warning" role="alert">
+        <span class="icon icon--warning" aria-hidden="true"></span>
+        <strong>Keine Ergebnisse gefunden</strong>
+        <p>Für den Suchbegriff "{{ suchbegriff }}" wurden keine Resultate gefunden.</p>
+        <p>Versuchen Sie es mit einem anderen Suchbegriff oder verwenden Sie weniger spezifische Begriffe.</p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
 {% endblock %}
