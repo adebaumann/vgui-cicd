@@ -19,30 +19,6 @@
     <strong>Historische Version vom {{ standard.check_date }}</strong>
   </div>
   {% endif %}
-
-  <!-- Metadata -->
-  <div class="row mb-4">
-    <div class="col-md-12">
-      <dl class="row">
-        <dt class="col-sm-3">Autoren:</dt>
-        <dd class="col-sm-9">{{ standard.autoren.all|join:", " }}</dd>
-
-        <dt class="col-sm-3">Prüfende:</dt>
-        <dd class="col-sm-9">{{ standard.pruefende.all|join:", " }}</dd>
-
-        <dt class="col-sm-3">Gültigkeit:</dt>
-        <dd class="col-sm-9">{{ standard.gueltigkeit_von }} bis {{ standard.gueltigkeit_bis|default_if_none:"auf weiteres" }}</dd>
-      </dl>
-      <p>
-        <a href="{% url 'standard_json' standard.nummer %}"
-           class="btn btn-secondary icon icon--before icon--download"
-           download="{{ standard.nummer }}.json">
-          JSON herunterladen
-        </a>
-      </p>
-    </div>
-  </div>
-
   <!-- Einleitung -->
   {% if standard.einleitung_html %}
   <div class="row mb-4">
@@ -175,5 +151,29 @@
   </div>
   {% endif %}
   {% endfor %}
+  <!-- Metadata -->
+
+  <h2>Metadaten</h2>
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <dl class="row">
+        <dt class="col-sm-3">Autoren:</dt>
+        <dd class="col-sm-9">{{ standard.autoren.all|join:", " }}</dd>
+
+        <dt class="col-sm-3">Prüfende:</dt>
+        <dd class="col-sm-9">{{ standard.pruefende.all|join:", " }}</dd>
+
+        <dt class="col-sm-3">Gültigkeit:</dt>
+        <dd class="col-sm-9">{{ standard.gueltigkeit_von }} bis {{ standard.gueltigkeit_bis|default_if_none:"auf weiteres" }}</dd>
+      </dl>
+      <p>
+        <a href="{% url 'standard_json' standard.nummer %}"
+           class="btn btn-secondary icon icon--before icon--download"
+           download="{{ standard.nummer }}.json">
+          JSON herunterladen
+        </a>
+      </p>
+    </div>
+  </div>
 </div>
 {% endblock %}
