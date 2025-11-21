@@ -3,8 +3,6 @@ kind: Ingress
 metadata:
   name: django
   namespace: vorgabenui
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: "vorgabenui-vorgabenui-rewrite@kubernetescrd"
 spec:
   rules:
     - host: vorgabenportal.knowyoursecurity.com
