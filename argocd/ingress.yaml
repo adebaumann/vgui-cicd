@@ -4,11 +4,7 @@ metadata:
   name: django
   namespace: vorgabenui
   annotations:
-<<<<<<< Updated upstream
     argocd.argoproj.io/ignore-healthcheck: "true"
-=======
-    nginx.ingress.kubernetes.io/rewrite-target: /
->>>>>>> Stashed changes
 spec:
   ingressClassName: traefik
   rules:
