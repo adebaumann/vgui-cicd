@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs
+provisioner: kubernetes.io/no-provisioner
+parameters:
+  server: 192.168.17.199
+  path: /mnt/user/vorgabenui/
+  readOnly: "false"
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
