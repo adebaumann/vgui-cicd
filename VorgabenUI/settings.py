@@ -152,6 +152,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DATA_UPLOAD_MAX_NUMBER_FIELDS=10250
 NESTED_ADMIN_LAZY_INLINES = True
 
+# Authentication settings
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = 'login'
+
 #LOGGING = {
 #    "version": 1,
 #    "handlers"  :{
