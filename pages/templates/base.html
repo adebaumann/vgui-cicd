@@ -41,6 +41,30 @@
            alt="Zur Startseite" />
       <h1>Vorgaben Informatiksicherheit BIT</h1>
     </a>
+    
+    <!-- User Menu -->
+    {% if user.is_authenticated %}
+    <div class="user-menu" style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="text-decoration: none; color: #000; display: flex; align-items: center;">
+          <span style="font-size: 24px; margin-right: 8px;">👤</span>
+          <span class="hidden-xs" style="margin-left: 0;">{{ user.username }}</span>
+          <span class="caret" style="margin-left: 8px;"></span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+          <li><a href="{% url 'password_change' %}">Passwort ändern</a></li>
+          <li class="divider"></li>
+          <li><a href="{% url 'logout' %}">Abmelden</a></li>
+        </ul>
+      </div>
+    </div>
+    {% else %}
+    <div class="user-menu" style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
+      <a href="{% url 'login' %}" class="btn btn-sm btn-primary" style="text-decoration: none;">
+        Anmelden
+      </a>
+    </div>
+    {% endif %}
   </header>
 
   <!-- Main Navigation -->
