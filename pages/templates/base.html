@@ -54,7 +54,14 @@
         <ul class="dropdown-menu dropdown-menu-right" role="menu">
           <li><a href="{% url 'password_change' %}">Passwort ändern</a></li>
           <li class="divider"></li>
-          <li><a href="{% url 'logout' %}">Abmelden</a></li>
+          <li>
+            <form method="post" action="{% url 'logout' %}" style="display: inline;">
+              {% csrf_token %}
+              <button type="submit" style="background: none; border: none; color: inherit; padding: 3px 20px; width: 100%; text-align: left; cursor: pointer;">
+                Abmelden
+              </button>
+            </form>
+          </li>
         </ul>
       </div>
     </div>
