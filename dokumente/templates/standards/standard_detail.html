@@ -43,7 +43,7 @@
     <div class="col-md-12">
       <div class="card">
         <div class="card-header">
-          <h2 class="h4 mb-0">Geltungsbereich</h2>
+          <h2">Geltungsbereich</h2>
         </div>
         <div class="card-body">
           {% for typ, html in standard.geltungsbereich_html %}
@@ -73,7 +73,7 @@
       <a id="{{ vorgabe.Vorgabennummer }}"></a>
       <div class="card mb-4">
         <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 class="h5 mb-0">
+          <h3>
             {{ vorgabe.Vorgabennummer }} – {{ vorgabe.titel }}
             {% if vorgabe.long_status != "active" and standard.history == True %}
             <span class="badge badge-danger">{{ vorgabe.long_status }}</span>
@@ -123,7 +123,7 @@
           {% endif %}
 
           <!-- Stichworte und Referenzen -->
-          <div class="mt-4 p-3" style="background-color: #f8f9fa; border-left: 3px solid #dee2e6;">
+          <div class="mt-4 p-3" style="background-color: #f8f9fa; border-left: 3px solid #dee2e6; padding-left: 0.5en;">
             <p class="mb-2">
               <strong>Stichworte:</strong>
               {% if vorgabe.stichworte.all %}
