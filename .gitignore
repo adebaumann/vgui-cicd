@@ -12,6 +12,7 @@ keys/
 node_modules/
 package-lock.json
 package.json
+AGENT*.md
 # Diagram cache directory
 media/diagram_cache/
 .env
