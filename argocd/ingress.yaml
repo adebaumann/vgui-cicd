@@ -3,7 +3,10 @@ kind: Ingress
 metadata:
   name: django
   namespace: vorgabenui
+  annotations:
+    argocd.argoproj.io/ignore-healthcheck: "true"
 spec:
+  ingressClassName: traefik
   rules:
     - host: vorgabenportal.knowyoursecurity.com
       http:
