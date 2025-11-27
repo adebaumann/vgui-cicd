@@ -4,6 +4,8 @@ from django.http import JsonResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.html import escape, mark_safe
+from django.utils.safestring import SafeString
 import json
 from .models import Dokument, Vorgabe, VorgabeKurztext, VorgabeLangtext, Checklistenfrage, VorgabeComment
 from abschnitte.utils import render_textabschnitte
@@ -264,16 +266,21 @@ def get_vorgabe_comments(request, vorgabe_id):
     
     comments_data = []
     for comment in comments:
+        # Escape HTML but preserve line breaks
+        escaped_text = escape(comment.text).replace('\n', '<br>')
         comments_data.append({
             'id': comment.id,
-            'text': comment.text,
-            'user': comment.user.username,
+            'text': escaped_text,
+            'user': escape(comment.user.username),
             'created_at': comment.created_at.strftime('%d.%m.%Y %H:%M'),
             'updated_at': comment.updated_at.strftime('%d.%m.%Y %H:%M'),
             'is_own': comment.user == request.user
         })
     
-    return JsonResponse({'comments': comments_data})
+    response = JsonResponse({'comments': comments_data})
+    response['Content-Security-Policy'] = "default-src 'self'"
+    response['X-Content-Type-Options'] = 'nosniff'
+    return response
 
 
 @require_POST
@@ -286,8 +293,19 @@ def add_vorgabe_comment(request, vorgabe_id):
         data = json.loads(request.body)
         text = data.get('text', '').strip()
         
+        # Validate input
         if not text:
             return JsonResponse({'error': 'Kommentar darf nicht leer sein'}, status=400)
+        
+        if len(text) > 2000:  # Reasonable length limit
+            return JsonResponse({'error': 'Kommentar ist zu lang (max 2000 Zeichen)'}, status=400)
+        
+        # Additional XSS prevention - check for dangerous patterns
+        dangerous_patterns = ['<script', 'javascript:', 'onload=', 'onerror=', 'onclick=', 'onmouseover=']
+        text_lower = text.lower()
+        for pattern in dangerous_patterns:
+            if pattern in text_lower:
+                return JsonResponse({'error': 'Kommentar enthält ungültige Zeichen'}, status=400)
         
         comment = VorgabeComment.objects.create(
             vorgabe=vorgabe,
@@ -295,22 +313,33 @@ def add_vorgabe_comment(request, vorgabe_id):
             text=text
         )
         
-        return JsonResponse({
+        # Escape HTML but preserve line breaks
+        escaped_text = escape(comment.text).replace('\n', '<br>')
+        response = JsonResponse({
             'success': True,
             'comment': {
                 'id': comment.id,
-                'text': comment.text,
-                'user': comment.user.username,
+                'text': escaped_text,
+                'user': escape(comment.user.username),
                 'created_at': comment.created_at.strftime('%d.%m.%Y %H:%M'),
                 'updated_at': comment.updated_at.strftime('%d.%m.%Y %H:%M'),
                 'is_own': True
             }
         })
+    response['Content-Security-Policy'] = "default-src 'self'"
+    response['X-Content-Type-Options'] = 'nosniff'
+    return response
     
     except json.JSONDecodeError:
-        return JsonResponse({'error': 'Ungültige Daten'}, status=400)
+        response = JsonResponse({'error': 'Ungültige Daten'}, status=400)
+        response['Content-Security-Policy'] = "default-src 'self'"
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+        response = JsonResponse({'error': 'Serverfehler'}, status=500)
+        response['Content-Security-Policy'] = "default-src 'self'"
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response
 
 
 @require_POST
@@ -321,10 +350,19 @@ def delete_vorgabe_comment(request, comment_id):
     
     # Check if user can delete this comment
     if comment.user != request.user and not request.user.is_staff:
-        return JsonResponse({'error': 'Keine Berechtigung zum Löschen dieses Kommentars'}, status=403)
+        response = JsonResponse({'error': 'Keine Berechtigung zum Löschen dieses Kommentars'}, status=403)
+        response['Content-Security-Policy'] = "default-src 'self'"
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response
     
     try:
         comment.delete()
-        return JsonResponse({'success': True})
+        response = JsonResponse({'success': True})
+        response['Content-Security-Policy'] = "default-src 'self'"
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+        response = JsonResponse({'error': 'Serverfehler'}, status=500)
+        response['Content-Security-Policy'] = "default-src 'self'"
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response

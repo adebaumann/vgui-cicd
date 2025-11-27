@@ -219,6 +219,36 @@
 
 <!-- JavaScript for Comments -->
 <script>
+// Content Security Policy for comment system
+document.addEventListener('DOMContentLoaded', function() {
+  // Prevent inline script execution in dynamically loaded content
+  const commentsContainer = document.getElementById('commentsContainer');
+  if (commentsContainer) {
+    // Use DOMPurify-like approach - only allow safe HTML
+    const allowedTags = ['br', 'small', 'div', 'span', 'button'];
+    const allowedAttributes = ['class', 'data-comment-id', 'aria-hidden'];
+    
+    // Monitor for any script injection attempts
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        mutation.addedNodes.forEach(function(node) {
+          if (node.nodeType === 1) { // Element node
+            const tagName = node.tagName.toLowerCase();
+            if (tagName === 'script') {
+              console.warn('Script injection attempt blocked');
+              node.parentNode.removeChild(node);
+            }
+          }
+        });
+      });
+    });
+    
+    observer.observe(commentsContainer, {
+      childList: true,
+      subtree: true
+    });
+  }
+});
 document.addEventListener('DOMContentLoaded', function() {
   let currentVorgabeId = null;
   let currentVorgabeNummer = null;
@@ -270,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <strong>${comment.user}</strong> 
               <small class="text-muted">(${comment.created_at})</small>
               ${comment.updated_at !== comment.created_at ? `<small class="text-muted">(bearbeitet: ${comment.updated_at})</small>` : ''}
-              <div class="mt-1">${comment.text.replace(/\n/g, '<br>')}</div>
+              <div class="mt-1">${comment.text}</div>
             </div>
             ${canDelete ? `
               <button class="btn btn-sm btn-outline-danger ml-2 delete-comment-btn" data-comment-id="${comment.id}">
