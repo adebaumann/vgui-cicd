@@ -326,10 +326,10 @@ def add_vorgabe_comment(request, vorgabe_id):
                 'is_own': True
             }
         })
-    response['Content-Security-Policy'] = "default-src 'self'"
-    response['X-Content-Type-Options'] = 'nosniff'
-    return response
-    
+        response['Content-Security-Policy'] = "default-src 'self'"
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response
+        
     except json.JSONDecodeError:
         response = JsonResponse({'error': 'Ungültige Daten'}, status=400)
         response['Content-Security-Policy'] = "default-src 'self'"
