@@ -28,12 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["10.128.128.144","localhost","127.0.0.1","*"]
 
-TEMPLATES = [
-        {"BACKEND": "django.template.backends.django.DjangoTemplates",
-        "APP_DIRS": True,
-        }
-]
-
 # Application definition
 
 INSTALLED_APPS = [

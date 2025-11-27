@@ -15,7 +15,7 @@ Dieses Dokument bietet einen umfassenden Überblick über alle Tests im vgui-cic
 
 ## abschnitte App Tests
 
-Die abschnitte App enthält 32 Tests, die Modelle, Utility-Funktionen, Diagram-Caching und Management-Befehle abdecken.
+Die abschnitte App enthält 33 Tests, die Modelle, Utility-Funktionen, Diagram-Caching, Management-Befehle und Sicherheit abdecken.
 
 ### Modell-Tests
 
@@ -58,6 +58,7 @@ Die abschnitte App enthält 32 Tests, die Modelle, Utility-Funktionen, Diagram-C
 - **test_render_text_with_footnotes**: Verarbeitet Text, der Fußnoten enthält
 - **test_render_abschnitt_without_type**: Behandelt Textabschnitte ohne AbschnittTyp
 - **test_render_abschnitt_with_empty_content**: Behandelt Textabschnitte mit leerem Inhalt
+- **test_render_textabschnitte_xss_prevention**: Überprüft, dass bösartiger HTML-Code und Skript-Tags aus gerenderten Inhalten bereinigt werden, um XSS-Angriffe zu verhindern
 
 ### Diagram-Caching-Tests
 
@@ -332,8 +333,8 @@ Die stichworte App enthält 18 Tests, die Schlüsselwortmodelle und ihre Sortier
 
 ## Test-Statistiken
 
-- **Gesamt-Tests**: 206
-- **abschnitte**: 32 Tests
+- **Gesamt-Tests**: 207
+- **abschnitte**: 33 Tests (einschließlich XSS-Prävention)
 - **dokumente**: 116 Tests (98 in tests.py + 9 in test_json.py + 9 JSON-Tests in Haupt-tests.py)
 - **pages**: 4 Tests
 - **referenzen**: 18 Tests
@@ -348,6 +349,7 @@ Die stichworte App enthält 18 Tests, die Schlüsselwortmodelle und ihre Sortier
 4. **Utility-Funktionen**: Textverarbeitung, Caching, Formatierung
 5. **Management-Befehle**: CLI-Schnittstelle und Ausgabeverarbeitung
 6. **Integration**: App-übergreifende Funktionalität und Datenfluss
+7. **Sicherheit**: XSS-Prävention durch HTML-Bereinigung beim Rendern von Inhalten
 
 ## Ausführen der Tests
 

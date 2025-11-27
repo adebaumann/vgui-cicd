@@ -467,6 +467,32 @@ A -> B
         typ, html = result[0]
         self.assertEqual(typ, "text")
 
+    def test_render_textabschnitte_xss_prevention(self):
+        """Test that malicious HTML is sanitized in rendered content"""
+        from dokumente.models import VorgabeLangtext
+
+        # Create content with malicious HTML
+        malicious_abschnitt = VorgabeLangtext.objects.create(
+            abschnitt=self.vorgabe,
+            abschnitttyp=self.typ_text,
+            inhalt='<script>alert("xss")</script><img src=x onerror=alert(1)>Normal text',
+            order=1
+        )
+
+        result = render_textabschnitte(VorgabeLangtext.objects.filter(pk=malicious_abschnitt.pk))
+
+        self.assertEqual(len(result), 1)
+        typ, html = result[0]
+        self.assertEqual(typ, "text")
+
+        # Dangerous tags and attributes should be removed or sanitized
+        self.assertNotIn('<script>', html)  # Script tags should not be present unescaped
+        self.assertNotIn('onerror', html)   # Dangerous attributes removed
+        # Note: 'alert' may still be present in escaped script tags, which is safe
+
+        # Safe content should remain
+        self.assertIn('Normal text', html)
+
 
 class MdTableToHtmlTest(TestCase):
     """Test cases for md_table_to_html function"""

@@ -102,6 +102,7 @@
                   <li><a href="/dokumente">Standards</a></li>
                   {% if user.is_staff %}
                   <li><a href="/dokumente/unvollstaendig/">Unvollständig</a></li>
+                  <li><a href="/autorenumgebung/">Autorenumgebung</a></li>
                   {% endif %}
                   <li><a href="/referenzen">Referenzen</a></li>
                   <li><a href="/stichworte">Stichworte</a></li>
@@ -130,6 +131,9 @@
       {% if user.is_staff %}
       <li class="dropdown {% if 'unvollstaendig' in request.path %}current{% endif %}">
         <a href="/dokumente/unvollstaendig/">Unvollständig</a>
+      </li>
+      <li class="dropdown {% if 'autorenumgebung' in request.path %}current{% endif %}">
+        <a href="/autorenumgebung/">Autorenumgebung</a>
       </li>
       {% endif %}
       <li class="dropdown {% if 'referenzen' in request.path %}current{% endif %}">

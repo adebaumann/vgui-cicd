@@ -4,11 +4,33 @@ import zlib
 import re
 from textwrap import dedent
 from django.conf import settings
+import bleach
 
 # Import the caching function
 from diagramm_proxy.diagram_cache import get_cached_diagram
 
 DIAGRAMMSERVER="/diagramm"
+
+# Allowed HTML tags for bleach sanitization
+ALLOWED_TAGS = [
+    'p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'hr',
+    'table', 'thead', 'tbody', 'tr', 'th', 'td',
+    'img', 'a', 'sup', 'sub', 'span', 'div'
+]
+
+ALLOWED_ATTRIBUTES = {
+    'img': ['src', 'alt', 'width', 'height'],
+    'a': ['href', 'title'],
+    'span': ['class'],
+    'div': ['class'],
+    'p': ['class'],
+    'table': ['class'],
+    'th': ['colspan', 'rowspan', 'class'],
+    'td': ['colspan', 'rowspan', 'class'],
+    'pre': ['class'],
+    'code': ['class'],
+}
 
 def render_textabschnitte(queryset):
     """
@@ -52,6 +74,8 @@ def render_textabschnitte(queryset):
             html += "</code></pre>"
         else:
             html = markdown(inhalt, extensions=['tables', 'attr_list','footnotes'])
+        # Sanitize HTML to prevent XSS
+        html = bleach.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
         output.append((typ, html))
     return output
 

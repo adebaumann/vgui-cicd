@@ -15,7 +15,7 @@ This document provides a comprehensive overview of all tests in the vgui-cicd Dj
 
 ## abschnitte App Tests
 
-The abschnitte app contains 32 tests covering models, utility functions, diagram caching, and management commands.
+The abschnitte app contains 33 tests covering models, utility functions, diagram caching, management commands, and security.
 
 ### Model Tests
 
@@ -58,6 +58,7 @@ The abschnitte app contains 32 tests covering models, utility functions, diagram
 - **test_render_text_with_footnotes**: Processes text containing footnotes
 - **test_render_abschnitt_without_type**: Handles Textabschnitte without AbschnittTyp
 - **test_render_abschnitt_with_empty_content**: Handles Textabschnitte with empty content
+- **test_render_textabschnitte_xss_prevention**: Verifies that malicious HTML and script tags are sanitized from rendered content to prevent XSS attacks
 
 ### Diagram Caching Tests
 
@@ -332,8 +333,8 @@ The stichworte app contains 18 tests covering keyword models and their ordering.
 
 ## Test Statistics
 
-- **Total Tests**: 206
-- **abschnitte**: 32 tests
+- **Total Tests**: 207
+- **abschnitte**: 33 tests (including XSS prevention)
 - **dokumente**: 116 tests (98 in tests.py + 9 in test_json.py + 9 JSON tests in main tests.py)
 - **pages**: 4 tests
 - **referenzen**: 18 tests
@@ -348,6 +349,7 @@ The stichworte app contains 18 tests covering keyword models and their ordering.
 4. **Utility Functions**: Text processing, caching, formatting
 5. **Management Commands**: CLI interface and output handling
 6. **Integration**: Cross-app functionality and data flow
+7. **Security**: XSS prevention through HTML sanitization in content rendering
 
 ## Running the Tests
 

@@ -32,3 +32,4 @@ six==1.17.0
 sqlparse==0.5.3
 urllib3==2.5.0
 wcwidth==0.2.13
+bleach==6.1.0
