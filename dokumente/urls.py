@@ -8,6 +8,9 @@ urlpatterns = [
     path('<str:nummer>/history/<str:check_date>/', views.standard_detail),
     path('<str:nummer>/history/', views.standard_detail, {"check_date":"today"}, name='standard_history'),
     path('<str:nummer>/checkliste/', views.standard_checkliste, name='standard_checkliste'),
-    path('<str:nummer>/json/', views.standard_json, name='standard_json')
+    path('<str:nummer>/json/', views.standard_json, name='standard_json'),
+    path('comments/<int:vorgabe_id>/', views.get_vorgabe_comments, name='get_vorgabe_comments'),
+    path('comments/<int:vorgabe_id>/add/', views.add_vorgabe_comment, name='add_vorgabe_comment'),
+    path('comments/delete/<int:comment_id>/', views.delete_vorgabe_comment, name='delete_vorgabe_comment'),
 ]
 

@@ -1,5 +1,6 @@
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
+from django.contrib.auth.models import User
 from abschnitte.models import Textabschnitt
 from stichworte.models import Stichwort
 from referenzen.models import Referenz
@@ -261,3 +262,19 @@ class Changelog(models.Model):
     class Meta:
         verbose_name_plural="Changelog"
         verbose_name="Changelog-Eintrag"
+
+
+class VorgabeComment(models.Model):
+    vorgabe = models.ForeignKey(Vorgabe, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Vorgabe-Kommentar"
+        verbose_name_plural = "Vorgabe-Kommentare"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Kommentar von {self.user.username} zu {self.vorgabe.Vorgabennummer()}"

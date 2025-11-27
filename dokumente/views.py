@@ -2,8 +2,10 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 from django.core.serializers.json import DjangoJSONEncoder
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 import json
-from .models import Dokument, Vorgabe, VorgabeKurztext, VorgabeLangtext, Checklistenfrage
+from .models import Dokument, Vorgabe, VorgabeKurztext, VorgabeLangtext, Checklistenfrage, VorgabeComment
 from abschnitte.utils import render_textabschnitte
 
 from datetime import date
@@ -44,6 +46,15 @@ def standard_detail(request, nummer,check_date=""):
         for r in vorgabe.referenzen.all():
             referenz_items.append(r.Path())
         vorgabe.referenzpfade = referenz_items
+        
+        # Add comment count
+        if request.user.is_authenticated:
+            if request.user.is_staff:
+                vorgabe.comment_count = vorgabe.comments.count()
+            else:
+                vorgabe.comment_count = vorgabe.comments.filter(user=request.user).count()
+        else:
+            vorgabe.comment_count = 0
 
     return render(request, 'standards/standard_detail.html', {
         'standard': standard,
@@ -237,3 +248,83 @@ def standard_json(request, nummer):
 
     # Return JSON response
     return JsonResponse(doc_data, json_dumps_params={'indent': 2, 'ensure_ascii': False}, encoder=DjangoJSONEncoder)
+
+
+@login_required
+def get_vorgabe_comments(request, vorgabe_id):
+    """Get comments for a specific Vorgabe"""
+    vorgabe = get_object_or_404(Vorgabe, id=vorgabe_id)
+    
+    if request.user.is_staff:
+        # Staff can see all comments
+        comments = vorgabe.comments.all().select_related('user')
+    else:
+        # Regular users can only see their own comments
+        comments = vorgabe.comments.filter(user=request.user).select_related('user')
+    
+    comments_data = []
+    for comment in comments:
+        comments_data.append({
+            'id': comment.id,
+            'text': comment.text,
+            'user': comment.user.username,
+            'created_at': comment.created_at.strftime('%d.%m.%Y %H:%M'),
+            'updated_at': comment.updated_at.strftime('%d.%m.%Y %H:%M'),
+            'is_own': comment.user == request.user
+        })
+    
+    return JsonResponse({'comments': comments_data})
+
+
+@require_POST
+@login_required
+def add_vorgabe_comment(request, vorgabe_id):
+    """Add a new comment to a Vorgabe"""
+    vorgabe = get_object_or_404(Vorgabe, id=vorgabe_id)
+    
+    try:
+        data = json.loads(request.body)
+        text = data.get('text', '').strip()
+        
+        if not text:
+            return JsonResponse({'error': 'Kommentar darf nicht leer sein'}, status=400)
+        
+        comment = VorgabeComment.objects.create(
+            vorgabe=vorgabe,
+            user=request.user,
+            text=text
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'comment': {
+                'id': comment.id,
+                'text': comment.text,
+                'user': comment.user.username,
+                'created_at': comment.created_at.strftime('%d.%m.%Y %H:%M'),
+                'updated_at': comment.updated_at.strftime('%d.%m.%Y %H:%M'),
+                'is_own': True
+            }
+        })
+    
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Ungültige Daten'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@require_POST
+@login_required
+def delete_vorgabe_comment(request, comment_id):
+    """Delete a comment (only own comments or staff can delete)"""
+    comment = get_object_or_404(VorgabeComment, id=comment_id)
+    
+    # Check if user can delete this comment
+    if comment.user != request.user and not request.user.is_staff:
+        return JsonResponse({'error': 'Keine Berechtigung zum Löschen dieses Kommentars'}, status=403)
+    
+    try:
+        comment.delete()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

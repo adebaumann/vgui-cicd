@@ -12,3 +12,92 @@
     border: 1px solid #ccc;
     padding: 0;
   }
+
+/* Comment System Styles */
+.comment-btn {
+  position: relative;
+}
+
+.comment-btn .comment-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.comment-item {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.comment-item .text-muted {
+  font-size: 0.85em;
+}
+
+#commentModal .modal-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+#commentsContainer {
+  min-height: 100px;
+}
+
+.delete-comment-btn {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.delete-comment-btn:hover {
+  opacity: 1;
+}
+
+.delete-comment-btn {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.delete-comment-btn:hover {
+  opacity: 1;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+/* Icon styling for emoji replacements */
+.emoji-icon {
+  font-size: 1.1em;
+  margin-right: 0.3em;
+  vertical-align: middle;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .comment-item .d-flex {
+    flex-direction: column;
+  }
+  
+  .delete-comment-btn {
+    margin-left: 0 !important;
+    margin-top: 0.5rem;
+  }
+}
