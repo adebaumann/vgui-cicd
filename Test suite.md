@@ -87,7 +87,7 @@ The abschnitte app contains 33 tests covering models, utility functions, diagram
 
 ## dokumente App Tests
 
-The dokumente app contains 98 tests, making it the most comprehensive test suite, covering all models, views, URLs, and business logic.
+The dokumente app contains 121 tests, making it the most comprehensive test suite, covering all models, views, URLs, business logic, and comment functionality with XSS protection.
 
 ### Model Tests
 
@@ -130,6 +130,14 @@ The dokumente app contains 98 tests, making it the most comprehensive test suite
 - **test_checklistenfrage_creation**: Tests Checklistenfrage creation with question and optional answer
 - **test_checklistenfrage_str**: Verifies string representation truncates long questions
 - **test_checklistenfrage_related_name**: Tests the reverse relationship from Vorgabe
+
+#### VorgabeCommentModelTest
+- **test_comment_creation**: Tests VorgabeComment creation with vorgabe, user, and text
+- **test_comment_str**: Verifies string representation includes username and Vorgabennummer
+- **test_comment_related_name**: Tests the reverse relationship from Vorgabe
+- **test_comment_ordering**: Tests comments are ordered by created_at descending (newest first)
+- **test_comment_timestamps_auto_update**: Tests that updated_at changes when comment is modified
+- **test_multiple_users_can_comment**: Tests multiple users can comment on same Vorgabe
 
 ### Text Abschnitt Tests
 
@@ -216,6 +224,40 @@ The dokumente app contains 98 tests, making it the most comprehensive test suite
 - **test_summary_section**: Tests summary section shows correct counts
 - **test_vorgabe_links**: Tests Vorgaben link to correct admin pages
 - **test_back_link**: Tests back link to standard list exists
+
+### Comment Functionality Tests
+
+#### GetVorgabeCommentsViewTest
+- **test_get_comments_requires_login**: Tests anonymous users cannot view comments and are redirected
+- **test_regular_user_sees_only_own_comments**: Tests regular users only see their own comments
+- **test_staff_user_sees_all_comments**: Tests staff users can see all comments
+- **test_get_comments_returns_404_for_nonexistent_vorgabe**: Tests 404 response for non-existent Vorgabe
+- **test_comments_are_html_escaped**: Tests HTML escaping prevents XSS attacks (e.g., `<script>` tags)
+- **test_line_breaks_preserved**: Tests line breaks are converted to `<br>` tags
+- **test_security_headers_present**: Tests Content-Security-Policy and X-Content-Type-Options headers are set
+
+#### AddVorgabeCommentViewTest
+- **test_add_comment_requires_login**: Tests anonymous users cannot add comments
+- **test_add_comment_requires_post**: Tests only POST method is allowed (405 for GET)
+- **test_add_comment_success**: Tests successful comment creation with valid data
+- **test_add_empty_comment_fails**: Tests empty comments are rejected with 400 error
+- **test_add_whitespace_only_comment_fails**: Tests whitespace-only comments are rejected
+- **test_add_too_long_comment_fails**: Tests comments exceeding 2000 characters are rejected
+- **test_add_comment_xss_script_tag_blocked**: Tests comments with `<script>` tags are blocked
+- **test_add_comment_xss_javascript_protocol_blocked**: Tests `javascript:` protocol is blocked
+- **test_add_comment_xss_event_handlers_blocked**: Tests event handlers (onload, onerror, onclick, onmouseover) are blocked
+- **test_add_comment_invalid_json_fails**: Tests invalid JSON payloads are rejected
+- **test_add_comment_nonexistent_vorgabe_fails**: Tests 404 response for non-existent Vorgabe
+- **test_add_comment_security_headers**: Tests security headers are present in responses
+
+#### DeleteVorgabeCommentViewTest
+- **test_delete_comment_requires_login**: Tests anonymous users cannot delete comments
+- **test_delete_comment_requires_post**: Tests only POST method is allowed (405 for GET)
+- **test_user_can_delete_own_comment**: Tests users can delete their own comments
+- **test_user_cannot_delete_other_users_comment**: Tests users cannot delete others' comments (403 Forbidden)
+- **test_staff_can_delete_any_comment**: Tests staff users can delete any comment
+- **test_delete_nonexistent_comment_returns_404**: Tests 404 response for non-existent comment
+- **test_delete_comment_security_headers**: Tests security headers are present in responses
 
 ---
 
@@ -333,9 +375,17 @@ The stichworte app contains 18 tests covering keyword models and their ordering.
 
 ## Test Statistics
 
-- **Total Tests**: 207
+- **Total Tests**: 230
 - **abschnitte**: 33 tests (including XSS prevention)
-- **dokumente**: 116 tests (98 in tests.py + 9 in test_json.py + 9 JSON tests in main tests.py)
+- **dokumente**: 121 tests (including comment functionality with XSS protection)
+  - Model tests: 44 tests
+  - View tests: 7 tests
+  - URL pattern tests: 4 tests
+  - Sanity check tests: 16 tests
+  - Management command tests: 2 tests
+  - JSON export tests: 9 tests
+  - Incomplete Vorgaben tests: 15 tests
+  - Comment tests: 24 tests (6 model + 18 view tests)
 - **pages**: 4 tests
 - **referenzen**: 18 tests
 - **rollen**: 18 tests
@@ -349,7 +399,17 @@ The stichworte app contains 18 tests covering keyword models and their ordering.
 4. **Utility Functions**: Text processing, caching, formatting
 5. **Management Commands**: CLI interface and output handling
 6. **Integration**: Cross-app functionality and data flow
-7. **Security**: XSS prevention through HTML sanitization in content rendering
+7. **Security**: 
+   - XSS prevention through HTML sanitization in content rendering
+   - XSS attack prevention in comment system (script tags, javascript: protocol, event handlers)
+   - Input validation and sanitization
+   - Authorization checks (staff vs. regular users)
+   - Security headers (Content-Security-Policy, X-Content-Type-Options)
+8. **Comment Functionality**:
+   - CRUD operations (Create, Read, Delete)
+   - User permissions and ownership
+   - HTML escaping and line break preservation
+   - Multiple XSS attack vector prevention
 
 ## Running the Tests
 

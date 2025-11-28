@@ -259,10 +259,10 @@ def get_vorgabe_comments(request, vorgabe_id):
     
     if request.user.is_staff:
         # Staff can see all comments
-        comments = vorgabe.comments.all().select_related('user')
+        comments = vorgabe.comments.all().select_related('user').order_by('created_at')
     else:
         # Regular users can only see their own comments
-        comments = vorgabe.comments.filter(user=request.user).select_related('user')
+        comments = vorgabe.comments.filter(user=request.user).select_related('user').order_by('created_at')
     
     comments_data = []
     for comment in comments:
