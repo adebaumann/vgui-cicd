@@ -7,7 +7,7 @@ from io import StringIO
 from .models import (
     Dokumententyp, Person, Thema, Dokument, Vorgabe,
     VorgabeLangtext, VorgabeKurztext, Geltungsbereich,
-    Einleitung, Checklistenfrage, Changelog
+    Einleitung, Checklistenfrage, Changelog, VorgabeComment
 )
 from .utils import check_vorgabe_conflicts, date_ranges_intersect, format_conflict_report
 from abschnitte.models import AbschnittTyp
@@ -1506,3 +1506,669 @@ class StandardJSONViewTest(TestCase):
         # Check that JSON is properly indented (should be formatted)
         self.assertIn('\n', response.content.decode())
         self.assertIn('  ', response.content.decode())  # Check for indentation
+
+
+class VorgabeCommentModelTest(TestCase):
+    """Test cases for VorgabeComment model"""
+    
+    def setUp(self):
+        """Set up test data for comment tests"""
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+        
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Test Typ",
+            verantwortliche_ve="Test VE"
+        )
+        
+        self.thema = Thema.objects.create(
+            name="Test Thema"
+        )
+        
+        self.dokument = Dokument.objects.create(
+            nummer="COMM-001",
+            dokumententyp=self.dokumententyp,
+            name="Comment Test Document",
+            aktiv=True
+        )
+        
+        self.vorgabe = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Test Vorgabe",
+            gueltigkeit_von=date.today()
+        )
+        
+        self.comment = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe,
+            user=self.user,
+            text="Dies ist ein Testkommentar"
+        )
+    
+    def test_comment_creation(self):
+        """Test that VorgabeComment is created correctly"""
+        self.assertEqual(self.comment.vorgabe, self.vorgabe)
+        self.assertEqual(self.comment.user, self.user)
+        self.assertEqual(self.comment.text, "Dies ist ein Testkommentar")
+        self.assertIsNotNone(self.comment.created_at)
+        self.assertIsNotNone(self.comment.updated_at)
+    
+    def test_comment_str(self):
+        """Test string representation of VorgabeComment"""
+        expected = f"Kommentar von {self.user.username} zu {self.vorgabe.Vorgabennummer()}"
+        self.assertEqual(str(self.comment), expected)
+    
+    def test_comment_related_name(self):
+        """Test related name works correctly"""
+        self.assertIn(self.comment, self.vorgabe.comments.all())
+    
+    def test_comment_ordering(self):
+        """Test comments are ordered by created_at descending"""
+        comment2 = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe,
+            user=self.user,
+            text="Zweiter Kommentar"
+        )
+        
+        comments = list(self.vorgabe.comments.all())
+        self.assertEqual(comments[0], comment2)  # Newest first
+        self.assertEqual(comments[1], self.comment)
+    
+    def test_comment_timestamps_auto_update(self):
+        """Test that updated_at changes when comment is modified"""
+        original_updated_at = self.comment.updated_at
+        
+        # Wait a tiny bit and update
+        import time
+        time.sleep(0.01)
+        
+        self.comment.text = "Updated text"
+        self.comment.save()
+        
+        self.assertNotEqual(self.comment.updated_at, original_updated_at)
+        self.assertEqual(self.comment.text, "Updated text")
+    
+    def test_multiple_users_can_comment(self):
+        """Test multiple users can comment on same Vorgabe"""
+        user2 = User.objects.create_user(
+            username='testuser2',
+            password='testpass123'
+        )
+        
+        comment2 = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe,
+            user=user2,
+            text="Kommentar von anderem Benutzer"
+        )
+        
+        self.assertEqual(self.vorgabe.comments.count(), 2)
+        self.assertIn(self.comment, self.vorgabe.comments.all())
+        self.assertIn(comment2, self.vorgabe.comments.all())
+
+
+class GetVorgabeCommentsViewTest(TestCase):
+    """Test cases for get_vorgabe_comments view"""
+    
+    def setUp(self):
+        """Set up test data"""
+        self.client = Client()
+        
+        # Create users
+        self.regular_user = User.objects.create_user(
+            username='regularuser',
+            password='testpass123'
+        )
+        
+        self.staff_user = User.objects.create_user(
+            username='staffuser',
+            password='testpass123'
+        )
+        self.staff_user.is_staff = True
+        self.staff_user.save()
+        
+        self.other_user = User.objects.create_user(
+            username='otheruser',
+            password='testpass123'
+        )
+        
+        # Create test data
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Test Typ",
+            verantwortliche_ve="Test VE"
+        )
+        
+        self.thema = Thema.objects.create(name="Test Thema")
+        
+        self.dokument = Dokument.objects.create(
+            nummer="COMM-001",
+            dokumententyp=self.dokumententyp,
+            name="Comment Test",
+            aktiv=True
+        )
+        
+        self.vorgabe = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Test Vorgabe",
+            gueltigkeit_von=date.today()
+        )
+        
+        # Create comments from different users
+        self.comment1 = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe,
+            user=self.regular_user,
+            text="Kommentar von Regular User"
+        )
+        
+        self.comment2 = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe,
+            user=self.other_user,
+            text="Kommentar von Other User"
+        )
+    
+    def test_get_comments_requires_login(self):
+        """Test that anonymous users cannot view comments"""
+        url = reverse('get_vorgabe_comments', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.get(url)
+        
+        # Should redirect to login
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response.url)
+    
+    def test_regular_user_sees_only_own_comments(self):
+        """Test that regular users only see their own comments"""
+        self.client.login(username='regularuser', password='testpass123')
+        
+        url = reverse('get_vorgabe_comments', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        
+        import json
+        data = json.loads(response.content)
+        
+        # Should only see their own comment
+        self.assertEqual(len(data['comments']), 1)
+        self.assertEqual(data['comments'][0]['text'], 'Kommentar von Regular User')
+        self.assertEqual(data['comments'][0]['user'], 'regularuser')
+        self.assertTrue(data['comments'][0]['is_own'])
+    
+    def test_staff_user_sees_all_comments(self):
+        """Test that staff users see all comments"""
+        self.client.login(username='staffuser', password='testpass123')
+        
+        url = reverse('get_vorgabe_comments', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        
+        import json
+        data = json.loads(response.content)
+        
+        # Should see all comments
+        self.assertEqual(len(data['comments']), 2)
+        usernames = [c['user'] for c in data['comments']]
+        self.assertIn('regularuser', usernames)
+        self.assertIn('otheruser', usernames)
+    
+    def test_get_comments_returns_404_for_nonexistent_vorgabe(self):
+        """Test that requesting comments for non-existent Vorgabe returns 404"""
+        self.client.login(username='regularuser', password='testpass123')
+        
+        url = reverse('get_vorgabe_comments', kwargs={'vorgabe_id': 99999})
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 404)
+    
+    def test_comments_are_html_escaped(self):
+        """Test that comments are properly HTML escaped"""
+        # Create comment with HTML
+        comment = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe,
+            user=self.regular_user,
+            text="Test <script>alert('xss')</script> comment"
+        )
+        
+        self.client.login(username='regularuser', password='testpass123')
+        
+        url = reverse('get_vorgabe_comments', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.get(url)
+        
+        import json
+        data = json.loads(response.content)
+        
+        # Find the comment with script tag
+        script_comment = [c for c in data['comments'] if 'script' in c['text'].lower()][0]
+        
+        # Should be escaped
+        self.assertIn('&lt;script&gt;', script_comment['text'])
+        self.assertNotIn('<script>', script_comment['text'])
+    
+    def test_line_breaks_preserved(self):
+        """Test that line breaks are converted to <br> tags"""
+        comment = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe,
+            user=self.regular_user,
+            text="Line 1\nLine 2\nLine 3"
+        )
+        
+        self.client.login(username='regularuser', password='testpass123')
+        
+        url = reverse('get_vorgabe_comments', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.get(url)
+        
+        import json
+        data = json.loads(response.content)
+        
+        # Find the multiline comment
+        multiline_comment = [c for c in data['comments'] if 'Line 1' in c['text']][0]
+        
+        # Should contain <br> tags
+        self.assertIn('<br>', multiline_comment['text'])
+        self.assertIn('Line 1<br>Line 2<br>Line 3', multiline_comment['text'])
+    
+    def test_security_headers_present(self):
+        """Test that security headers are present in response"""
+        self.client.login(username='regularuser', password='testpass123')
+        
+        url = reverse('get_vorgabe_comments', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.get(url)
+        
+        self.assertIn('Content-Security-Policy', response)
+        self.assertIn('X-Content-Type-Options', response)
+        self.assertEqual(response['X-Content-Type-Options'], 'nosniff')
+
+
+class AddVorgabeCommentViewTest(TestCase):
+    """Test cases for add_vorgabe_comment view"""
+    
+    def setUp(self):
+        """Set up test data"""
+        self.client = Client()
+        
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+        
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Test Typ",
+            verantwortliche_ve="Test VE"
+        )
+        
+        self.thema = Thema.objects.create(name="Test Thema")
+        
+        self.dokument = Dokument.objects.create(
+            nummer="COMM-001",
+            dokumententyp=self.dokumententyp,
+            name="Comment Test",
+            aktiv=True
+        )
+        
+        self.vorgabe = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Test Vorgabe",
+            gueltigkeit_von=date.today()
+        )
+    
+    def test_add_comment_requires_login(self):
+        """Test that anonymous users cannot add comments"""
+        url = reverse('add_vorgabe_comment', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.post(url, 
+            data='{"text": "Test comment"}',
+            content_type='application/json'
+        )
+        
+        # Should redirect to login
+        self.assertEqual(response.status_code, 302)
+    
+    def test_add_comment_requires_post(self):
+        """Test that only POST method is allowed"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        url = reverse('add_vorgabe_comment', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.get(url)
+        
+        # Should return method not allowed
+        self.assertEqual(response.status_code, 405)
+    
+    def test_add_comment_success(self):
+        """Test successful comment addition"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        url = reverse('add_vorgabe_comment', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.post(url,
+            data='{"text": "Dies ist ein neuer Kommentar"}',
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        
+        import json
+        data = json.loads(response.content)
+        
+        self.assertTrue(data['success'])
+        self.assertEqual(data['comment']['text'], 'Dies ist ein neuer Kommentar')
+        self.assertEqual(data['comment']['user'], 'testuser')
+        self.assertTrue(data['comment']['is_own'])
+        
+        # Verify comment was created in database
+        self.assertEqual(VorgabeComment.objects.count(), 1)
+        comment = VorgabeComment.objects.first()
+        self.assertEqual(comment.text, 'Dies ist ein neuer Kommentar')
+        self.assertEqual(comment.user, self.user)
+    
+    def test_add_empty_comment_fails(self):
+        """Test that empty comments are rejected"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        url = reverse('add_vorgabe_comment', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.post(url,
+            data='{"text": ""}',
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 400)
+        
+        import json
+        data = json.loads(response.content)
+        
+        self.assertIn('error', data)
+        self.assertIn('leer', data['error'].lower())
+        
+        # No comment should be created
+        self.assertEqual(VorgabeComment.objects.count(), 0)
+    
+    def test_add_whitespace_only_comment_fails(self):
+        """Test that whitespace-only comments are rejected"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        url = reverse('add_vorgabe_comment', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.post(url,
+            data='{"text": "   \\n\\t  "}',
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(VorgabeComment.objects.count(), 0)
+    
+    def test_add_too_long_comment_fails(self):
+        """Test that comments exceeding max length are rejected"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        long_text = "a" * 2001  # Over the 2000 character limit
+        
+        url = reverse('add_vorgabe_comment', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.post(url,
+            data=f'{{"text": "{long_text}"}}',
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 400)
+        
+        import json
+        data = json.loads(response.content)
+        
+        self.assertIn('error', data)
+        self.assertIn('lang', data['error'].lower())
+        
+        # No comment should be created
+        self.assertEqual(VorgabeComment.objects.count(), 0)
+    
+    def test_add_comment_xss_script_tag_blocked(self):
+        """Test that comments with <script> tags are blocked"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        url = reverse('add_vorgabe_comment', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.post(url,
+            data='{"text": "Test <script>alert(\\"xss\\")</script> comment"}',
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 400)
+        
+        import json
+        data = json.loads(response.content)
+        
+        self.assertIn('error', data)
+        self.assertIn('ungültige', data['error'].lower())
+        
+        # No comment should be created
+        self.assertEqual(VorgabeComment.objects.count(), 0)
+    
+    def test_add_comment_xss_javascript_protocol_blocked(self):
+        """Test that comments with javascript: protocol are blocked"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        url = reverse('add_vorgabe_comment', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.post(url,
+            data='{"text": "Click <a href=\\"javascript:alert(1)\\">here</a>"}',
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(VorgabeComment.objects.count(), 0)
+    
+    def test_add_comment_xss_event_handlers_blocked(self):
+        """Test that comments with event handlers are blocked"""
+        dangerous_inputs = [
+            'Test onload=alert(1) comment',
+            'Test onerror=alert(1) comment',
+            'Test onclick=alert(1) comment',
+            'Test onmouseover=alert(1) comment'
+        ]
+        
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('add_vorgabe_comment', kwargs={'vorgabe_id': self.vorgabe.id})
+        
+        for dangerous_input in dangerous_inputs:
+            response = self.client.post(url,
+                data=f'{{"text": "{dangerous_input}"}}',
+                content_type='application/json'
+            )
+            
+            self.assertEqual(response.status_code, 400)
+        
+        # No comments should be created
+        self.assertEqual(VorgabeComment.objects.count(), 0)
+    
+    def test_add_comment_invalid_json_fails(self):
+        """Test that invalid JSON is rejected"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        url = reverse('add_vorgabe_comment', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.post(url,
+            data='invalid json',
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 400)
+        
+        import json
+        data = json.loads(response.content)
+        
+        self.assertIn('error', data)
+        self.assertIn('Ungültige', data['error'])
+    
+    def test_add_comment_nonexistent_vorgabe_fails(self):
+        """Test that adding comment to non-existent Vorgabe returns 404"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        url = reverse('add_vorgabe_comment', kwargs={'vorgabe_id': 99999})
+        response = self.client.post(url,
+            data='{"text": "Test comment"}',
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 404)
+    
+    def test_add_comment_security_headers(self):
+        """Test that security headers are present in response"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        url = reverse('add_vorgabe_comment', kwargs={'vorgabe_id': self.vorgabe.id})
+        response = self.client.post(url,
+            data='{"text": "Test comment"}',
+            content_type='application/json'
+        )
+        
+        self.assertIn('Content-Security-Policy', response)
+        self.assertIn('X-Content-Type-Options', response)
+        self.assertEqual(response['X-Content-Type-Options'], 'nosniff')
+
+
+class DeleteVorgabeCommentViewTest(TestCase):
+    """Test cases for delete_vorgabe_comment view"""
+    
+    def setUp(self):
+        """Set up test data"""
+        self.client = Client()
+        
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+        
+        self.other_user = User.objects.create_user(
+            username='otheruser',
+            password='testpass123'
+        )
+        
+        self.staff_user = User.objects.create_user(
+            username='staffuser',
+            password='testpass123'
+        )
+        self.staff_user.is_staff = True
+        self.staff_user.save()
+        
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Test Typ",
+            verantwortliche_ve="Test VE"
+        )
+        
+        self.thema = Thema.objects.create(name="Test Thema")
+        
+        self.dokument = Dokument.objects.create(
+            nummer="COMM-001",
+            dokumententyp=self.dokumententyp,
+            name="Comment Test",
+            aktiv=True
+        )
+        
+        self.vorgabe = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Test Vorgabe",
+            gueltigkeit_von=date.today()
+        )
+        
+        self.comment = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe,
+            user=self.user,
+            text="Test comment to delete"
+        )
+    
+    def test_delete_comment_requires_login(self):
+        """Test that anonymous users cannot delete comments"""
+        url = reverse('delete_vorgabe_comment', kwargs={'comment_id': self.comment.id})
+        response = self.client.post(url)
+        
+        # Should redirect to login
+        self.assertEqual(response.status_code, 302)
+        
+        # Comment should still exist
+        self.assertTrue(VorgabeComment.objects.filter(id=self.comment.id).exists())
+    
+    def test_delete_comment_requires_post(self):
+        """Test that only POST method is allowed"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        url = reverse('delete_vorgabe_comment', kwargs={'comment_id': self.comment.id})
+        response = self.client.get(url)
+        
+        # Should return method not allowed
+        self.assertEqual(response.status_code, 405)
+    
+    def test_user_can_delete_own_comment(self):
+        """Test that users can delete their own comments"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        url = reverse('delete_vorgabe_comment', kwargs={'comment_id': self.comment.id})
+        response = self.client.post(url)
+        
+        self.assertEqual(response.status_code, 200)
+        
+        import json
+        data = json.loads(response.content)
+        
+        self.assertTrue(data['success'])
+        
+        # Comment should be deleted
+        self.assertFalse(VorgabeComment.objects.filter(id=self.comment.id).exists())
+    
+    def test_user_cannot_delete_other_users_comment(self):
+        """Test that users cannot delete other users' comments"""
+        self.client.login(username='otheruser', password='testpass123')
+        
+        url = reverse('delete_vorgabe_comment', kwargs={'comment_id': self.comment.id})
+        response = self.client.post(url)
+        
+        self.assertEqual(response.status_code, 403)
+        
+        import json
+        data = json.loads(response.content)
+        
+        self.assertIn('error', data)
+        self.assertIn('Berechtigung', data['error'])
+        
+        # Comment should still exist
+        self.assertTrue(VorgabeComment.objects.filter(id=self.comment.id).exists())
+    
+    def test_staff_can_delete_any_comment(self):
+        """Test that staff users can delete any comment"""
+        self.client.login(username='staffuser', password='testpass123')
+        
+        url = reverse('delete_vorgabe_comment', kwargs={'comment_id': self.comment.id})
+        response = self.client.post(url)
+        
+        self.assertEqual(response.status_code, 200)
+        
+        import json
+        data = json.loads(response.content)
+        
+        self.assertTrue(data['success'])
+        
+        # Comment should be deleted
+        self.assertFalse(VorgabeComment.objects.filter(id=self.comment.id).exists())
+    
+    def test_delete_nonexistent_comment_returns_404(self):
+        """Test that deleting non-existent comment returns 404"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        url = reverse('delete_vorgabe_comment', kwargs={'comment_id': 99999})
+        response = self.client.post(url)
+        
+        self.assertEqual(response.status_code, 404)
+    
+    def test_delete_comment_security_headers(self):
+        """Test that security headers are present in response"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        url = reverse('delete_vorgabe_comment', kwargs={'comment_id': self.comment.id})
+        response = self.client.post(url)
+        
+        self.assertIn('Content-Security-Policy', response)
+        self.assertIn('X-Content-Type-Options', response)
+        self.assertEqual(response['X-Content-Type-Options'], 'nosniff')

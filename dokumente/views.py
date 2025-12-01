@@ -2,8 +2,12 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 from django.core.serializers.json import DjangoJSONEncoder
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.html import escape, mark_safe
+from django.utils.safestring import SafeString
 import json
-from .models import Dokument, Vorgabe, VorgabeKurztext, VorgabeLangtext, Checklistenfrage
+from .models import Dokument, Vorgabe, VorgabeKurztext, VorgabeLangtext, Checklistenfrage, VorgabeComment
 from abschnitte.utils import render_textabschnitte
 
 from datetime import date
@@ -44,6 +48,15 @@ def standard_detail(request, nummer,check_date=""):
         for r in vorgabe.referenzen.all():
             referenz_items.append(r.Path())
         vorgabe.referenzpfade = referenz_items
+        
+        # Add comment count
+        if request.user.is_authenticated:
+            if request.user.is_staff:
+                vorgabe.comment_count = vorgabe.comments.count()
+            else:
+                vorgabe.comment_count = vorgabe.comments.filter(user=request.user).count()
+        else:
+            vorgabe.comment_count = 0
 
     return render(request, 'standards/standard_detail.html', {
         'standard': standard,
@@ -237,3 +250,119 @@ def standard_json(request, nummer):
 
     # Return JSON response
     return JsonResponse(doc_data, json_dumps_params={'indent': 2, 'ensure_ascii': False}, encoder=DjangoJSONEncoder)
+
+
+@login_required
+def get_vorgabe_comments(request, vorgabe_id):
+    """Get comments for a specific Vorgabe"""
+    vorgabe = get_object_or_404(Vorgabe, id=vorgabe_id)
+    
+    if request.user.is_staff:
+        # Staff can see all comments
+        comments = vorgabe.comments.all().select_related('user').order_by('created_at')
+    else:
+        # Regular users can only see their own comments
+        comments = vorgabe.comments.filter(user=request.user).select_related('user').order_by('created_at')
+    
+    comments_data = []
+    for comment in comments:
+        # Escape HTML but preserve line breaks
+        escaped_text = escape(comment.text).replace('\n', '<br>')
+        comments_data.append({
+            'id': comment.id,
+            'text': escaped_text,
+            'user': escape(comment.user.first_name+" "+comment.user.last_name),
+            'created_at': comment.created_at.strftime('%d.%m.%Y %H:%M'),
+            'updated_at': comment.updated_at.strftime('%d.%m.%Y %H:%M'),
+            'is_own': comment.user == request.user
+        })
+    
+    response = JsonResponse({'comments': comments_data})
+    response['Content-Security-Policy'] = "default-src 'self'"
+    response['X-Content-Type-Options'] = 'nosniff'
+    return response
+
+
+@require_POST
+@login_required
+def add_vorgabe_comment(request, vorgabe_id):
+    """Add a new comment to a Vorgabe"""
+    vorgabe = get_object_or_404(Vorgabe, id=vorgabe_id)
+    
+    try:
+        data = json.loads(request.body)
+        text = data.get('text', '').strip()
+        
+        # Validate input
+        if not text:
+            return JsonResponse({'error': 'Kommentar darf nicht leer sein'}, status=400)
+        
+        if len(text) > 2000:  # Reasonable length limit
+            return JsonResponse({'error': 'Kommentar ist zu lang (max 2000 Zeichen)'}, status=400)
+        
+        # Additional XSS prevention - check for dangerous patterns
+        dangerous_patterns = ['<script', 'javascript:', 'onload=', 'onerror=', 'onclick=', 'onmouseover=']
+        text_lower = text.lower()
+        for pattern in dangerous_patterns:
+            if pattern in text_lower:
+                return JsonResponse({'error': 'Kommentar enthält ungültige Zeichen'}, status=400)
+        
+        comment = VorgabeComment.objects.create(
+            vorgabe=vorgabe,
+            user=request.user,
+            text=text
+        )
+        
+        # Escape HTML but preserve line breaks
+        escaped_text = escape(comment.text).replace('\n', '<br>')
+        response = JsonResponse({
+            'success': True,
+            'comment': {
+                'id': comment.id,
+                'text': escaped_text,
+                'user': escape(comment.user.username),
+                'created_at': comment.created_at.strftime('%d.%m.%Y %H:%M'),
+                'updated_at': comment.updated_at.strftime('%d.%m.%Y %H:%M'),
+                'is_own': True
+            }
+        })
+        response['Content-Security-Policy'] = "default-src 'self'"
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response
+        
+    except json.JSONDecodeError:
+        response = JsonResponse({'error': 'Ungültige Daten'}, status=400)
+        response['Content-Security-Policy'] = "default-src 'self'"
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response
+    except Exception as e:
+        response = JsonResponse({'error': 'Serverfehler'}, status=500)
+        response['Content-Security-Policy'] = "default-src 'self'"
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response
+
+
+@require_POST
+@login_required
+def delete_vorgabe_comment(request, comment_id):
+    """Delete a comment (only own comments or staff can delete)"""
+    comment = get_object_or_404(VorgabeComment, id=comment_id)
+    
+    # Check if user can delete this comment
+    if comment.user != request.user and not request.user.is_staff:
+        response = JsonResponse({'error': 'Keine Berechtigung zum Löschen dieses Kommentars'}, status=403)
+        response['Content-Security-Policy'] = "default-src 'self'"
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response
+    
+    try:
+        comment.delete()
+        response = JsonResponse({'success': True})
+        response['Content-Security-Policy'] = "default-src 'self'"
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response
+    except Exception as e:
+        response = JsonResponse({'error': 'Serverfehler'}, status=500)
+        response['Content-Security-Policy'] = "default-src 'self'"
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response

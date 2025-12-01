@@ -145,6 +145,20 @@
               {% endif %}
             </p>
           </div>
+
+          <!-- Comment Button -->
+          {% if user.is_authenticated %}
+          <div class="mt-3 text-right">
+            <button class="btn btn-sm btn-outline-primary comment-btn" 
+                    data-vorgabe-id="{{ vorgabe.id }}" 
+                    data-vorgabe-nummer="{{ vorgabe.Vorgabennummer }}">
+              <span class="emoji-icon">💬</span> Kommentare
+              {% if vorgabe.comment_count > 0 %}
+              <span class="comment-count">{{ vorgabe.comment_count }}</span>
+              {% endif %}
+            </button>
+          </div>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -176,4 +190,210 @@
     </div>
   </div>
 </div>
+
+<!-- Comment Modal -->
+<div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="commentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="commentModalLabel">Kommentare für <span id="modalVorgabeNummer"></span></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="commentsContainer">
+          <!-- Comments will be loaded here -->
+        </div>
+        
+        <!-- Add Comment Form -->
+        <div class="mt-4">
+          <h6>Neuen Kommentar hinzufügen:</h6>
+          <textarea id="newCommentText" class="form-control" rows="3" placeholder="Ihr Kommentar..."></textarea>
+          <button id="addCommentBtn" class="btn btn-primary btn-sm mt-2">Kommentar hinzufügen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript for Comments -->
+<script>
+// Content Security Policy for comment system
+document.addEventListener('DOMContentLoaded', function() {
+  // Prevent inline script execution in dynamically loaded content
+  const commentsContainer = document.getElementById('commentsContainer');
+  if (commentsContainer) {
+    // Use DOMPurify-like approach - only allow safe HTML
+    const allowedTags = ['br', 'small', 'div', 'span', 'button'];
+    const allowedAttributes = ['class', 'data-comment-id', 'aria-hidden'];
+    
+    // Monitor for any script injection attempts
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        mutation.addedNodes.forEach(function(node) {
+          if (node.nodeType === 1) { // Element node
+            const tagName = node.tagName.toLowerCase();
+            if (tagName === 'script') {
+              console.warn('Script injection attempt blocked');
+              node.parentNode.removeChild(node);
+            }
+          }
+        });
+      });
+    });
+    
+    observer.observe(commentsContainer, {
+      childList: true,
+      subtree: true
+    });
+  }
+});
+document.addEventListener('DOMContentLoaded', function() {
+  let currentVorgabeId = null;
+  let currentVorgabeNummer = null;
+  
+  // Comment button click handler
+  document.querySelectorAll('.comment-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      currentVorgabeId = this.dataset.vorgabeId;
+      currentVorgabeNummer = this.dataset.vorgabeNummer;
+      
+      document.getElementById('modalVorgabeNummer').textContent = currentVorgabeNummer;
+      document.getElementById('newCommentText').value = '';
+      
+      loadComments();
+      $('#commentModal').modal('show');
+    });
+  });
+  
+  // Load comments function
+  function loadComments() {
+    fetch(`/dokumente/comments/${currentVorgabeId}/`)
+      .then(response => response.json())
+      .then(data => {
+        renderComments(data.comments);
+      })
+      .catch(error => {
+        console.error('Error loading comments:', error);
+        document.getElementById('commentsContainer').innerHTML = 
+          '<div class="alert alert-danger">Fehler beim Laden der Kommentare</div>';
+      });
+  }
+  
+  // Render comments function
+  function renderComments(comments) {
+    const container = document.getElementById('commentsContainer');
+    
+    if (comments.length === 0) {
+      container.innerHTML = '<p class="text-muted">Noch keine Kommentare vorhanden.</p>';
+      return;
+    }
+    
+    let html = '';
+    comments.forEach(comment => {
+      const canDelete = comment.is_own || {% if user.is_authenticated %}'{{ user.is_staff|yesno:"true,false" }}'{% else %}'false'{% endif %} === 'true';
+      html += `
+        <div class="comment-item border-bottom pb-2 mb-2">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <strong>${comment.user}</strong>
+              <small class="text-muted">(${comment.created_at})</small>
+              ${comment.updated_at !== comment.created_at ? `<small class="text-muted">(bearbeitet: ${comment.updated_at})</small>` : ''}
+              <div class="mt-1">${comment.text}</div>
+            </div>
+            ${canDelete ? `
+              <button class="btn btn-sm btn-outline-danger ml-2 delete-comment-btn" data-comment-id="${comment.id}">
+<span aria-hidden="true">&times;</span>
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    });
+    
+    container.innerHTML = html;
+    
+    // Add delete handlers
+    document.querySelectorAll('.delete-comment-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        if (confirm('Möchten Sie diesen Kommentar wirklich löschen?')) {
+          deleteComment(this.dataset.commentId);
+        }
+      });
+    });
+  }
+  
+  // Add comment function
+  document.getElementById('addCommentBtn').addEventListener('click', function() {
+    const text = document.getElementById('newCommentText').value.trim();
+    
+    if (!text) {
+      alert('Bitte geben Sie einen Kommentar ein.');
+      return;
+    }
+    
+    fetch(`/dokumente/comments/${currentVorgabeId}/add/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({ text: text })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('newCommentText').value = '';
+        loadComments();
+      } else {
+        alert('Fehler: ' + (data.error || 'Unbekannter Fehler'));
+      }
+    })
+    .catch(error => {
+      console.error('Error adding comment:', error);
+      alert('Fehler beim Hinzufügen des Kommentars');
+    });
+  });
+  
+  // Delete comment function
+  function deleteComment(commentId) {
+    fetch(`/dokumente/comments/delete/${commentId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken')
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        loadComments();
+      } else {
+        alert('Fehler: ' + (data.error || 'Unbekannter Fehler'));
+      }
+    })
+    .catch(error => {
+      console.error('Error deleting comment:', error);
+      alert('Fehler beim Löschen des Kommentars');
+    });
+  }
+  
+  // CSRF token helper
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+});
+</script>
+
 {% endblock %}

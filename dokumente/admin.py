@@ -293,6 +293,6 @@ class VorgabeAdmin(NestedModelAdmin):
 
 admin.site.register(Checklistenfrage)
 admin.site.register(Dokumententyp)
-#admin.site.register(Person)
+admin.site.register(VorgabeComment)
 
 #admin.site.register(Changelog)

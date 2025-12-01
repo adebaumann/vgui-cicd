@@ -87,7 +87,7 @@ Die abschnitte App enthält 33 Tests, die Modelle, Utility-Funktionen, Diagram-C
 
 ## dokumente App Tests
 
-Die dokumente App enthält 98 Tests und ist damit die umfassendste Test-Suite, die alle Modelle, Views, URLs und Geschäftslogik abdeckt.
+Die dokumente App enthält 121 Tests und ist damit die umfassendste Test-Suite, die alle Modelle, Views, URLs, Geschäftslogik und Kommentarfunktionalität mit XSS-Schutz abdeckt.
 
 ### Modell-Tests
 
@@ -130,6 +130,14 @@ Die dokumente App enthält 98 Tests und ist damit die umfassendste Test-Suite, d
 - **test_checklistenfrage_creation**: Testet die Erstellung von Checklistenfrage mit Frage und optionaler Antwort
 - **test_checklistenfrage_str**: Überprüft, dass die String-Repräsentation lange Fragen kürzt
 - **test_checklistenfrage_related_name**: Testet die umgekehrte Beziehung von Vorgabe
+
+#### VorgabeCommentModelTest
+- **test_comment_creation**: Testet die Erstellung von VorgabeComment mit Vorgabe, Benutzer und Text
+- **test_comment_str**: Überprüft, dass die String-Repräsentation Benutzername und Vorgabennummer enthält
+- **test_comment_related_name**: Testet die umgekehrte Beziehung von Vorgabe
+- **test_comment_ordering**: Testet, dass Kommentare nach created_at absteigend sortiert sind (neueste zuerst)
+- **test_comment_timestamps_auto_update**: Testet, dass sich updated_at ändert, wenn ein Kommentar geändert wird
+- **test_multiple_users_can_comment**: Testet, dass mehrere Benutzer zur selben Vorgabe kommentieren können
 
 ### Text-Abschnitt-Tests
 
@@ -216,6 +224,40 @@ Die dokumente App enthält 98 Tests und ist damit die umfassendste Test-Suite, d
 - **test_summary_section**: Testet, dass die Zusammenfassungssektion korrekte Zähler anzeigt
 - **test_vorgabe_links**: Testet, dass Vorgaben zu korrekten Admin-Seiten verlinken
 - **test_back_link**: Testet, dass der Zurück-Link zur Standardübersicht existiert
+
+### Kommentar-Funktionalität Tests
+
+#### GetVorgabeCommentsViewTest
+- **test_get_comments_requires_login**: Testet, dass anonyme Benutzer keine Kommentare sehen können und weitergeleitet werden
+- **test_regular_user_sees_only_own_comments**: Testet, dass normale Benutzer nur ihre eigenen Kommentare sehen
+- **test_staff_user_sees_all_comments**: Testet, dass Staff-Benutzer alle Kommentare sehen können
+- **test_get_comments_returns_404_for_nonexistent_vorgabe**: Testet 404-Antwort für nicht existierende Vorgabe
+- **test_comments_are_html_escaped**: Testet HTML-Escaping zur Verhinderung von XSS-Angriffen (z.B. `<script>`-Tags)
+- **test_line_breaks_preserved**: Testet, dass Zeilenumbrüche in `<br>`-Tags umgewandelt werden
+- **test_security_headers_present**: Testet, dass Content-Security-Policy und X-Content-Type-Options Header gesetzt sind
+
+#### AddVorgabeCommentViewTest
+- **test_add_comment_requires_login**: Testet, dass anonyme Benutzer keine Kommentare hinzufügen können
+- **test_add_comment_requires_post**: Testet, dass nur POST-Methode erlaubt ist (405 für GET)
+- **test_add_comment_success**: Testet erfolgreiche Kommentarerstellung mit gültigen Daten
+- **test_add_empty_comment_fails**: Testet, dass leere Kommentare mit 400-Fehler abgelehnt werden
+- **test_add_whitespace_only_comment_fails**: Testet, dass Kommentare nur mit Leerzeichen abgelehnt werden
+- **test_add_too_long_comment_fails**: Testet, dass Kommentare über 2000 Zeichen abgelehnt werden
+- **test_add_comment_xss_script_tag_blocked**: Testet, dass Kommentare mit `<script>`-Tags blockiert werden
+- **test_add_comment_xss_javascript_protocol_blocked**: Testet, dass `javascript:`-Protokoll blockiert wird
+- **test_add_comment_xss_event_handlers_blocked**: Testet, dass Event-Handler (onload, onerror, onclick, onmouseover) blockiert werden
+- **test_add_comment_invalid_json_fails**: Testet, dass ungültige JSON-Payloads abgelehnt werden
+- **test_add_comment_nonexistent_vorgabe_fails**: Testet 404-Antwort für nicht existierende Vorgabe
+- **test_add_comment_security_headers**: Testet, dass Sicherheits-Header in Antworten vorhanden sind
+
+#### DeleteVorgabeCommentViewTest
+- **test_delete_comment_requires_login**: Testet, dass anonyme Benutzer keine Kommentare löschen können
+- **test_delete_comment_requires_post**: Testet, dass nur POST-Methode erlaubt ist (405 für GET)
+- **test_user_can_delete_own_comment**: Testet, dass Benutzer ihre eigenen Kommentare löschen können
+- **test_user_cannot_delete_other_users_comment**: Testet, dass Benutzer keine Kommentare anderer löschen können (403 Forbidden)
+- **test_staff_can_delete_any_comment**: Testet, dass Staff-Benutzer jeden Kommentar löschen können
+- **test_delete_nonexistent_comment_returns_404**: Testet 404-Antwort für nicht existierenden Kommentar
+- **test_delete_comment_security_headers**: Testet, dass Sicherheits-Header in Antworten vorhanden sind
 
 ---
 
@@ -333,9 +375,17 @@ Die stichworte App enthält 18 Tests, die Schlüsselwortmodelle und ihre Sortier
 
 ## Test-Statistiken
 
-- **Gesamt-Tests**: 207
+- **Gesamt-Tests**: 230
 - **abschnitte**: 33 Tests (einschließlich XSS-Prävention)
-- **dokumente**: 116 Tests (98 in tests.py + 9 in test_json.py + 9 JSON-Tests in Haupt-tests.py)
+- **dokumente**: 121 Tests (einschließlich Kommentarfunktionalität mit XSS-Schutz)
+  - Modell-Tests: 44 Tests
+  - View-Tests: 7 Tests
+  - URL-Pattern-Tests: 4 Tests
+  - Sanity-Check-Tests: 16 Tests
+  - Management-Befehl-Tests: 2 Tests
+  - JSON-Export-Tests: 9 Tests
+  - Unvollständige-Vorgaben-Tests: 15 Tests
+  - Kommentar-Tests: 24 Tests (6 Modell + 18 View-Tests)
 - **pages**: 4 Tests
 - **referenzen**: 18 Tests
 - **rollen**: 18 Tests
@@ -349,7 +399,17 @@ Die stichworte App enthält 18 Tests, die Schlüsselwortmodelle und ihre Sortier
 4. **Utility-Funktionen**: Textverarbeitung, Caching, Formatierung
 5. **Management-Befehle**: CLI-Schnittstelle und Ausgabeverarbeitung
 6. **Integration**: App-übergreifende Funktionalität und Datenfluss
-7. **Sicherheit**: XSS-Prävention durch HTML-Bereinigung beim Rendern von Inhalten
+7. **Sicherheit**: 
+   - XSS-Prävention durch HTML-Bereinigung beim Rendern von Inhalten
+   - XSS-Angriffsverhinderung im Kommentarsystem (Script-Tags, javascript:-Protokoll, Event-Handler)
+   - Eingabevalidierung und -bereinigung
+   - Autorisierungsprüfungen (Staff vs. normale Benutzer)
+   - Sicherheits-Header (Content-Security-Policy, X-Content-Type-Options)
+8. **Kommentar-Funktionalität**:
+   - CRUD-Operationen (Create, Read, Delete)
+   - Benutzerberechtigungen und -besitz
+   - HTML-Escaping und Erhalt von Zeilenumbrüchen
+   - Verhinderung mehrerer XSS-Angriffsvektoren
 
 ## Ausführen der Tests
 
