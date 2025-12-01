@@ -271,7 +271,7 @@ def get_vorgabe_comments(request, vorgabe_id):
         comments_data.append({
             'id': comment.id,
             'text': escaped_text,
-            'user': escape(comment.user.username),
+            'user': escape(comment.user.first_name+" "+comment.user.last_name),
             'created_at': comment.created_at.strftime('%d.%m.%Y %H:%M'),
             'updated_at': comment.updated_at.strftime('%d.%m.%Y %H:%M'),
             'is_own': comment.user == request.user
