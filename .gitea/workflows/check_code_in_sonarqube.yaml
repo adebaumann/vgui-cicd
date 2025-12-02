@@ -48,5 +48,5 @@ jobs:
         sonar-scanner \
           -Dsonar.projectKey=${{ github.event.repository.name }} \
           -Dsonar.sources=. \
-          -Dsonar.host.url=${SONARQUBE_HOST} \
-          -Dsonar.token=${SONARQUBE_TOKEN}
+          -Dsonar.host.url=${SONAR_HOST_URL} \
+          -Dsonar.token=${SONAR_TOKEN}
