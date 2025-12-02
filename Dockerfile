@@ -1,4 +1,4 @@
-FROM python:3.13-slim AS baustelle
+FROM python:3.14-slim AS baustelle
 RUN mkdir /app
 WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
