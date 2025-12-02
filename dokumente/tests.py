@@ -1620,19 +1620,25 @@ class GetVorgabeCommentsViewTest(TestCase):
         # Create users
         self.regular_user = User.objects.create_user(
             username='regularuser',
-            password='testpass123'
+            password='testpass123',
+            first_name='Regular',
+            last_name='User'
         )
         
         self.staff_user = User.objects.create_user(
             username='staffuser',
-            password='testpass123'
+            password='testpass123',
+            first_name='Staff',
+            last_name='User'
         )
         self.staff_user.is_staff = True
         self.staff_user.save()
         
         self.other_user = User.objects.create_user(
             username='otheruser',
-            password='testpass123'
+            password='testpass123',
+            first_name='Other',
+            last_name='User'
         )
         
         # Create test data
@@ -1697,7 +1703,7 @@ class GetVorgabeCommentsViewTest(TestCase):
         # Should only see their own comment
         self.assertEqual(len(data['comments']), 1)
         self.assertEqual(data['comments'][0]['text'], 'Kommentar von Regular User')
-        self.assertEqual(data['comments'][0]['user'], 'regularuser')
+        self.assertEqual(data['comments'][0]['user'], 'Regular User')
         self.assertTrue(data['comments'][0]['is_own'])
     
     def test_staff_user_sees_all_comments(self):
@@ -1715,8 +1721,8 @@ class GetVorgabeCommentsViewTest(TestCase):
         # Should see all comments
         self.assertEqual(len(data['comments']), 2)
         usernames = [c['user'] for c in data['comments']]
-        self.assertIn('regularuser', usernames)
-        self.assertIn('otheruser', usernames)
+        self.assertIn('Regular User', usernames)
+        self.assertIn('Other User', usernames)
     
     def test_get_comments_returns_404_for_nonexistent_vorgabe(self):
         """Test that requesting comments for non-existent Vorgabe returns 404"""
@@ -2041,12 +2047,16 @@ class DeleteVorgabeCommentViewTest(TestCase):
         
         self.other_user = User.objects.create_user(
             username='otheruser',
-            password='testpass123'
+            password='testpass123',
+            first_name='Other',
+            last_name='User'
         )
         
         self.staff_user = User.objects.create_user(
             username='staffuser',
-            password='testpass123'
+            password='testpass123',
+            first_name='Staff',
+            last_name='User'
         )
         self.staff_user.is_staff = True
         self.staff_user.save()
