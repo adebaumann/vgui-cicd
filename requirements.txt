@@ -33,3 +33,4 @@ sqlparse==0.5.3
 urllib3==2.5.0
 wcwidth==0.2.13
 bleach==6.1.0
+coverage==7.6.1
