@@ -14,8 +14,7 @@ RUN useradd -m -r appuser && \
 
 COPY --from=baustelle /usr/local/lib/python3.13/site-packages/ /usr/local/lib/python3.13/site-packages/
 COPY --from=baustelle /usr/local/bin/ /usr/local/bin/
-RUN rm /usr/bin/tar
-RUN rm /usr/lib/x86_64-linux-gnu/libncur*
+RUN rm /usr/bin/tar /usr/lib/x86_64-linux-gnu/libncur*
 WORKDIR /app
 COPY --chown=appuser:appuser . .
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -31,7 +30,7 @@ RUN rm -rf /app/Dockerfile* \
            /app/requirements.txt \
            /app/node_modules \
            /app/*.json \
-           /app/test_*.py
-RUN python3 manage.py collectstatic
+           /app/test_*.py && \
+    python3 manage.py collectstatic
 CMD ["gunicorn","--bind","0.0.0.0:8000","--workers","3","VorgabenUI.wsgi:application"]
 
