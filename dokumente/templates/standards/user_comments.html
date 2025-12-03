@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Meine Kommentare</h1>
+
+{% if total_comments == 0 %}
+  <div class="alert alert-info">
+    <p>Sie haben noch keine Kommentare zu Vorgaben hinterlassen.</p>
+    <p><a href="{% url 'standard_list' %}">Zu den Standards</a></p>
+  </div>
+{% else %}
+  <p class="text-muted">Insgesamt {{ total_comments }} Kommentar{{ total_comments|pluralize:"e" }}</p>
+
+  {% for dokument, comments in comments_by_document.items %}
+  <div class="panel panel-default" style="margin-top: 2rem;">
+    <div class="panel-heading">
+      <h2 style="margin: 0;">
+        <a href="{% url 'standard_detail' nummer=dokument.nummer %}">
+          {{ dokument.nummer }} – {{ dokument.name }}
+        </a>
+      </h2>
+      <p style="margin: 0; color: #666; font-size: 0.9rem;">
+        {{ comments|length }} Kommentar{{ comments|length|pluralize:"e" }}
+      </p>
+    </div>
+    <div class="panel-body">
+      <div class="list-group">
+        {% for comment in comments %}
+        <div class="list-group-item" style="border-left: 3px solid #007bff; padding: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="flex: 1;">
+              <h4 style="margin: 0 0 0.5rem 0;">
+                <a href="{% url 'standard_detail' nummer=comment.vorgabe.dokument.nummer %}#{{ comment.vorgabe.Vorgabennummer }}">
+                  {{ comment.vorgabe.Vorgabennummer }}
+                </a>
+              </h4>
+              <p style="margin: 0 0 0.75rem 0; color: #666; font-size: 0.9rem;">
+                <strong>Erstellt:</strong> {{ comment.created_at|date:"d.m.Y H:i" }}
+                {% if comment.updated_at != comment.created_at %}
+                  <br>
+                  <strong>Bearbeitet:</strong> {{ comment.updated_at|date:"d.m.Y H:i" }}
+                {% endif %}
+              </p>
+            </div>
+            <form method="POST" action="{% url 'delete_vorgabe_comment' comment.id %}" 
+                  style="display: inline; margin-left: 1rem;"
+                  onsubmit="return confirm('Sind Sie sicher, dass Sie diesen Kommentar löschen möchten?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-danger">Löschen</button>
+            </form>
+          </div>
+          <div style="background: #f8f9fa; padding: 0.75rem; border-radius: 4px; margin-top: 0.5rem; white-space: pre-wrap; word-wrap: break-word;">
+            {{ comment.text }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% endif %}
+
+<div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #ddd;">
+  <a href="{% url 'standard_list' %}" class="btn btn-default">Zu den Standards</a>
+</div>
+{% endblock %}
