@@ -2182,3 +2182,164 @@ class DeleteVorgabeCommentViewTest(TestCase):
         self.assertIn('Content-Security-Policy', response)
         self.assertIn('X-Content-Type-Options', response)
         self.assertEqual(response['X-Content-Type-Options'], 'nosniff')
+
+
+class UserCommentsViewTest(TestCase):
+    """Test the user comments view that displays all comments grouped by document"""
+    
+    def setUp(self):
+        """Set up test data"""
+        # Create users
+        self.user1 = User.objects.create_user(username='user1', password='pass123')
+        self.user2 = User.objects.create_user(username='user2', password='pass123')
+        
+        # Create documents
+        self.doc_type = Dokumententyp.objects.create(name='Test Type', verantwortliche_ve='test')
+        self.doc1 = Dokument.objects.create(nummer='DOC-001', name='Document 1', dokumententyp=self.doc_type, aktiv=True)
+        self.doc2 = Dokument.objects.create(nummer='DOC-002', name='Document 2', dokumententyp=self.doc_type, aktiv=True)
+        
+        # Create themes
+        self.theme1 = Thema.objects.create(name='Theme 1')
+        self.theme2 = Thema.objects.create(name='Theme 2')
+        
+        # Create vorgaben
+        from datetime import date
+        self.vorgabe1 = Vorgabe.objects.create(
+            nummer=1,
+            order=1,
+            dokument=self.doc1,
+            thema=self.theme1,
+            titel='Vorgabe 1',
+            gueltigkeit_von=date.today()
+        )
+        self.vorgabe2 = Vorgabe.objects.create(
+            nummer=2,
+            order=2,
+            dokument=self.doc1,
+            thema=self.theme1,
+            titel='Vorgabe 2',
+            gueltigkeit_von=date.today()
+        )
+        self.vorgabe3 = Vorgabe.objects.create(
+            nummer=1,
+            order=1,
+            dokument=self.doc2,
+            thema=self.theme2,
+            titel='Vorgabe 3',
+            gueltigkeit_von=date.today()
+        )
+        
+        # Create comments for user1
+        self.comment1 = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe1,
+            user=self.user1,
+            text='User1 comment on vorgabe1'
+        )
+        self.comment2 = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe2,
+            user=self.user1,
+            text='User1 comment on vorgabe2'
+        )
+        self.comment3 = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe3,
+            user=self.user1,
+            text='User1 comment on vorgabe3'
+        )
+        
+        # Create comment for user2
+        self.comment4 = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe1,
+            user=self.user2,
+            text='User2 comment on vorgabe1'
+        )
+    
+    def test_user_comments_requires_login(self):
+        """Test that user comments view requires authentication"""
+        response = self.client.get(reverse('user_comments'))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response.url)
+    
+    def test_user_comments_shows_only_own_comments(self):
+        """Test that user only sees their own comments"""
+        self.client.login(username='user1', password='pass123')
+        response = self.client.get(reverse('user_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'User1 comment on vorgabe1')
+        self.assertContains(response, 'User1 comment on vorgabe2')
+        self.assertContains(response, 'User1 comment on vorgabe3')
+        self.assertNotContains(response, 'User2 comment on vorgabe1')
+    
+    def test_user_comments_grouped_by_document(self):
+        """Test that comments are properly grouped by document"""
+        self.client.login(username='user1', password='pass123')
+        response = self.client.get(reverse('user_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        # Check that document titles appear
+        self.assertContains(response, 'DOC-001 – Document 1')
+        self.assertContains(response, 'DOC-002 – Document 2')
+        
+        # Check context
+        self.assertIn('comments_by_document', response.context)
+        self.assertEqual(len(response.context['comments_by_document']), 2)
+    
+    def test_user_comments_count_display(self):
+        """Test that total comment count is displayed"""
+        self.client.login(username='user1', password='pass123')
+        response = self.client.get(reverse('user_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['total_comments'], 3)
+        self.assertContains(response, '3 Kommentare')
+    
+    def test_user_comments_empty_view(self):
+        """Test the view when user has no comments"""
+        # Create a new user with no comments
+        user3 = User.objects.create_user(username='user3', password='pass123')
+        self.client.login(username='user3', password='pass123')
+        response = self.client.get(reverse('user_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['total_comments'], 0)
+        self.assertContains(response, 'Sie haben noch keine Kommentare')
+    
+    def test_user_comments_comment_text_preserved(self):
+        """Test that comment text is correctly displayed"""
+        self.client.login(username='user1', password='pass123')
+        response = self.client.get(reverse('user_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        # Check that comment text appears in response
+        self.assertContains(response, 'User1 comment on vorgabe1')
+    
+    def test_user_comments_vorgabe_number_link(self):
+        """Test that vorgabe numbers are linked correctly"""
+        self.client.login(username='user1', password='pass123')
+        response = self.client.get(reverse('user_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        # Check that vorgabe numbers appear (format is DOC-001.T.1)
+        self.assertContains(response, 'DOC-001.T.1')
+        self.assertContains(response, 'DOC-001.T.2')
+        self.assertContains(response, 'DOC-002.T.1')
+    
+    def test_user_comments_ordered_by_creation_date(self):
+        """Test that comments are ordered by creation date (newest first)"""
+        self.client.login(username='user1', password='pass123')
+        response = self.client.get(reverse('user_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        # The queryset orders by vorgabe document, then by -created_at
+        # Check that all three comments are in the response
+        self.assertContains(response, 'User1 comment on vorgabe1')
+        self.assertContains(response, 'User1 comment on vorgabe2')
+        self.assertContains(response, 'User1 comment on vorgabe3')
+    
+    def test_user_comments_template_used(self):
+        """Test that correct template is used"""
+        self.client.login(username='user1', password='pass123')
+        response = self.client.get(reverse('user_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'standards/user_comments.html')

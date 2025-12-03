@@ -366,3 +366,29 @@ def delete_vorgabe_comment(request, comment_id):
         response['Content-Security-Policy'] = "default-src 'self'"
         response['X-Content-Type-Options'] = 'nosniff'
         return response
+
+
+@login_required
+def user_comments(request):
+    """
+    Display all comments made by the logged-in user, grouped by document.
+    """
+    # Get all comments by the current user
+    user_comments = VorgabeComment.objects.filter(
+        user=request.user
+    ).select_related('vorgabe', 'vorgabe__dokument').order_by(
+        'vorgabe__dokument__nummer', '-created_at'
+    )
+    
+    # Group comments by document
+    comments_by_document = {}
+    for comment in user_comments:
+        dokument = comment.vorgabe.dokument
+        if dokument not in comments_by_document:
+            comments_by_document[dokument] = []
+        comments_by_document[dokument].append(comment)
+    
+    return render(request, 'standards/user_comments.html', {
+        'comments_by_document': comments_by_document,
+        'total_comments': user_comments.count(),
+    })
