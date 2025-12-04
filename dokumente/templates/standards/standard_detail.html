@@ -19,6 +19,25 @@
     <strong>Historische Version vom {{ standard.check_date }}</strong>
   </div>
   {% endif %}
+
+  <!-- History Dates Dropdown -->
+  {% if standard.dates %}
+  <div class="mb-3">
+    <div class="dropdown">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="text-decoration: none;">
+        📅 Historische Versionen
+      </a>
+      <ul class="dropdown-menu" role="menu">
+        <li><a href="/dokumente/{{ standard.nummer }}/">Aktuelle Version</a></li>
+        <li class="divider"></li>
+        {% for date in standard.dates %}
+        <li><a href="/dokumente/{{ standard.nummer }}/history/{{ date|date:'Y-m-d' }}/">{{ date|date:'d.m.Y' }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Einleitung -->
   {% if standard.einleitung_html %}
   <div class="row mb-4">
