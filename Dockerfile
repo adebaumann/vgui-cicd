@@ -21,7 +21,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 USER appuser
 EXPOSE 8000
-RUN rm -rf /app/Dockerfile* \
+RUN rm -rvf /app/Dockerfile* \
            /app/README.md \
            /app/argocd \
            /app/k8s \
@@ -31,6 +31,6 @@ RUN rm -rf /app/Dockerfile* \
            /app/node_modules \
            /app/*.json \
            /app/test_*.py && \
-    python3 manage.py collectstatic
+       python3 /app/manage.py collectstatic --noinput
 CMD ["gunicorn","--bind","0.0.0.0:8000","--workers","3","VorgabenUI.wsgi:application"]
 

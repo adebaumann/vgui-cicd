@@ -24,8 +24,8 @@ spec:
             - name: data
               mountPath: /data
       containers:
-        - name: web
-          image: docker.io/adebaumann/vui:0.917
+         - name: web
+           image: docker.io/adebaumann/vui:0.918
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

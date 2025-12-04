@@ -5,6 +5,7 @@ urlpatterns = [
     path('', views.standard_list, name='standard_list'),
     path('unvollstaendig/', views.incomplete_vorgaben, name='incomplete_vorgaben'),
     path('meine-kommentare/', views.user_comments, name='user_comments'),
+    path('alle-kommentare/', views.all_comments, name='all_comments'),
     path('<str:nummer>/', views.standard_detail, name='standard_detail'),
     path('<str:nummer>/history/<str:check_date>/', views.standard_detail),
     path('<str:nummer>/history/', views.standard_detail, {"check_date":"today"}, name='standard_history'),

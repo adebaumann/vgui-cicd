@@ -392,3 +392,31 @@ def user_comments(request):
         'comments_by_document': comments_by_document,
         'total_comments': user_comments.count(),
     })
+
+
+@login_required
+@user_passes_test(is_staff_user)
+def all_comments(request):
+    """
+    Display all comments from all users, grouped by document.
+    Staff only.
+    """
+    # Get all comments
+    all_comments_qs = VorgabeComment.objects.select_related(
+        'vorgabe', 'vorgabe__dokument', 'user'
+    ).order_by(
+        'vorgabe__dokument__nummer', '-created_at'
+    )
+    
+    # Group comments by document
+    comments_by_document = {}
+    for comment in all_comments_qs:
+        dokument = comment.vorgabe.dokument
+        if dokument not in comments_by_document:
+            comments_by_document[dokument] = []
+        comments_by_document[dokument].append(comment)
+    
+    return render(request, 'standards/all_comments.html', {
+        'comments_by_document': comments_by_document,
+        'total_comments': all_comments_qs.count(),
+    })
