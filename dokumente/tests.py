@@ -2343,3 +2343,222 @@ class UserCommentsViewTest(TestCase):
         
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'standards/user_comments.html')
+
+
+class AllCommentsViewTest(TestCase):
+    """Test the all comments view that displays all comments from all users (staff only)"""
+    
+    def setUp(self):
+        """Set up test data"""
+        # Create users
+        self.user1 = User.objects.create_user(username='user1', password='pass123', first_name='Max', last_name='Mustermann')
+        self.user2 = User.objects.create_user(username='user2', password='pass123', first_name='Anna', last_name='Mueller')
+        self.staff_user = User.objects.create_user(username='staff', password='pass123', is_staff=True, first_name='Admin', last_name='User')
+        
+        # Create documents
+        self.doc_type = Dokumententyp.objects.create(name='Test Type', verantwortliche_ve='test')
+        self.doc1 = Dokument.objects.create(nummer='DOC-001', name='Document 1', dokumententyp=self.doc_type, aktiv=True)
+        self.doc2 = Dokument.objects.create(nummer='DOC-002', name='Document 2', dokumententyp=self.doc_type, aktiv=True)
+        
+        # Create themes
+        self.theme1 = Thema.objects.create(name='Theme 1')
+        self.theme2 = Thema.objects.create(name='Theme 2')
+        
+        # Create vorgaben
+        self.vorgabe1 = Vorgabe.objects.create(
+            nummer=1,
+            order=1,
+            dokument=self.doc1,
+            thema=self.theme1,
+            titel='Vorgabe 1',
+            gueltigkeit_von=date.today()
+        )
+        self.vorgabe2 = Vorgabe.objects.create(
+            nummer=2,
+            order=2,
+            dokument=self.doc1,
+            thema=self.theme1,
+            titel='Vorgabe 2',
+            gueltigkeit_von=date.today()
+        )
+        self.vorgabe3 = Vorgabe.objects.create(
+            nummer=1,
+            order=1,
+            dokument=self.doc2,
+            thema=self.theme2,
+            titel='Vorgabe 3',
+            gueltigkeit_von=date.today()
+        )
+        
+        # Create comments from different users
+        self.comment1 = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe1,
+            user=self.user1,
+            text='User1 comment on vorgabe1'
+        )
+        self.comment2 = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe2,
+            user=self.user1,
+            text='User1 comment on vorgabe2'
+        )
+        self.comment3 = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe3,
+            user=self.user2,
+            text='User2 comment on vorgabe3'
+        )
+        self.comment4 = VorgabeComment.objects.create(
+            vorgabe=self.vorgabe1,
+            user=self.user2,
+            text='User2 comment on vorgabe1'
+        )
+    
+    def test_all_comments_requires_login(self):
+        """Test that all comments view requires authentication"""
+        response = self.client.get(reverse('all_comments'))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response.url)
+    
+    def test_all_comments_staff_only(self):
+        """Test that non-staff users cannot access all comments view"""
+        self.client.login(username='user1', password='pass123')
+        response = self.client.get(reverse('all_comments'))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response.url)
+    
+    def test_all_comments_staff_can_access(self):
+        """Test that staff users can access all comments view"""
+        self.client.login(username='staff', password='pass123')
+        response = self.client.get(reverse('all_comments'))
+        self.assertEqual(response.status_code, 200)
+    
+    def test_all_comments_shows_all_comments(self):
+        """Test that staff sees all comments from all users"""
+        self.client.login(username='staff', password='pass123')
+        response = self.client.get(reverse('all_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'User1 comment on vorgabe1')
+        self.assertContains(response, 'User1 comment on vorgabe2')
+        self.assertContains(response, 'User2 comment on vorgabe3')
+        self.assertContains(response, 'User2 comment on vorgabe1')
+    
+    def test_all_comments_shows_usernames(self):
+        """Test that all comments display the username of the author"""
+        self.client.login(username='staff', password='pass123')
+        response = self.client.get(reverse('all_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        # Check that user names appear in the response
+        self.assertContains(response, 'Max Mustermann')
+        self.assertContains(response, 'Anna Mueller')
+    
+    def test_all_comments_grouped_by_document(self):
+        """Test that comments are properly grouped by document"""
+        self.client.login(username='staff', password='pass123')
+        response = self.client.get(reverse('all_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        # Check that document titles appear
+        self.assertContains(response, 'DOC-001 – Document 1')
+        self.assertContains(response, 'DOC-002 – Document 2')
+        
+        # Check context
+        self.assertIn('comments_by_document', response.context)
+        self.assertEqual(len(response.context['comments_by_document']), 2)
+    
+    def test_all_comments_count_display(self):
+        """Test that total comment count is displayed"""
+        self.client.login(username='staff', password='pass123')
+        response = self.client.get(reverse('all_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['total_comments'], 4)
+        self.assertContains(response, '4 Kommentare')
+    
+    def test_all_comments_empty_view(self):
+        """Test the view when there are no comments"""
+        # Delete all comments
+        VorgabeComment.objects.all().delete()
+        
+        self.client.login(username='staff', password='pass123')
+        response = self.client.get(reverse('all_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['total_comments'], 0)
+        self.assertContains(response, 'Es gibt noch keine Kommentare')
+    
+    def test_all_comments_template_used(self):
+        """Test that correct template is used"""
+        self.client.login(username='staff', password='pass123')
+        response = self.client.get(reverse('all_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'standards/all_comments.html')
+    
+    def test_all_comments_has_delete_buttons(self):
+        """Test that delete buttons are present for each comment"""
+        self.client.login(username='staff', password='pass123')
+        response = self.client.get(reverse('all_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        # Check for delete button form elements - look for the delete form action URLs
+        self.assertContains(response, '/dokumente/comments/delete/', count=4)
+        # Also check for the delete button text
+        self.assertContains(response, 'Löschen', count=4)
+    
+    def test_all_comments_vorgabe_number_link(self):
+        """Test that vorgabe numbers are linked correctly"""
+        self.client.login(username='staff', password='pass123')
+        response = self.client.get(reverse('all_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        # Check that vorgabe numbers appear
+        self.assertContains(response, 'DOC-001.T.1')
+        self.assertContains(response, 'DOC-001.T.2')
+        self.assertContains(response, 'DOC-002.T.1')
+    
+    def test_all_comments_ordered_by_document_and_date(self):
+        """Test that comments are ordered by document then by creation date"""
+        self.client.login(username='staff', password='pass123')
+        response = self.client.get(reverse('all_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        # Check context has properly grouped comments
+        comments_by_doc = response.context['comments_by_document']
+        
+        # Verify all documents are present
+        doc_numbers = [doc.nummer for doc in comments_by_doc.keys()]
+        self.assertIn('DOC-001', doc_numbers)
+        self.assertIn('DOC-002', doc_numbers)
+    
+    def test_all_comments_displays_timestamps(self):
+        """Test that comment timestamps are displayed"""
+        self.client.login(username='staff', password='pass123')
+        response = self.client.get(reverse('all_comments'))
+        
+        self.assertEqual(response.status_code, 200)
+        # Check that timestamp patterns appear (date formatting)
+        self.assertContains(response, 'Erstellt:')
+    
+    def test_all_comments_regular_user_redirect(self):
+        """Test that regular users are redirected to login"""
+        # Create and login as regular user
+        regular_user = User.objects.create_user(username='regular', password='pass123')
+        self.client.login(username='regular', password='pass123')
+        
+        response = self.client.get(reverse('all_comments'))
+        # Should redirect to login since user is not staff
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response.url)
+    
+    def test_all_comments_no_own_comments_filter(self):
+        """Test that staff sees comments from ALL users, not just their own"""
+        self.client.login(username='staff', password='pass123')
+        response = self.client.get(reverse('all_comments'))
+        
+        # Verify all comments are visible, not filtered by user
+        self.assertContains(response, 'User1 comment on vorgabe1')
+        self.assertContains(response, 'User2 comment on vorgabe1')
+        # Both users' comments on the same vorgabe should be visible
+        self.assertEqual(response.context['total_comments'], 4)
+
