@@ -61,8 +61,8 @@ class Dokument(models.Model):
         state-change dates from all Vorgaben in this document.
         
         These are dates where Vorgaben become active (gueltigkeit_von) or change state
-        (the day after gueltigkeit_bis). Only includes the day after gueltigkeit_bis 
-        for Vorgaben that have a defined end date (not infinite validity).
+        (the day after gueltigkeit_bis). The very last date in the list is excluded
+        as it has no relevance (nothing changes after it).
         """
         dates_set = set()
         
@@ -77,8 +77,10 @@ class Dokument(models.Model):
             if vorgabe.gueltigkeit_bis:
                 dates_set.add(vorgabe.gueltigkeit_bis + datetime.timedelta(days=1))
         
-        # Return sorted unique dates from oldest to newest
-        return sorted(list(dates_set))
+        # Return sorted unique dates from oldest to newest, excluding the last date
+        # (but only if there are multiple dates; single dates are kept)
+        sorted_dates = sorted(list(dates_set))
+        return sorted_dates[:-1] if len(sorted_dates) > 1 else sorted_dates
 
     class Meta:
         verbose_name_plural="Dokumente"

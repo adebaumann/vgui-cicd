@@ -1842,10 +1842,9 @@ class DokumentDatesPropertyTest(TestCase):
         )
         
         dates = self.dokument.dates
-        self.assertEqual(len(dates), 2)
+        # gueltigkeit_bis would add 2026-01-02, but that's the last date so it's excluded
+        self.assertEqual(len(dates), 1)
         self.assertEqual(dates[0], date(2025, 1, 1))
-        # gueltigkeit_bis is 2026-01-01, so state change happens on 2026-01-02
-        self.assertEqual(dates[1], date(2026, 1, 2))
     
     def test_dates_property_multiple_vorgaben_different_dates(self):
         """Test dates property with multiple vorgaben with different dates"""
@@ -1870,11 +1869,10 @@ class DokumentDatesPropertyTest(TestCase):
         )
         
         dates = self.dokument.dates
-        # 3 unique dates: 2025-01-01, 2025-07-01 (deduplicated: end of v1+1 == start of v2), 2026-01-02
-        self.assertEqual(len(dates), 3)
+        # Dates: 2025-01-01, 2025-07-01, 2026-01-02 (but last one excluded)
+        self.assertEqual(len(dates), 2)
         self.assertIn(date(2025, 1, 1), dates)  # Start of vorgabe1
         self.assertIn(date(2025, 7, 1), dates)  # End of vorgabe1 + 1 day = Start of vorgabe2 (deduplicated)
-        self.assertIn(date(2026, 1, 2), dates)  # End of vorgabe2 + 1 day
     
     def test_dates_property_ensures_uniqueness(self):
         """Test dates property returns unique dates only"""
@@ -1900,10 +1898,9 @@ class DokumentDatesPropertyTest(TestCase):
         )
         
         dates = self.dokument.dates
-        # Should have only 2 unique dates, not 4
-        self.assertEqual(len(dates), 2)
+        # Both vorgaben have same dates, and the last date (2026-01-02) is excluded
+        self.assertEqual(len(dates), 1)
         self.assertEqual(dates[0], date(2025, 1, 1))
-        self.assertEqual(dates[1], date(2026, 1, 2))  # gueltigkeit_bis + 1 day
     
     def test_dates_property_sorted_chronologically(self):
         """Test dates property returns dates sorted from oldest to newest"""
@@ -1936,10 +1933,10 @@ class DokumentDatesPropertyTest(TestCase):
         )
         
         dates = self.dokument.dates
-        # Should be sorted from oldest to newest
+        # Dates are [2024-01-01, 2025-01-01, 2026-01-01] but the last one is excluded
+        self.assertEqual(len(dates), 2)
         self.assertEqual(dates[0], date(2024, 1, 1))
         self.assertEqual(dates[1], date(2025, 1, 1))
-        self.assertEqual(dates[2], date(2026, 1, 1))
     
     def test_dates_property_ignores_none_dates(self):
         """Test dates property ignores None date values"""
@@ -1964,10 +1961,9 @@ class DokumentDatesPropertyTest(TestCase):
         )
         
         dates = self.dokument.dates
-        # Should only include gueltigkeit_von dates (gueltigkeit_bis is None for vorgabe2)
-        self.assertEqual(len(dates), 2)
-        self.assertIn(date(2025, 1, 1), dates)
-        self.assertIn(date(2026, 1, 1), dates)
+        # Dates are 2025-01-01 and 2026-01-01, but the last date (2026-01-01) is excluded
+        self.assertEqual(len(dates), 1)
+        self.assertEqual(dates[0], date(2025, 1, 1))
     
     def test_dates_property_complex_scenario(self):
         """Test dates property with complex real-world scenario
@@ -2010,12 +2006,13 @@ class DokumentDatesPropertyTest(TestCase):
         )
         
         dates = self.dokument.dates
+        # All dates: 2025-01-01, 2025-06-01, 2026-01-01, 2026-01-02, 2026-02-01
+        # Last date (2026-02-01) is excluded
         expected = [
             date(2025, 1, 1),   # Start of A
             date(2025, 6, 1),   # Start of B
             date(2026, 1, 1),   # End of A + 1 day
-            date(2026, 1, 2),   # End of B + 1 day
-            date(2026, 2, 1)    # Start of C
+            date(2026, 1, 2)    # End of B + 1 day
         ]
         
         self.assertEqual(dates, expected)
@@ -2048,22 +2045,24 @@ class DokumentDatesPropertyTest(TestCase):
         
         # Get dates before adding new vorgabe
         dates_before = self.dokument.dates
-        self.assertEqual(len(dates_before), 2)  # gueltigkeit_von and gueltigkeit_bis+1
+        self.assertEqual(len(dates_before), 1)  # 2025-01-01 (2026-01-02 is last, so excluded)
         
-        # Add new vorgabe (should add a unique date)
+        # Add new vorgabe
         vorgabe2 = Vorgabe.objects.create(
             order=2,
             nummer=2,
             dokument=self.dokument,
             thema=self.thema,
             titel="Test Vorgabe 2",
-            gueltigkeit_von=date(2026, 2, 1)  # Different from existing dates
+            gueltigkeit_von=date(2026, 2, 1)
         )
         
-        # Get dates after - should include new vorgabe's date
+        # Get dates after - new dates are 2025-01-01, 2026-01-02, 2026-02-01
+        # Last date (2026-02-01) is excluded, so we get [2025-01-01, 2026-01-01]
         dates_after = self.dokument.dates
-        self.assertEqual(len(dates_after), 3)
-        self.assertIn(date(2026, 2, 1), dates_after)
+        self.assertEqual(len(dates_after), 2)
+        self.assertEqual(dates_after[0], date(2025, 1, 1))
+        self.assertEqual(dates_after[1], date(2026, 1, 1))
 
 
 class AddVorgabeCommentViewTest(TestCase):
