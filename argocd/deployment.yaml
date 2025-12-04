@@ -25,7 +25,7 @@ spec:
               mountPath: /data
       containers:
         - name: web
-          image: git.baumann.gr/adebaumann/vui:0.964
+          image: git.baumann.gr/adebaumann/vui:0.965
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

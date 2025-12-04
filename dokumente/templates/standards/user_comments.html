@@ -32,7 +32,7 @@
               <h4 style="margin: 0 0 0.5rem 0;">
                 <a href="{% url 'standard_detail' nummer=comment.vorgabe.dokument.nummer %}#{{ comment.vorgabe.Vorgabennummer }}">
                   {{ comment.vorgabe.Vorgabennummer }}
-                </a>
+                </a> {{ comment.vorgabe.titel }}
               </h4>
               <p style="margin: 0 0 0.75rem 0; color: #666; font-size: 0.9rem;">
                 <strong>Erstellt:</strong> {{ comment.created_at|date:"d.m.Y H:i" }}
