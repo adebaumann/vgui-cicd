@@ -54,6 +54,32 @@ class Dokument(models.Model):
     def __str__(self):
         return f"{self.nummer} – {self.name}"
 
+    @property
+    def dates(self):
+        """
+        Returns an array of unique, chronologically sorted dates representing
+        state-change dates from all Vorgaben in this document.
+        
+        These are dates where Vorgaben become active (gueltigkeit_von) or change state
+        (the day after gueltigkeit_bis). Only includes the day after gueltigkeit_bis 
+        for Vorgaben that have a defined end date (not infinite validity).
+        """
+        dates_set = set()
+        
+        # Get all vorgaben for this document
+        for vorgabe in self.vorgaben.all():
+            # Add gueltigkeit_von (when vorgabe becomes active)
+            if vorgabe.gueltigkeit_von:
+                dates_set.add(vorgabe.gueltigkeit_von)
+            
+            # Add the day after gueltigkeit_bis (when vorgabe expires/changes state)
+            # Only if gueltigkeit_bis is defined (not None)
+            if vorgabe.gueltigkeit_bis:
+                dates_set.add(vorgabe.gueltigkeit_bis + datetime.timedelta(days=1))
+        
+        # Return sorted unique dates from oldest to newest
+        return sorted(list(dates_set))
+
     class Meta:
         verbose_name_plural="Dokumente"
         verbose_name="Dokument"

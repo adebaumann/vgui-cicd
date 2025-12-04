@@ -1792,6 +1792,280 @@ class GetVorgabeCommentsViewTest(TestCase):
         self.assertEqual(response['X-Content-Type-Options'], 'nosniff')
 
 
+class DokumentDatesPropertyTest(TestCase):
+    """Test cases for Dokument.dates property"""
+    
+    def setUp(self):
+        """Set up test data for dates property tests"""
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
+        )
+        self.dokument = Dokument.objects.create(
+            nummer="R0066",
+            dokumententyp=self.dokumententyp,
+            name="IT Security Standard",
+            aktiv=True
+        )
+        self.thema = Thema.objects.create(name="Organisation")
+    
+    def test_dates_property_no_vorgaben(self):
+        """Test dates property returns empty list when dokument has no vorgaben"""
+        dates = self.dokument.dates
+        self.assertEqual(dates, [])
+    
+    def test_dates_property_single_vorgabe_with_only_gueltigkeit_von(self):
+        """Test dates property with single vorgabe with only gueltigkeit_von"""
+        vorgabe = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Test Vorgabe",
+            gueltigkeit_von=date(2025, 1, 1)
+        )
+        
+        dates = self.dokument.dates
+        self.assertEqual(len(dates), 1)
+        self.assertEqual(dates[0], date(2025, 1, 1))
+    
+    def test_dates_property_single_vorgabe_with_both_dates(self):
+        """Test dates property with single vorgabe with both gueltigkeit_von and gueltigkeit_bis"""
+        vorgabe = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Test Vorgabe",
+            gueltigkeit_von=date(2025, 1, 1),
+            gueltigkeit_bis=date(2026, 1, 1)
+        )
+        
+        dates = self.dokument.dates
+        self.assertEqual(len(dates), 2)
+        self.assertEqual(dates[0], date(2025, 1, 1))
+        # gueltigkeit_bis is 2026-01-01, so state change happens on 2026-01-02
+        self.assertEqual(dates[1], date(2026, 1, 2))
+    
+    def test_dates_property_multiple_vorgaben_different_dates(self):
+        """Test dates property with multiple vorgaben with different dates"""
+        vorgabe1 = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe 1",
+            gueltigkeit_von=date(2025, 1, 1),
+            gueltigkeit_bis=date(2025, 6, 30)
+        )
+        
+        vorgabe2 = Vorgabe.objects.create(
+            order=2,
+            nummer=2,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe 2",
+            gueltigkeit_von=date(2025, 7, 1),
+            gueltigkeit_bis=date(2026, 1, 1)
+        )
+        
+        dates = self.dokument.dates
+        # 3 unique dates: 2025-01-01, 2025-07-01 (deduplicated: end of v1+1 == start of v2), 2026-01-02
+        self.assertEqual(len(dates), 3)
+        self.assertIn(date(2025, 1, 1), dates)  # Start of vorgabe1
+        self.assertIn(date(2025, 7, 1), dates)  # End of vorgabe1 + 1 day = Start of vorgabe2 (deduplicated)
+        self.assertIn(date(2026, 1, 2), dates)  # End of vorgabe2 + 1 day
+    
+    def test_dates_property_ensures_uniqueness(self):
+        """Test dates property returns unique dates only"""
+        # Create two vorgaben with overlapping dates
+        vorgabe1 = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe A",
+            gueltigkeit_von=date(2025, 1, 1),
+            gueltigkeit_bis=date(2026, 1, 1)
+        )
+        
+        vorgabe2 = Vorgabe.objects.create(
+            order=2,
+            nummer=2,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe B",
+            gueltigkeit_von=date(2025, 1, 1),  # Same start date
+            gueltigkeit_bis=date(2026, 1, 1)   # Same end date
+        )
+        
+        dates = self.dokument.dates
+        # Should have only 2 unique dates, not 4
+        self.assertEqual(len(dates), 2)
+        self.assertEqual(dates[0], date(2025, 1, 1))
+        self.assertEqual(dates[1], date(2026, 1, 2))  # gueltigkeit_bis + 1 day
+    
+    def test_dates_property_sorted_chronologically(self):
+        """Test dates property returns dates sorted from oldest to newest"""
+        # Create vorgaben in non-chronological order
+        vorgabe1 = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe 1",
+            gueltigkeit_von=date(2026, 1, 1)
+        )
+        
+        vorgabe2 = Vorgabe.objects.create(
+            order=2,
+            nummer=2,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe 2",
+            gueltigkeit_von=date(2024, 1, 1)
+        )
+        
+        vorgabe3 = Vorgabe.objects.create(
+            order=3,
+            nummer=3,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe 3",
+            gueltigkeit_von=date(2025, 1, 1)
+        )
+        
+        dates = self.dokument.dates
+        # Should be sorted from oldest to newest
+        self.assertEqual(dates[0], date(2024, 1, 1))
+        self.assertEqual(dates[1], date(2025, 1, 1))
+        self.assertEqual(dates[2], date(2026, 1, 1))
+    
+    def test_dates_property_ignores_none_dates(self):
+        """Test dates property ignores None date values"""
+        vorgabe1 = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe 1",
+            gueltigkeit_von=date(2025, 1, 1)
+            # No gueltigkeit_bis (None)
+        )
+        
+        vorgabe2 = Vorgabe.objects.create(
+            order=2,
+            nummer=2,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe 2",
+            gueltigkeit_von=date(2026, 1, 1),
+            gueltigkeit_bis=None  # Explicitly None
+        )
+        
+        dates = self.dokument.dates
+        # Should only include gueltigkeit_von dates (gueltigkeit_bis is None for vorgabe2)
+        self.assertEqual(len(dates), 2)
+        self.assertIn(date(2025, 1, 1), dates)
+        self.assertIn(date(2026, 1, 1), dates)
+    
+    def test_dates_property_complex_scenario(self):
+        """Test dates property with complex real-world scenario
+        
+        Vorgabe A: 2025-01-01 to 2025-12-31
+        Vorgabe B: 2025-06-01 to 2026-01-01  (overlaps with A)
+        Vorgabe C: 2026-02-01 to None        (no end date)
+        
+        Expected dates: [2025-01-01, 2025-06-01, 2025-12-31, 2026-01-01, 2026-02-01]
+        The middle date (2026-01-01) should NOT be excluded even though B overlaps with A
+        """
+        vorgabe_a = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe A",
+            gueltigkeit_von=date(2025, 1, 1),
+            gueltigkeit_bis=date(2025, 12, 31)
+        )
+        
+        vorgabe_b = Vorgabe.objects.create(
+            order=2,
+            nummer=2,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe B",
+            gueltigkeit_von=date(2025, 6, 1),
+            gueltigkeit_bis=date(2026, 1, 1)
+        )
+        
+        vorgabe_c = Vorgabe.objects.create(
+            order=3,
+            nummer=3,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Vorgabe C",
+            gueltigkeit_von=date(2026, 2, 1)
+            # No gueltigkeit_bis
+        )
+        
+        dates = self.dokument.dates
+        expected = [
+            date(2025, 1, 1),   # Start of A
+            date(2025, 6, 1),   # Start of B
+            date(2026, 1, 1),   # End of A + 1 day
+            date(2026, 1, 2),   # End of B + 1 day
+            date(2026, 2, 1)    # Start of C
+        ]
+        
+        self.assertEqual(dates, expected)
+    
+    def test_dates_property_returns_list(self):
+        """Test dates property returns a list (not a set or tuple)"""
+        vorgabe = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Test Vorgabe",
+            gueltigkeit_von=date(2025, 1, 1)
+        )
+        
+        dates = self.dokument.dates
+        self.assertIsInstance(dates, list)
+    
+    def test_dates_property_does_not_persist_to_database(self):
+        """Test dates property is calculated on-the-fly, not stored"""
+        vorgabe = Vorgabe.objects.create(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Test Vorgabe",
+            gueltigkeit_von=date(2025, 1, 1),
+            gueltigkeit_bis=date(2025, 12, 31)
+        )
+        
+        # Get dates before adding new vorgabe
+        dates_before = self.dokument.dates
+        self.assertEqual(len(dates_before), 2)  # gueltigkeit_von and gueltigkeit_bis+1
+        
+        # Add new vorgabe (should add a unique date)
+        vorgabe2 = Vorgabe.objects.create(
+            order=2,
+            nummer=2,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Test Vorgabe 2",
+            gueltigkeit_von=date(2026, 2, 1)  # Different from existing dates
+        )
+        
+        # Get dates after - should include new vorgabe's date
+        dates_after = self.dokument.dates
+        self.assertEqual(len(dates_after), 3)
+        self.assertIn(date(2026, 2, 1), dates_after)
+
+
 class AddVorgabeCommentViewTest(TestCase):
     """Test cases for add_vorgabe_comment view"""
     
@@ -2561,4 +2835,5 @@ class AllCommentsViewTest(TestCase):
         self.assertContains(response, 'User2 comment on vorgabe1')
         # Both users' comments on the same vorgabe should be visible
         self.assertEqual(response.context['total_comments'], 4)
+
 
