@@ -16,7 +16,11 @@
 
   {% if standard.history == True %}
   <div class="alert alert-warning" role="alert">
+    {% if standard.is_future %}
+    <strong>Zukünftige Version vom {{ standard.check_date }}</strong>
+    {% else %}
     <strong>Historische Version vom {{ standard.check_date }}</strong>
+    {% endif %}
   </div>
   {% endif %}
 

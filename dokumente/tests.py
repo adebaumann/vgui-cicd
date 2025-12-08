@@ -493,6 +493,38 @@ class ViewsTestCase(TestCase):
         url = reverse('standard_history', kwargs={'nummer': 'R01234'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+    
+    def test_standard_history_past_date_shows_historische(self):
+        """Test that past dates show 'Historische Version'"""
+        past_date = (date.today() - timedelta(days=30)).strftime('%Y-%m-%d')
+        url = f'/dokumente/R01234/history/{past_date}/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Historische Version vom')
+        self.assertNotContains(response, 'Zukünftige Version vom')
+        # Verify is_future flag is False
+        self.assertFalse(response.context['standard'].is_future)
+    
+    def test_standard_history_future_date_shows_zukuenftige(self):
+        """Test that future dates show 'Zukünftige Version'"""
+        future_date = (date.today() + timedelta(days=30)).strftime('%Y-%m-%d')
+        url = f'/dokumente/R01234/history/{future_date}/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Zukünftige Version vom')
+        self.assertNotContains(response, 'Historische Version vom')
+        # Verify is_future flag is True
+        self.assertTrue(response.context['standard'].is_future)
+    
+    def test_standard_detail_current_has_no_version_label(self):
+        """Test that current view (no history) has no version label"""
+        url = reverse('standard_detail', kwargs={'nummer': 'R01234'})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'Historische Version vom')
+        self.assertNotContains(response, 'Zukünftige Version vom')
+        # Verify history flag is False
+        self.assertFalse(response.context['standard'].history)
 
 
 class URLPatternsTest(TestCase):

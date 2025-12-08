@@ -29,9 +29,11 @@ def standard_detail(request, nummer,check_date=""):
     if check_date:
         check_date = calendar.parseDT(check_date)[0].date()
         standard.history = True
+        standard.is_future = check_date > date.today()
     else:
         check_date = date.today()
         standard.history = False
+        standard.is_future = False
     standard.check_date=check_date
     vorgaben = list(standard.vorgaben.order_by("thema","nummer").select_related("thema","dokument"))  # convert queryset to list so we can attach attributes
 
