@@ -60,7 +60,7 @@ jobs:
           chmod +x /usr/local/bin/yq
           yq --version
 
-      - name: Read ${{ matrix.description }} image from deployment (old vs new)
+      - name: Read ${{ matrix.description }} image from deployment 
         id: img
         shell: bash
         run: |
