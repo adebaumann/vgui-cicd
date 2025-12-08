@@ -540,5 +540,5 @@ digraph {
 Bei Fragen oder Problemen mit Diagrammen:
 1. Code auf https://kroki.io/ testen
 2. Syntax-Dokumentation des jeweiligen Diagrammtyps konsultieren
-3. Diagramm-Cache leeren: `python manage.py clear_diagram_cache`
+3. (Nur mit Shell-Zugriff auf Kubernetes-Pod möglich): Diagramm-Cache leeren: `python manage.py clear_diagram_cache`
 4. Bei technischen Problemen: Information Security Management BIT kontaktieren
