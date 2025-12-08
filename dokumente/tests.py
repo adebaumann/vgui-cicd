@@ -761,6 +761,134 @@ class VorgabeSanityCheckTest(TestCase):
         self.assertIn("intersecting validity periods", report)
 
 
+class VorgabeThemaValidationTest(TestCase):
+    """Test cases for Vorgabe Thema validation"""
+    
+    def setUp(self):
+        """Set up test data for Thema validation tests"""
+        self.dokumententyp = Dokumententyp.objects.create(
+            name="Standard IT-Sicherheit",
+            verantwortliche_ve="SR-SUR-SEC"
+        )
+        self.dokument = Dokument.objects.create(
+            nummer="R0066",
+            dokumententyp=self.dokumententyp,
+            name="IT Security Standard",
+            aktiv=True
+        )
+        self.thema = Thema.objects.create(name="Organisation")
+    
+    def test_vorgabe_with_thema_passes_validation(self):
+        """Test that Vorgabe with a valid Thema passes clean() validation"""
+        vorgabe = Vorgabe(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=self.thema,
+            titel="Test Vorgabe",
+            gueltigkeit_von=date.today()
+        )
+        # Should not raise any exception
+        try:
+            vorgabe.clean()
+        except Exception as e:
+            self.fail(f"clean() raised {e} unexpectedly!")
+    
+    def test_vorgabe_without_thema_fails_validation(self):
+        """Test that Vorgabe without Thema fails clean() validation"""
+        from django.core.exceptions import ValidationError
+        
+        vorgabe = Vorgabe(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=None,  # No Thema
+            titel="Test Vorgabe",
+            gueltigkeit_von=date.today()
+        )
+        
+        with self.assertRaises(ValidationError) as context:
+            vorgabe.clean()
+        
+        # Check that the error message is about thema
+        self.assertIn('thema', context.exception.message_dict)
+        self.assertIn('Thema ist ein Pflichtfeld', str(context.exception))
+    
+    def test_vorgabe_form_with_thema_is_valid(self):
+        """Test that VorgabeForm with Thema is valid"""
+        from dokumente.admin import VorgabeForm
+        
+        form_data = {
+            'order': 1,
+            'nummer': 1,
+            'dokument': self.dokument.pk,
+            'thema': self.thema.pk,
+            'titel': 'Test Vorgabe',
+            'gueltigkeit_von': date.today(),
+        }
+        form = VorgabeForm(data=form_data)
+        self.assertTrue(form.is_valid(), f"Form errors: {form.errors}")
+    
+    def test_vorgabe_form_without_thema_is_invalid(self):
+        """Test that VorgabeForm without Thema is invalid"""
+        from dokumente.admin import VorgabeForm
+        
+        form_data = {
+            'order': 1,
+            'nummer': 1,
+            'dokument': self.dokument.pk,
+            'thema': '',  # Empty/missing Thema
+            'titel': 'Test Vorgabe',
+            'gueltigkeit_von': date.today(),
+        }
+        form = VorgabeForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('thema', form.errors)
+    
+    def test_vorgabe_form_thema_error_message_is_german(self):
+        """Test that VorgabeForm shows German error message for missing Thema"""
+        from dokumente.admin import VorgabeForm
+        
+        form_data = {
+            'order': 1,
+            'nummer': 1,
+            'dokument': self.dokument.pk,
+            'thema': '',  # Empty/missing Thema
+            'titel': 'Test Vorgabe',
+            'gueltigkeit_von': date.today(),
+        }
+        form = VorgabeForm(data=form_data)
+        form.is_valid()
+        
+        # Check that the error message is in German
+        thema_errors = form.errors.get('thema', [])
+        error_messages = ' '.join(thema_errors)
+        self.assertTrue(
+            'Pflichtfeld' in error_messages or 'pflichtfeld' in error_messages.lower(),
+            f"Expected German error message about Pflichtfeld, got: {thema_errors}"
+        )
+    
+    def test_vorgabe_model_clean_error_message_is_german(self):
+        """Test that Vorgabe.clean() shows German error message for missing Thema"""
+        from django.core.exceptions import ValidationError
+        
+        vorgabe = Vorgabe(
+            order=1,
+            nummer=1,
+            dokument=self.dokument,
+            thema=None,
+            titel="Test Vorgabe",
+            gueltigkeit_von=date.today()
+        )
+        
+        with self.assertRaises(ValidationError) as context:
+            vorgabe.clean()
+        
+        # Check error message is in German
+        error_str = str(context.exception)
+        self.assertIn('Thema ist ein Pflichtfeld', error_str)
+
+
 class SanityCheckManagementCommandTest(TestCase):
     """Test cases for sanity_check_vorgaben management command"""
     

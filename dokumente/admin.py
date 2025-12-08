@@ -94,9 +94,17 @@ class EinleitungInline(NestedStackedInline):
 
 class VorgabeForm(forms.ModelForm):
     referenzen = TreeNodeMultipleChoiceField(queryset=Referenz.objects.all(), required=False)
+    
     class Meta:
         model = Vorgabe
         fields = '__all__'
+    
+    def clean_thema(self):
+        """Validate that thema is provided."""
+        thema = self.cleaned_data.get('thema')
+        if not thema:
+            raise forms.ValidationError('Thema ist ein Pflichtfeld. Bitte wählen Sie ein Thema aus.')
+        return thema
 
 class VorgabeInline(SortableInlineAdminMixin, NestedStackedInline):
     model = Vorgabe

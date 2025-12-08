@@ -169,6 +169,12 @@ class Vorgabe(models.Model):
         """
         from django.core.exceptions import ValidationError
 
+        # Check that thema is provided
+        if not self.thema_id:
+            raise ValidationError({
+                'thema': 'Thema ist ein Pflichtfeld. Bitte wählen Sie ein Thema aus.'
+            })
+
         # Check for conflicts with existing Vorgaben
         conflicts = self.find_conflicts()
         if conflicts:
