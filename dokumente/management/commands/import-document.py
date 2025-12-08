@@ -71,6 +71,7 @@ class Command(BaseCommand):
                 "name": name,
                 "gueltigkeit_von": options["gueltigkeit_von"],
                 "gueltigkeit_bis": options["gueltigkeit_bis"],
+                "aktiv":False,
             },
         )
         if created:
@@ -319,6 +320,7 @@ class Command(BaseCommand):
                     thema=thema,
                     titel=v["titel"],
                     gueltigkeit_von=timezone.now().date(),
+                    order=0,
                 )
 
                 # Stichworte
